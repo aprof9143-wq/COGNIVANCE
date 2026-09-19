@@ -51,12 +51,12 @@ export function SiteNav() {
           : "border-b border-transparent"
       }`}
     >
-      <nav className="mx-auto flex max-w-[1500px] items-center gap-4 px-[clamp(1rem,3vw,2.5rem)] py-3">
+      <nav className="mx-auto grid max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-[clamp(1rem,3vw,2.5rem)] py-3">
         {/* ---- mark ---- */}
         <Link
           to="/"
           aria-label="Cognivance Labs — home"
-          className="flex min-w-0 shrink-0 items-center"
+          className="col-start-1 flex min-w-0 shrink-0 items-center justify-self-start"
         >
           <img
             src="/logo-mark.png"
@@ -68,7 +68,7 @@ export function SiteNav() {
         </Link>
 
         {/* ---- centre capsule ---- */}
-        <div className="mx-auto hidden lg:block">
+        <div className="col-start-2 hidden lg:block">
           <ul className="flex items-center gap-1 rounded-full border border-foreground/12 bg-foreground/[0.04] p-1.5 backdrop-blur-xl">
             {links.map((l) => {
               const active = isActive(l);
@@ -102,54 +102,56 @@ export function SiteNav() {
         </div>
 
         {/* ---- right cluster ---- */}
-        <div className="ml-auto hidden shrink-0 items-center gap-4 lg:flex">
-          <Link
-            to="/auth"
-            aria-label="Account"
-            title="Account"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-ash transition-colors hover:bg-foreground/8 hover:text-foreground"
-          >
-            <UserRound className="h-[1.05rem] w-[1.05rem]" strokeWidth={1.6} />
-          </Link>
-          {signedIn ? (
-            <button
-              type="button"
-              onClick={signOut}
-              className="flex items-center gap-2 text-[0.84rem] font-medium text-ash transition-colors hover:text-foreground"
-            >
-              <LogOut className="h-[1.05rem] w-[1.05rem]" strokeWidth={1.6} />
-              Logout
-            </button>
-          ) : (
+        <div className="col-start-3 flex items-center justify-self-end">
+          <div className="hidden shrink-0 items-center gap-4 lg:flex">
             <Link
               to="/auth"
-              className="flex items-center gap-2 text-[0.84rem] font-medium text-ash transition-colors hover:text-foreground"
+              aria-label="Account"
+              title="Account"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-ash transition-colors hover:bg-foreground/8 hover:text-foreground"
             >
-              <LogOut className="h-[1.05rem] w-[1.05rem] rotate-180" strokeWidth={1.6} />
-              Sign in
+              <UserRound className="h-[1.05rem] w-[1.05rem]" strokeWidth={1.6} />
             </Link>
-          )}
-        </div>
+            {signedIn ? (
+              <button
+                type="button"
+                onClick={signOut}
+                className="flex items-center gap-2 text-[0.84rem] font-medium text-ash transition-colors hover:text-foreground"
+              >
+                <LogOut className="h-[1.05rem] w-[1.05rem]" strokeWidth={1.6} />
+                Logout
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="flex items-center gap-2 text-[0.84rem] font-medium text-ash transition-colors hover:text-foreground"
+              >
+                <LogOut className="h-[1.05rem] w-[1.05rem] rotate-180" strokeWidth={1.6} />
+                Sign in
+              </Link>
+            )}
+          </div>
 
-        {/* ---- mobile toggle ---- */}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-label="Toggle menu"
-          className="ml-auto flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[5px] rounded-full border border-foreground/15 lg:hidden"
-        >
-          <span
-            className={`h-px w-4 bg-foreground transition-transform duration-300 ${
-              open ? "translate-y-[3px] rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`h-px w-4 bg-foreground transition-transform duration-300 ${
-              open ? "-translate-y-[3px] -rotate-45" : ""
-            }`}
-          />
-        </button>
+          {/* ---- mobile toggle ---- */}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-label="Toggle menu"
+            className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[5px] rounded-full border border-foreground/15 lg:hidden"
+          >
+            <span
+              className={`h-px w-4 bg-foreground transition-transform duration-300 ${
+                open ? "translate-y-[3px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`h-px w-4 bg-foreground transition-transform duration-300 ${
+                open ? "-translate-y-[3px] -rotate-45" : ""
+              }`}
+            />
+          </button>
+        </div>
       </nav>
 
       {/* ---- mobile sheet ---- */}
