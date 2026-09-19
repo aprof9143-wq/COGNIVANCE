@@ -3,8 +3,11 @@
 @import "tw-animate-css";
 
 /*
- * Cognivance Labs — monochrome surreal design system.
- * Pure black ground, white ink, greys only. No hue anywhere.
+ * Cognivance Labs — deep-field design system.
+ * Palette is sampled directly from the brand mark and main-hero.png:
+ * near-black blue-biased grounds, deep navy core (#001050), electric blue
+ * (#002080–#003090), cyan filament highlights and violet nebula accents.
+ * Dark only — there is no light mode.
  */
 
 @theme inline {
@@ -38,63 +41,80 @@
 
 :root {
   --radius: 0.25rem;
-  /* light "laboratory paper" ground, ink type, graphite greys — no hue */
-  --background: oklch(0.975 0.002 90);
-  --foreground: oklch(0.165 0 0);
-  --paper: oklch(0.975 0.002 90);
-  --veil: oklch(0.945 0.003 90);
-  --card: oklch(0.99 0.002 90);
-  --card-foreground: oklch(0.165 0 0);
-  --primary: oklch(0.165 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.93 0.003 90);
-  --secondary-foreground: oklch(0.165 0 0);
-  --muted: oklch(0.93 0.003 90);
-  --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.9 0.003 90);
-  --accent-foreground: oklch(0.165 0 0);
-  --synapse: oklch(0.165 0 0);
-  --synapse-dim: oklch(0.42 0 0);
-  --ash: oklch(0.48 0 0);
-  --border: oklch(0.86 0.003 90);
-  --input: oklch(0.86 0.003 90);
-  --ring: oklch(0.35 0 0);
 
-  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.05), 0 18px 50px -24px oklch(0 0 0 / 0.14);
-  --shadow-lift: 0 2px 8px oklch(0 0 0 / 0.07), 0 44px 90px -36px oklch(0 0 0 / 0.22);
+  /* ---- brand primitives, sampled from the mark + hero ---- */
+  --void: #00030b;        /* page ground */
+  --abyss: #01071a;       /* alternating band */
+  --slab: #04102b;        /* card / panel */
+  --deep: #001050;        /* logo core navy */
+  --electric: #1e63c4;    /* primary blue */
+  --beam: #3d8bf5;        /* bright blue */
+  --lift: #63b0ff;        /* lifted blue */
+  --ion: #7fd8ff;         /* cyan filament — live/active only */
+  --nebula: #8a6bff;      /* violet — glow only, never a data series */
+
+  /* ---- semantic tokens ---- */
+  --background: var(--void);
+  --foreground: #e6efff;
+  --paper: var(--void);
+  --veil: var(--abyss);
+  --card: var(--slab);
+  --card-foreground: #e6efff;
+  --primary: var(--beam);
+  --primary-foreground: #00030b;
+  --secondary: #0a1b3d;
+  --secondary-foreground: #e6efff;
+  --muted: #0a1b3d;
+  --muted-foreground: #8095bf;
+  --accent: #0d2350;
+  --accent-foreground: #e6efff;
+  --synapse: var(--ion);
+  --synapse-dim: var(--electric);
+  --ash: #8095bf;
+  --border: #16305e;
+  --input: #16305e;
+  --ring: var(--beam);
+
+  /* ---- status: reserved, never reused as a data series ---- */
+  --ok: #3fa87a;
+  --warn: #d9a441;
+  --critical: #e5484d;
+
+  --shadow-soft: 0 1px 2px #00000080, 0 18px 50px -24px #000814cc;
+  --shadow-lift: 0 2px 8px #00000099, 0 44px 90px -36px #000814e6;
   --haze-warm: radial-gradient(
     120% 90% at 12% 8%,
-    oklch(0.72 0.01 90 / 0.28) 0%,
-    oklch(0.975 0 0 / 0) 62%
+    color-mix(in oklab, var(--deep) 60%, transparent) 0%,
+    transparent 60%
   );
   --haze-cool: radial-gradient(
     100% 80% at 92% 100%,
-    oklch(0.6 0 0 / 0.16) 0%,
-    oklch(0.975 0 0 / 0) 62%
+    color-mix(in oklab, var(--nebula) 22%, transparent) 0%,
+    transparent 58%
   );
 }
 
-/* Dark instrument scope: any panel that behaves like a screen.
-   Redefines the local token set so semantic utilities invert automatically. */
+/* Instrument scope: any panel that behaves like a screen. One step up from the
+   page ground so a panel reads as a separate surface without a lighter theme. */
 .scope {
-  --background: oklch(0.13 0 0);
-  --foreground: oklch(0.98 0 0);
-  --paper: oklch(0.13 0 0);
-  --veil: oklch(0.17 0 0);
-  --card: oklch(0.19 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.13 0 0);
-  --secondary: oklch(0.2 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.2 0 0);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.24 0 0);
-  --accent-foreground: oklch(0.98 0 0);
-  --ash: oklch(0.7 0 0);
-  --border: oklch(0.28 0 0);
-  --input: oklch(0.28 0 0);
-  --ring: oklch(0.8 0 0);
+  --background: var(--slab);
+  --foreground: #eaf2ff;
+  --paper: var(--slab);
+  --veil: #061530;
+  --card: #071a38;
+  --card-foreground: #eaf2ff;
+  --primary: var(--lift);
+  --primary-foreground: #00030b;
+  --secondary: #0b2146;
+  --secondary-foreground: #eaf2ff;
+  --muted: #0b2146;
+  --muted-foreground: #90a6ce;
+  --accent: #0e2a57;
+  --accent-foreground: #eaf2ff;
+  --ash: #90a6ce;
+  --border: #1d3d70;
+  --input: #1d3d70;
+  --ring: var(--lift);
   color: var(--foreground);
 }
 
@@ -122,7 +142,7 @@
   }
 
   ::selection {
-    background: oklch(0.165 0 0 / 0.14);
+    background: color-mix(in oklab, var(--beam) 32%, transparent);
   }
 
 }
@@ -194,10 +214,10 @@
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    background-image: radial-gradient(var(--foreground) 0.5px, transparent 0.5px);
+    background-image: radial-gradient(var(--lift) 0.5px, transparent 0.5px);
     background-size: 3px 3px;
-    mix-blend-mode: multiply;
-    opacity: 0.06;
+    mix-blend-mode: screen;
+    opacity: 0.07;
   }
 }
 
@@ -217,7 +237,7 @@
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(120% 100% at 50% 0%, oklch(0.24 0 0) 0%, oklch(0.12 0 0) 70%);
+    radial-gradient(120% 100% at 50% 0%, #0a1f4a 0%, #01081c 70%);
   &::after {
     content: "";
     position: absolute;
@@ -225,8 +245,8 @@
     pointer-events: none;
     background-image: repeating-linear-gradient(
       to bottom,
-      oklch(1 0 0 / 0.045) 0px,
-      oklch(1 0 0 / 0.045) 1px,
+      color-mix(in oklab, var(--lift) 7%, transparent) 0px,
+      color-mix(in oklab, var(--lift) 7%, transparent) 1px,
       transparent 1px,
       transparent 3px
     );
@@ -235,8 +255,8 @@
 
 @utility grid-fine {
   background-image:
-    linear-gradient(to right, oklch(1 0 0 / 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(1 0 0 / 0.06) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in oklab, var(--lift) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--lift) 10%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 

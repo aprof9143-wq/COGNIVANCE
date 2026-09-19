@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { AboutSection } from "@/components/AboutSection";
 import { Waitlist } from "@/components/Waitlist";
 import { NimbleSection } from "@/components/NimbleSection";
+import { NoveltySection } from "@/components/NoveltySection";
 import { EEGTrace, LiveBadge, Metric } from "@/components/research-viz";
 import divisionNano from "@/assets/division-nano.jpg";
 import divisionComp from "@/assets/division-comp.jpg";
@@ -76,23 +77,6 @@ const frontiers = [
   },
 ];
 
-const sites = [
-  { name: "Germany", place: "Munich", x: 55, y: 46, focus: "Nanorobotic fabrication" },
-  { name: "Switzerland", place: "Lausanne", x: 49, y: 58, focus: "Computational modelling" },
-  { name: "Norway", place: "Trondheim", x: 52, y: 18, focus: "Circuit reconstruction" },
-  { name: "Sweden", place: "Stockholm", x: 62, y: 22, focus: "Longitudinal cohorts" },
-  { name: "United Kingdom", place: "Cambridge", x: 34, y: 40, focus: "Clinical translation" },
-];
-
-const funding = [
-  "Horizon Europe",
-  "ERC Synergy",
-  "SNF",
-  "Research Council of Norway",
-  "Vetenskapsrådet",
-  "UKRI",
-];
-
 const analytics = [
   { k: "18.4 nm", v: "Median traversal resolution", d: "Sub-cellular, in living tissue" },
   { k: "1.2 M", v: "Synaptic events / session", d: "Captured without inference layers" },
@@ -135,8 +119,8 @@ function Index() {
       {/* ---------- Hero ---------- */}
       <section className="relative flex min-h-svh items-end overflow-hidden">
         <img
-          src="/hero-image.png"
-          alt="Translucent brain suspended in a luminous landscape, threaded with sub-cellular instruments"
+          src="/main-hero.png"
+          alt="A human head dissolving into a spiral of luminous neural filaments against deep space"
           width={1664}
           height={936}
           className="drift-slow absolute inset-0 h-full w-full object-cover"
@@ -147,7 +131,10 @@ function Index() {
 
         <div className="relative w-full px-[clamp(1.25rem,4vw,3.5rem)] pt-36 pb-[clamp(2.5rem,6vw,5rem)]">
           <div className="mx-auto max-w-[1500px]">
-            <p className="t-marker rise text-ash" style={{ animationDelay: "80ms" }}>
+            <p
+              className="t-marker rise text-[var(--ion)]"
+              style={{ animationDelay: "80ms", textShadow: "0 1px 12px rgba(0,4,20,0.9)" }}
+            >
               Institute of Neuronanotechnology
             </p>
             <h1 className="t-hero rise mt-7 max-w-[19ch] text-foreground">
@@ -158,9 +145,9 @@ function Index() {
                 className="t-lead rise max-w-[48ch] text-foreground/80"
                 style={{ animationDelay: "160ms" }}
               >
-                We engineer the instruments neuroscience never had — nanorobotic systems that
-                move through living neural tissue, and computational models that turn what they
-                find into structure.
+                We engineer the instruments neuroscience never had — nanorobotic systems that move
+                through living neural tissue, and computational models that turn what they find into
+                structure.
               </p>
               <div
                 className="rise flex flex-wrap items-center gap-4 lg:justify-end"
@@ -185,100 +172,14 @@ function Index() {
         </div>
       </section>
 
-      {/* ---------- Research map (directly under hero) ---------- */}
-      <section id="map" className="grain border-t border-foreground/10 bg-veil px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(3.5rem,8vw,7rem)]">
-        <div className="mx-auto max-w-[1500px]">
-          <Reveal>
-            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-              <div className="min-w-0">
-                <p className="t-marker text-ash">The map</p>
-                <h2 className="t-section mt-4 max-w-[22ch] text-foreground">
-                  Five sites. One research programme.
-                </h2>
-              </div>
-              <p className="max-w-[38ch] text-[0.95rem] leading-relaxed text-ash">
-                Instruments, tissue and computation distributed across European partner
-                institutions — running against one shared dataset.
-              </p>
-            </div>
-          </Reveal>
-
-          <Reveal delay={120}>
-            <div className="mt-[clamp(2rem,4vw,3.5rem)] grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-              <div className="scope instrument relative overflow-hidden rounded-2xl border border-foreground/12">
-                <div
-                  className="absolute inset-0 opacity-[0.18]"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(oklch(1 0 0 / 0.8) 0.7px, transparent 0.7px)",
-                    backgroundSize: "14px 14px",
-                  }}
-                />
-                <div className="relative aspect-[16/10] w-full">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
-                    <g stroke="rgba(255,255,255,0.22)" strokeWidth="0.2" fill="none">
-                      {sites.map((a, i) =>
-                        sites.slice(i + 1).map((b) => (
-                          <line key={`${a.name}-${b.name}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
-                        )),
-                      )}
-                    </g>
-                  </svg>
-                  {sites.map((s, i) => (
-                    <div
-                      key={s.name}
-                      className="group absolute -translate-x-1/2 -translate-y-1/2"
-                      style={{ left: `${s.x}%`, top: `${s.y}%` }}
-                    >
-                      <span
-                        className="live-dot absolute -inset-2 rounded-full border border-foreground/40"
-                        style={{ animationDelay: `${i * 240}ms` }}
-                      />
-                      <span className="relative block h-2 w-2 rounded-full bg-foreground" />
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 whitespace-nowrap text-[0.72rem] font-medium text-foreground/80">
-                        {s.place}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="min-w-0">
-                <ul>
-                  {sites.map((s) => (
-                    <li
-                      key={s.name}
-                      className="group flex items-baseline justify-between gap-4 border-b border-foreground/10 py-4"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-[1.02rem] font-medium text-foreground">
-                          {s.name}
-                        </p>
-                        <p className="mt-1 text-[0.8rem] text-ash">{s.focus}</p>
-                      </div>
-                      <span className="t-num shrink-0 text-[0.75rem] text-ash">{s.place}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="t-marker mt-7 text-ash">Funding pathways</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {funding.map((f) => (
-                    <span
-                      key={f}
-                      className="rounded-full border border-foreground/15 px-3.5 py-1.5 text-[0.8rem] text-foreground/75"
-                    >
-                      {f}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      {/* ---------- Novelty (directly under hero) ---------- */}
+      <NoveltySection />
 
       {/* ---------- Problem ---------- */}
-      <section id="problem" className="haze px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(4.5rem,10vw,9rem)]">
+      <section
+        id="problem"
+        className="haze px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(4.5rem,10vw,9rem)]"
+      >
         <div className="mx-auto max-w-[1500px] grid gap-[clamp(2rem,5vw,5rem)] lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1fr)]">
           <Reveal>
             <p className="t-marker text-ash">The problem, stated without flattery</p>
@@ -287,18 +188,18 @@ function Index() {
             <Reveal delay={80}>
               <p className="t-lead text-foreground">
                 Neuroscience has been working with instruments designed for a different era. MRI
-                shows you averages. EEG shows you surface noise. Patch clamps show you one cell at
-                a time. The hardest problems in the field were never unsolvable — they were
+                shows you averages. EEG shows you surface noise. Patch clamps show you one cell at a
+                time. The hardest problems in the field were never unsolvable — they were
                 under-tooled.
               </p>
             </Reveal>
             <Reveal delay={160}>
               <p className="t-body text-ash">
                 We build the tools that were missing. Nanorobotic systems that navigate neural
-                tissue at sub-cellular resolution. Computational frameworks that make sense of
-                what those instruments find. Not two teams working in parallel — one engine,
-                designed from the first principle that you cannot understand what you cannot
-                measure, and you cannot measure what you cannot reach.
+                tissue at sub-cellular resolution. Computational frameworks that make sense of what
+                those instruments find. Not two teams working in parallel — one engine, designed
+                from the first principle that you cannot understand what you cannot measure, and you
+                cannot measure what you cannot reach.
               </p>
             </Reveal>
           </div>
@@ -449,7 +350,7 @@ function Index() {
       <div className="border-t border-foreground/10">
         <NimbleSection />
 
-      <AboutSection />
+        <AboutSection />
       </div>
 
       {/* ---------- Waitlist ---------- */}
@@ -540,7 +441,9 @@ function BentoCard({
             <p className="t-marker text-foreground/50">{f.n}</p>
             <h3
               className={`mt-3 font-semibold tracking-[-0.03em] text-foreground ${
-                big ? "[font-size:clamp(1.6rem,3vw,2.4rem)]" : "[font-size:clamp(1.2rem,2vw,1.55rem)]"
+                big
+                  ? "[font-size:clamp(1.6rem,3vw,2.4rem)]"
+                  : "[font-size:clamp(1.2rem,2vw,1.55rem)]"
               }`}
             >
               {f.title}
@@ -551,7 +454,9 @@ function BentoCard({
           </div>
           <p
             className={`min-w-0 text-[0.88rem] leading-relaxed text-ash ${
-              big ? "" : "max-h-0 overflow-hidden opacity-0 transition-all duration-700 group-hover:max-h-40 group-hover:opacity-100"
+              big
+                ? ""
+                : "max-h-0 overflow-hidden opacity-0 transition-all duration-700 group-hover:max-h-40 group-hover:opacity-100"
             }`}
           >
             {f.body}
