@@ -198,6 +198,34 @@ const regions = [
   { label: "Entorhinal cortex", dx: 9.5, cy: 69, rx: 3.4, ry: 2.4, lead: true },
 ];
 
+/**
+ * The guards that decide whether any published figure survives review. Leakage
+ * through scan-level splitting is the main threat to an accuracy number on a
+ * longitudinal cohort, so these are listed as first-class as the targets.
+ */
+const guards = [
+  {
+    label: "Subject-level splits",
+    detail: "No subject in train and test, across any timepoint. Asserted in code.",
+    phase: "02",
+  },
+  {
+    label: "Locked hold-out",
+    detail: "Opened once per release. All tuning on a separate development set.",
+    phase: "02",
+  },
+  {
+    label: "Bootstrap CI",
+    detail: "Every figure published with a 95% confidence interval.",
+    phase: "02",
+  },
+  {
+    label: "Provenance record",
+    detail: "Git sha, config hash, library versions and RNG seed on every run.",
+    phase: "01",
+  },
+];
+
 /* ------------------------------------------------------- small utilities */
 
 const GATE_COPY: Record<Gate, { text: string; color: string }> = {
@@ -219,11 +247,32 @@ function Panel({
 }) {
   return (
     <section
-      className={`flex min-w-0 flex-col rounded-lg border border-foreground/12 bg-card/60 ${className}`}
+      className={`group/panel relative flex min-w-0 flex-col rounded-lg border border-foreground/12 bg-card/60 transition-colors duration-500 hover:border-foreground/20 ${className}`}
     >
-      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-foreground/10 px-3.5 py-2.5">
+      {/* corner brackets — the instrument framing from the console reference */}
+      <span
+        className="pointer-events-none absolute left-0 top-0 h-2.5 w-2.5 rounded-tl-lg border-l border-t border-[var(--ion)]/45"
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute right-0 top-0 h-2.5 w-2.5 rounded-tr-lg border-r border-t border-[var(--ion)]/45"
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute bottom-0 left-0 h-2.5 w-2.5 rounded-bl-lg border-b border-l border-[var(--ion)]/20"
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute bottom-0 right-0 h-2.5 w-2.5 rounded-br-lg border-b border-r border-[var(--ion)]/20"
+        aria-hidden="true"
+      />
+
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-foreground/10 bg-foreground/[0.02] px-3.5 py-2.5">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="h-3 w-[2px] shrink-0 rounded-full bg-[var(--ion)]" aria-hidden="true" />
+          <span
+            className="h-3 w-[2px] shrink-0 rounded-full bg-[var(--ion)] shadow-[0_0_6px_var(--ion)]"
+            aria-hidden="true"
+          />
           <h2 className="truncate text-[0.82rem] font-semibold tracking-[-0.01em] text-foreground">
             {t}
           </h2>
@@ -236,6 +285,34 @@ function Panel({
       </header>
       <div className="min-h-0 flex-1 p-3.5">{children}</div>
     </section>
+  );
+}
+
+/** Compact readout for the summary strip. */
+function Kpi({
+  label,
+  value,
+  sub,
+  tone = "ink",
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  tone?: "ink" | "ion" | "warn";
+}) {
+  const color =
+    tone === "ion" ? "var(--ion)" : tone === "warn" ? "var(--warn)" : "var(--foreground)";
+  return (
+    <div className="relative min-w-0 rounded-lg border border-foreground/12 bg-card/60 px-3.5 py-2.5">
+      <p className="t-num text-[0.56rem] uppercase tracking-[0.14em] text-ash">{label}</p>
+      <p
+        className="t-num mt-1.5 truncate text-[1.25rem] font-semibold leading-none"
+        style={{ color }}
+      >
+        {value}
+      </p>
+      <p className="mt-1.5 truncate text-[0.65rem] text-ash">{sub}</p>
+    </div>
   );
 }
 
@@ -341,6 +418,8 @@ function Benchmarks() {
     );
   }, [query]);
 
+  const gatesPassed = useMemo(() => tasks.filter((t) => t.gate === "passed").length, []);
+
   return (
     <div className="min-h-screen bg-paper">
       <SiteNav />
@@ -389,6 +468,26 @@ function Benchmarks() {
             </p>
           </div>
 
+          {/* ---------------- summary strip ---------------- */}
+          <div className="mt-2.5 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+            <Kpi
+              label="Gates passed"
+              value={`${gatesPassed} / ${tasks.length}`}
+              sub="diagnostic + quantification"
+              tone={gatesPassed === 0 ? "warn" : "ion"}
+            />
+            <Kpi
+              label="System metrics"
+              value={`0 / ${systemMetrics.length}`}
+              sub="uniqueness proof"
+              tone="warn"
+            />
+            <Kpi label="Modalities" value="5" sub="in one pipeline, planned" />
+            <Kpi label="Cohort" value="520" sub="subjects · 3 timepoints" />
+            <Kpi label="Split" value="subject" sub="grouped, enforced in code" tone="ion" />
+            <Kpi label="To v1.0" value="28 wk" sub="10 phases" />
+          </div>
+
           {/* ---------------- three-column console ---------------- */}
           <div className="mt-2.5 grid gap-2.5 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.05fr)_minmax(0,1.35fr)]">
             {/* ======================= LEFT ======================= */}
@@ -425,13 +524,19 @@ function Benchmarks() {
                     // single-hue ramp: magnitude by lightness, never by hue rotation
                     const fill = ["#1b5cbc", "#3d8bf5", "#7fc0ff"][i];
                     return (
-                      <li key={c.key}>
+                      <li
+                        key={c.key}
+                        title={`${c.label}: ${c.n} of ${c.of} subjects (${pct.toFixed(1)}%)`}
+                      >
                         <div className="flex items-baseline justify-between gap-2">
                           <span className="truncate text-[0.74rem] text-foreground/85">
                             {c.label}
                           </span>
                           <span className="t-num shrink-0 text-[0.72rem] text-foreground">
                             {c.n}
+                            <span className="ml-1.5 text-[0.62rem] text-ash">
+                              {pct.toFixed(0)}%
+                            </span>
                           </span>
                         </div>
                         <div className="mt-1 h-[6px] w-full overflow-hidden rounded-full bg-foreground/[0.06]">
@@ -449,7 +554,11 @@ function Benchmarks() {
               <Panel title="Modality coverage" meta="planned">
                 <ul className="flex flex-col gap-2.5">
                   {modalities.map((m) => (
-                    <li key={m.label} className="flex items-center gap-2.5">
+                    <li
+                      key={m.label}
+                      title={`${m.label}: ${m.pct}% of the planned cohort · gated at phase ${m.gate}`}
+                      className="flex items-center gap-2.5"
+                    >
                       <span className="w-[4.4rem] shrink-0 truncate text-[0.74rem] text-foreground/85">
                         {m.label}
                       </span>
@@ -503,6 +612,29 @@ function Benchmarks() {
                   <span>WK 14</span>
                   <span>WK 28</span>
                 </div>
+              </Panel>
+
+              <Panel title="Methodology guards" meta="non-negotiable">
+                <ul className="flex flex-col">
+                  {guards.map((g) => (
+                    <li
+                      key={g.label}
+                      className="flex items-start gap-2.5 border-b border-foreground/8 py-2.5 first:pt-0 last:border-0 last:pb-0"
+                    >
+                      <span
+                        className="mt-[5px] h-1.5 w-1.5 shrink-0 rotate-45 bg-[var(--ion)]"
+                        aria-hidden="true"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <p className="text-[0.76rem] font-medium text-foreground">{g.label}</p>
+                          <span className="t-num shrink-0 text-[0.58rem] text-ash">{g.phase}</span>
+                        </div>
+                        <p className="mt-0.5 text-[0.66rem] leading-relaxed text-ash">{g.detail}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </Panel>
             </div>
 

@@ -56,18 +56,15 @@ export function SiteNav() {
         <Link
           to="/"
           aria-label="Cognivance Labs — home"
-          className="flex min-w-0 shrink-0 items-center gap-2.5"
+          className="flex min-w-0 shrink-0 items-center"
         >
           <img
             src="/logo-mark.png"
-            alt=""
+            alt="Cognivance Labs"
             width={120}
             height={120}
-            className="h-9 w-auto shrink-0 object-contain"
+            className="h-[clamp(2.9rem,4.2vw,3.5rem)] w-auto shrink-0 object-contain"
           />
-          <span className="hidden text-[1.05rem] font-semibold tracking-[-0.03em] text-foreground sm:block">
-            Cognivance
-          </span>
         </Link>
 
         {/* ---- centre capsule ---- */}
