@@ -6,9 +6,8 @@ import { AboutSection } from "@/components/AboutSection";
 import { Waitlist } from "@/components/Waitlist";
 import { NimbleSection } from "@/components/NimbleSection";
 import { NoveltySection } from "@/components/NoveltySection";
+import { TechnologySection } from "@/components/TechnologySection";
 import { EEGTrace, LiveBadge, Metric } from "@/components/research-viz";
-import divisionNano from "@/assets/division-nano.jpg";
-import divisionComp from "@/assets/division-comp.jpg";
 import f1 from "@/assets/f1.jpg";
 import f2 from "@/assets/f2.jpg";
 import f3 from "@/assets/f3.jpg";
@@ -206,37 +205,8 @@ function Index() {
         </div>
       </section>
 
-      {/* ---------- Divisions ---------- */}
-      <section
-        id="divisions"
-        className="border-t border-foreground/10 px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(4.5rem,10vw,9rem)]"
-      >
-        <div className="mx-auto max-w-[1500px]">
-          <Reveal>
-            <p className="t-marker text-ash">Technology</p>
-            <h2 className="t-section mt-4 max-w-[24ch] text-foreground">
-              Two divisions, one instrument.
-            </h2>
-          </Reveal>
-          <div className="mt-[clamp(2.5rem,5vw,4rem)] grid gap-[clamp(2rem,4vw,3.5rem)] md:grid-cols-2">
-            <Division
-              n="01"
-              img={divisionNano}
-              alt="A translucent filament threading through pale tissue"
-              title="Nanorobotic Systems"
-              body="Autonomous agents navigating neural tissue at sub-cellular resolution. Powered by the body's own biochemistry. Guided by acoustic gradients. Reprogrammable in real time. These are not probes — they are instruments that live inside the tissue they study."
-            />
-            <Division
-              n="02"
-              delay={120}
-              img={divisionComp}
-              alt="A crystalline lattice emerging out of soft organic tissue"
-              title="Computational Neuroscience"
-              body="Mathematical frameworks that make sense of what those instruments find. Novel models of synaptic dynamics. Simulations of neurodegeneration before the first clinical symptom. Frameworks for emergent cognition that existing tools cannot represent."
-            />
-          </div>
-        </div>
-      </section>
+      {/* ---------- Technology ---------- */}
+      <TechnologySection />
 
       {/* ---------- Frontiers ---------- */}
       <section
@@ -358,42 +328,6 @@ function Index() {
 
       <SiteFooter />
     </div>
-  );
-}
-
-function Division({
-  n,
-  img,
-  alt,
-  title: t,
-  body,
-  delay = 0,
-}: {
-  n: string;
-  img: string;
-  alt: string;
-  title: string;
-  body: string;
-  delay?: number;
-}) {
-  return (
-    <Reveal delay={delay}>
-      <div className="group overflow-hidden rounded-2xl border border-foreground/12">
-        <img
-          src={img}
-          alt={alt}
-          width={1280}
-          height={960}
-          loading="lazy"
-          className="aspect-[4/3] w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.05]"
-        />
-      </div>
-      <p className="t-marker mt-7 text-ash">{n}</p>
-      <h3 className="mt-3.5 font-semibold tracking-[-0.03em] text-foreground [font-size:clamp(1.5rem,2.5vw,2.1rem)]">
-        {t}
-      </h3>
-      <p className="mt-4 max-w-[48ch] text-[1rem] leading-relaxed text-ash">{body}</p>
-    </Reveal>
   );
 }
 
