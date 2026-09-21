@@ -1,0 +1,37 @@
+name: core
+
+# Path-filtered on purpose: web changes must never trigger the Python suite,
+# and core changes must never trigger the web build. Three people work in
+# parallel in this repository and unrelated red CI wastes all of them.
+on:
+  push:
+    branches: [main]
+    paths: ["core/**", ".github/workflows/core.yml"]
+  pull_request:
+    paths: ["core/**", ".github/workflows/core.yml"]
+
+defaults:
+  run:
+    working-directory: core
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: uv pip install --system -e ".[imaging,eeg,dev]"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Types
+        run: mypy --strict cognivance_core/
+
+      - name: Tests
+        run: pytest -m "not slow" --cov=cognivance_core --cov-report=term-missing

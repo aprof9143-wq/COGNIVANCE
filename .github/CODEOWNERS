@@ -1,0 +1,23 @@
+# Ownership for parallel work on the NIMBLE core.
+# A PR touching a path here requests that owner's review automatically.
+# Replace the placeholder handles with real GitHub usernames.
+
+# --- shared foundation: change by agreement, not in passing ---
+/core/pyproject.toml            @aprof9143-wq
+/core/cognivance_core/abstraction/  @aprof9143-wq
+/core/cognivance_core/sources/      @aprof9143-wq
+/core/cognivance_core/testing/      @aprof9143-wq
+/core/tests/contract/           @aprof9143-wq
+/.github/                       @aprof9143-wq
+/.gitignore                     @aprof9143-wq
+/AGENTS.md                      @aprof9143-wq
+
+# --- modality modules: one owner each ---
+/core/cognivance_core/imaging/  @maheen
+/core/tests/imaging/            @maheen
+/core/cognivance_core/eeg/      @ruhma
+/core/tests/eeg/                @ruhma
+
+# --- the web application is not part of core work ---
+/src/                           @aprof9143-wq
+/public/                        @aprof9143-wq
