@@ -30,6 +30,9 @@ jobs:
       - name: Lint
         run: ruff check .
 
+      - name: Layer boundary
+        run: python scripts/check_layers.py
+
       - name: Types
         run: mypy --strict cognivance_core/
 
