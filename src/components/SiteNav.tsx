@@ -7,6 +7,7 @@ type NavLink = { label: string; to: string; hash?: string };
 const links: NavLink[] = [
   { label: "Home", to: "/" },
   { label: "Research", to: "/research" },
+  { label: "NIMBLE", to: "/nimble" },
   { label: "Benchmarks", to: "/benchmarks" },
   { label: "Technology", to: "/", hash: "divisions" },
   { label: "Frontiers", to: "/", hash: "frontiers" },
