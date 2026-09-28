@@ -28,8 +28,8 @@ export function SiteFooter() {
             <div className="min-w-0">
               <p className="t-marker text-ash">Institute of neuronanotechnology</p>
               <p className="mt-3 max-w-[38ch] text-[0.95rem] leading-relaxed text-foreground/75">
-                Mapping the brain inside-out — nanorobotic systems and computational
-                neuroscience in one engine.
+                Mapping the brain inside-out — nanorobotic systems and computational neuroscience in
+                one engine.
               </p>
             </div>
           </div>
@@ -39,7 +39,10 @@ export function SiteFooter() {
             className="group inline-flex w-fit items-center gap-3 rounded-full border border-foreground/20 px-6 py-3 text-[0.9rem] font-medium text-foreground transition-colors hover:bg-foreground hover:text-primary-foreground"
           >
             Join the waitlist
-            <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
+            <span
+              aria-hidden
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            >
               →
             </span>
           </Link>

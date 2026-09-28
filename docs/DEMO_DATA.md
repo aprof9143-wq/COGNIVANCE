@@ -21,15 +21,16 @@ unzip -o nilearn-*.whl "nilearn/datasets/data/mni_icbm152_t1_tal_nlin_sym_09a_co
 mv nilearn/datasets/data/mni_icbm152_t1_tal_nlin_sym_09a_converted.nii.gz MNI152_T1.nii.gz
 ```
 
-This template is **skull-stripped**, so EEG electrodes project onto the brain
-surface rather than a scalp. That is the more striking picture for a demo.
+This template is **skull-stripped** and is a population average, not a person.
+The viewer labels it "template" wherever it appears.
 
 ### For a real individual head, with skull: OpenNeuro
 
 <https://openneuro.org> — thousands of real, de-identified subject scans. Pick
 any dataset, open a subject folder, and download the file ending in
-`_T1w.nii.gz` from the `anat/` directory. A head scan with skull makes the
-electrodes sit on the actual scalp.
+`_T1w.nii.gz` from the `anat/` directory. For DICOM, open a whole series
+folder with **Open DICOM folder**; files are grouped by series and sorted by
+position, not by file name.
 
 ### Alzheimer's-specific cohorts
 
@@ -77,7 +78,8 @@ source.
 | --- | --- | --- | --- |
 | MRI | MNI152 ICBM 2009a T1 template, 1.5 mm | McConnell Brain Imaging Centre, via `nilearn` | MNI/McGill permissive notice — `public/templates/NOTICE.md` |
 | Tractography | 20,000 whole-brain streamlines, CSD + deterministic tracking, affinely registered to the template | OpenNeuro **ds000221** (MPI-Leipzig Mind-Brain-Body), subject 010002 | CC0 |
-| Lesion | **Synthetic** demonstration lesion — labelled so on screen | generated in code | — |
+| Lesion | None. Without a loaded label map the viewer shows "No validated segmentation loaded". | — | — |
+| EEG | None by default. A synthetic demo recording is available on request and is labelled SYNTHETIC. | generated in code | — |
 
 The tractogram is rebuilt, byte for byte, by
 [`tools/demo-assets/build_tractogram.py`](../tools/demo-assets/build_tractogram.py)
@@ -128,17 +130,20 @@ tractogram on the template).
 
 ## Tumour segmentation — data sources
 
-The lesion layer reads an integer **label map** in NIfTI (`*seg*.nii.gz`,
-`*label*`, `*mask*` or `*lesion*` in the name routes it automatically). It
-localises what the labels say and measures their volumes at native resolution.
-It does **not** detect tumours from a raw scan — that needs a trained model.
+The segmentation layer (**Add layer**) reads an integer **label map** in NIfTI,
+optionally with a BIDS `dseg.tsv` for class names. It shows what the labels say
+and measures their volumes on the label map's own grid (voxel count × voxel
+volume). Class names are never assumed: pick the convention the file follows,
+or leave it as label numbers. It does **not** detect tumours from a raw scan —
+that needs a trained model.
 
 - **BraTS** (RSNA-ASNR-MICCAI Brain Tumor Segmentation) — via Synapse, free
   registration. Expert multi-class labels: 1 necrotic core, 2 oedema, 3/4
-  enhancing tumour. This is the convention the console colours by.
+  enhancing tumour (BraTS 2023+ uses 3 for enhancing tumour). Choose the
+  matching convention in the Segmentation panel.
 - **Medical Segmentation Decathlon, Task01_BrainTumour** — CC-BY-SA 4.0.
-  ⚠ Different label convention (1 oedema, 2 non-enhancing, 3 enhancing). It will
-  load, but classes will be named as BraTS classes. Relabel first.
+  Different label convention (1 oedema, 2 non-enhancing, 3 enhancing): choose
+  "MSD Task01" in the Segmentation panel.
 - **UCSF-PDGM** — as above; segmentations included.
 
 ---
@@ -154,29 +159,26 @@ It does **not** detect tumours from a raw scan — that needs a trained model.
 
 ---
 
-## Demo script — about three minutes
+## Walkthrough — about three minutes
 
-1. **Open `/research`.** It opens on the MNI template with real whole-brain
-   tractography, so the screen is never empty. The header chips read
-   `MRI · template`, `EEG · phantom`.
-   *Try the scene switch, top right:* **Fibres** cuts the tractogram with MRI
-   slice planes; **Tumour** turns the brain to glass and draws the lesion as a
-   particle field with a measured-volume callout. On the template the lesion is
-   the synthetic demonstration lesion, and the screen says so.
-2. **Drop the MRI file onto the page.** The whole head renders as a true 3D
-   volume, with axial, coronal and sagittal slices below.
-   *Say:* "This is the full volume on the GPU — every voxel, not a slice."
-3. **Drag to orbit, then switch Volume → Surface → Glass.** Glass is the
-   showpiece: every fold becomes a lit contour.
-4. **Drag the Cutaway slider** to open the head and show interior structure.
-5. **Drop the EEG file.** Electrodes appear on the scalp of *this* scan, lit by
-   their measured band power. The chip turns to `FUSION · live`.
-   *Say:* "Two modalities, one coordinate frame."
-6. **Hover an occipital electrode (O1) on the topomap.** The same electrode
-   swells inside the 3D volume, its detail card appears, and the spectrum
-   switches to it — one selection driving every view.
-7. **Point at the Fusion readout.** The same question — hemispheric asymmetry —
-   asked of the anatomy and of the brain's electrical activity, side by side.
+1. **Open `/research`.** It opens on the MNI template (labelled "not a
+   patient") in three synchronised planes plus a 3D view, with the registered
+   ds000221 tractogram available as a 3D layer.
+2. **Open a DICOM series or NIfTI.** Orientation markers, slice n/N, spacing and
+   the acquired-versus-reformatted plane come from the file's own geometry.
+   *Say:* "Every view is resliced from the source volume in patient space."
+3. **Window/level:** drag with the W/L tool, type values, or press 1–9 for the
+   file's windows (and CT presets on calibrated CT only). The histogram shows
+   what the window clips.
+4. **Measure:** Length (mm) and Ellipse ROI (mm², mean ± sd) are computed in
+   patient space and do not change with zoom.
+5. **Display tools:** any enhancement shows "Display enhancement active";
+   **Original** and the before/after split are one click away.
+6. **3D:** clip along patient axes, switch camera presets, toggle layers; each
+   layer lists its source and method.
+7. **Neurodegeneration tracking** (`/neurodegeneration`): imports FreeSurfer
+   outputs; regional table, symptom–network research matrix, longitudinal
+   charts. No diagnosis or probability is computed.
 
 ---
 
@@ -201,11 +203,10 @@ This is a strength in a VC room, not a weakness. The credible story is: *the
 fusion infrastructure works on real data today; the models that turn it into a
 diagnosis are gated on rigorous benchmarks we have already published.*
 
-Two limits worth knowing before someone else points them out:
+Limits worth knowing before someone else points them out:
 
-- **Electrode placement is approximate.** Each 10-20 position is projected onto
-  the scan's scalp surface by marching outward from the centre. A clinical
-  co-registration uses fiducials (nasion, pre-auricular points); this does not.
-  The on-screen caption states it.
-- **The asymmetry index assumes a roughly midline-aligned scan.** An obliquely
-  acquired scan inflates it. It is shown as a raw measure, not a finding.
+- **Electrodes appear in 3D only from coordinate files** (BIDS
+  `electrodes.tsv`) that pass a bounds check against the image. The scalp map
+  in the EEG section is a schematic 10-20 layout, labelled as interpolated.
+- **Compressed DICOM** (JPEG, JPEG-LS, JPEG 2000, deflate) is not decoded; the
+  viewer names the transfer syntax and asks for an uncompressed copy.

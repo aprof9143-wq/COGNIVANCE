@@ -245,7 +245,7 @@ function Index() {
                   Measured, not asserted.
                 </h2>
               </div>
-              <LiveBadge label="Instrument telemetry" />
+              <LiveBadge label="Illustrative — not live data" />
             </div>
           </Reveal>
 
@@ -267,17 +267,22 @@ function Index() {
             <Reveal delay={140}>
               <div className="h-full rounded-2xl border border-foreground/12 bg-veil p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="t-marker text-ash">Cortical channel array — live</p>
+                  <p className="t-marker text-ash">
+                    Cortical channel array — illustrative animation
+                  </p>
                   <span className="t-num text-[0.75rem] text-ash">1.2 kHz</span>
                 </div>
                 <div className="scope instrument mt-5 overflow-hidden rounded-xl border border-foreground/10">
                   <EEGTrace channels={6} height={200} />
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-3">
-                  <Metric label="SNR" value={38.6} unit="dB" jitter={1.4} />
-                  <Metric label="Drift" value={0.42} unit="µm/h" jitter={0.4} />
-                  <Metric label="Yield" value={97.3} unit="%" jitter={1} />
+                  <Metric label="SNR" value={38.6} unit="dB" />
+                  <Metric label="Drift" value={0.42} unit="µm/h" />
+                  <Metric label="Yield" value={97.3} unit="%" />
                 </div>
+                <p className="mt-3 text-[0.78rem] text-ash">
+                  Illustrative trace and values for design purposes — not recorded or measured data.
+                </p>
               </div>
             </Reveal>
 

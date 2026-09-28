@@ -135,3 +135,90 @@ These are import-only (with provenance) or out of scope, and the UI says so:
 - PET, CSF and blood biomarkers — entered or imported with their assay
   metadata; never inferred from MRI.
 - Compressed DICOM transfer syntaxes other than RLE.
+
+---
+
+## 9. Status after implementation
+
+### Implemented
+
+| Area | What exists now | Where |
+| --- | --- | --- |
+| DICOM reading | dicom-parser; native LE/BE and RLE decoded; rescale slope/intercept; window centre/width (multi-valued, explanations); VOI LUT Function; MONOCHROME1/2; pixel spacing; slice thickness and spacing; IOP/IPP; enhanced multi-frame functional groups; per-frame rescale; bits-stored masking and sign extension | `src/lib/imaging/dicom.ts` |
+| Series building | grouping by series, sorting by position along the normal, gantry-tilt-safe step, duplicate-position, non-uniform-spacing and straight-stack checks | `dicom.ts` |
+| NIfTI | native resolution and values, sform → qform → none, RAS → LPS, scl_slope/inter, cal_min/max | `src/lib/imaging/nifti.ts` |
+| Coordinate system | LPS mm everywhere; documented; every overlay placed through its own affine | `geometry.ts` |
+| Grayscale | modality LUT, VOI LINEAR / LINEAR_EXACT / SIGMOID per PS3.3 C.11.2.1.2, MONOCHROME1 inversion, histogram with clipped fractions | `voi.ts`, `display.ts` |
+| MPR | three views resliced from the source in patient space, nearest (raw) or trilinear display interpolation, physical aspect ratio, crosshair sync, orientation markers from view axes | `reslice.ts`, `MprViewport.tsx` |
+| Interaction | W/L drag + numeric, file windows, CT presets on calibrated CT only, zoom about cursor, pan, fit, reset, magnifier (re-samples source), wheel/keys/cine, single/quad layout | `Workstation.tsx` |
+| Measurement | length mm, ellipse area mm² with mean ± sd, probe (HU only for calibrated CT) — all in patient space | `measure.ts` |
+| Overlays | label maps with per-class visibility, opacity, outline; different-grid resampling; no-overlap failure state; volumes on the native label grid | `segmentation.ts`, `panels.tsx` |
+| Display tools | gamma, local contrast, mild bilateral denoise, unsharp mask — off by default, "Display enhancement active", Original, before/after split | `display.ts` |
+| Metadata / PHI | descriptive metadata panel; identifying tags recorded as present, never read into memory, displayed, logged or exported; dates at month precision | `dicom.ts`, `panels.tsx` |
+| 3D | volume placed through its affine, grayscale TF from the 2D window, volume/MIP/surface, patient-axis clipping, orientation cube, camera presets, independent layers with provenance, registered-only tracts and electrodes, export with legend and audit lines | `Volume3D.tsx` |
+| EEG | measured / interpolated / inferred separated; band and time-window selectors; viridis maps; synthetic demo only on request, labelled | `EegSection.tsx` |
+| Neurodegeneration module | schemas, calculators, imports/exports, dashboard, research matrix, longitudinal charts, ratings, biomarkers, 3D regional map, evidence panel, safety statement | `src/lib/neuro/*`, `src/components/neuro/*` |
+
+### Test and build results
+
+- `pnpm test`: 101 tests, 8 files, all passing (imaging core, display,
+  electrodes, tractography, neurodegeneration calculators and importers).
+- DICOM decoding was cross-checked outside the suite against pydicom on its
+  bundled files (CT_small; MR_small in explicit, implicit, big-endian, RLE and
+  padded forms; a 484×300 image with overlay bits): pixel-for-pixel identical.
+- Browser checks: a 101-file sagittal DICOM series generated from the template
+  (shuffled, fake patient name) reconstructs to the same patient positions as
+  the NIfTI in all three planes; no identifier appears in the page text; a
+  2 mm label map on the 1.5 mm template gives the expected voxel counts.
+- `pnpm build`: passes.
+- Type check and lint: clean for all mounted code (every file reachable from a
+  route). **Repository-wide `tsc` and `eslint .` still fail**, solely because
+  of 15 Lovable-generated components that no route imports
+  (`NimbleResearchLab*`, `NimbleResearchStudio*`, `NimbleResearchSafe`,
+  `NimbleRealTimeAnalysis*`, `NimbleAnalysisWorkspace`, `BrainResearchLab*`,
+  `NimbleNeuralLab` — which has a syntax error — `NimbleMRI*`, `VolumeBrain`).
+  They were left untouched pending an owner's decision to delete or repair
+  them.
+
+### Not implemented / limitations
+
+- JPEG, JPEG-LS, JPEG 2000, HTJ2K and deflated transfer syntaxes: named
+  "unsupported transfer syntax" state, no decoding.
+- DICOM SEG and DICOM SR import/export; presentation states; overlay planes
+  (60xx); VOI LUT Sequence, Modality LUT Sequence and Real World Value Mapping
+  (detected and warned, not applied).
+- Non-uniform slice spacing is displayed with the mean spacing (warned), not
+  per-slice positions; multi-echo/multi-phase series show the first image at
+  each position.
+- Views are true patient-axis planes; no oblique or acquisition-aligned MPR,
+  no 2D slab/MIP.
+- Reslicing runs on the main thread; whole series are held in memory; no
+  progressive loading for very large studies. 3D textures above 256³ are
+  block-averaged for display.
+- No display calibration (PS3.14 Grayscale Standard Display Function) — screen
+  grey levels depend on the monitor.
+- Longitudinal registration, Jacobian and percentage-change maps are not
+  computed or imported; the module works from regional measurements.
+- No normative reference, segmentation uncertainty, PET image, or automated
+  visual-rating model is bundled; the UI shows "Unavailable" / "No compatible
+  norm" accordingly.
+- Series Description can, rarely, contain identifying text; it is displayed
+  and exported as recorded.
+- Contrast and keyboard accessibility were designed for but not formally
+  audited against WCAG.
+
+### Requires clinical, regulatory or medical-physics validation
+
+- Rendering and VOI against reference DICOM viewers and conformance datasets;
+  display calibration.
+- Geometric and measurement accuracy with physical phantoms across vendors,
+  including oblique and gantry-tilted acquisitions.
+- Segmentation-volume agreement (Dice, surface distance) and test–retest
+  reproducibility for whatever pipeline produces the imported measurements.
+- Compatibility rules for normative references, and any reference dataset
+  before use.
+- The symptom–network associations: review by clinicians against current
+  literature, including atypical presentations.
+- EEG spectral and coherence methods against established toolboxes.
+- Regulatory classification (e.g. EU MDR Rule 11, FDA software as a medical
+  device) before any clinical use. No compliance is claimed.
