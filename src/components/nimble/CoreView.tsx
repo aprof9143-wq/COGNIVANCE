@@ -251,8 +251,8 @@ export function CoreView({
           pCol[i * 3 + 2] = 1 * fade;
         }
       }
-      pGeo.attributes.position!.needsUpdate = true;
-      pGeo.attributes.color!.needsUpdate = true;
+      pGeo.attributes["position"]!.needsUpdate = true;
+      pGeo.attributes["color"]!.needsUpdate = true;
 
       renderer.render(scene, camera);
       raf = requestAnimationFrame(loop);
