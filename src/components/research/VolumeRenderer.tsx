@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { BRATS_CLASSES, type LabelVolume, type NiftiVolume } from "@/lib/nifti";
+import { tractStride, type Scene } from "./scenes";
 import { directionColour, type Tractogram } from "@/lib/tractography";
 
 /**
@@ -20,13 +21,7 @@ import { directionColour, type Tractogram } from "@/lib/tractography";
 
 export type RenderMode = "volume" | "glass" | "iso";
 export type Palette = "neural" | "thermal" | "clinical";
-/**
- * fusion  — raymarched MRI with every layer.
- * fibres  — opaque MRI slice planes cutting through the tractogram, the way
- *           diffusion tractography is conventionally shown.
- * tumour  — glass brain with the segmentation drawn as a particle field.
- */
-export type Scene = "fusion" | "fibres" | "tumour";
+export type { Scene } from "./scenes";
 
 export type Electrode = {
   label: string;
@@ -1150,7 +1145,10 @@ export function VolumeRenderer(props: Props) {
     // without washing the direction code toward white.
     const lift = (c: number) => 0.06 + 0.94 * c;
     let w = 0;
-    for (let s = 0; s < tg.count; s++) {
+    // Outside the fibre scene the tractogram shares the frame with the volume,
+    // electrodes and lesion, so only a fraction is drawn (see scenes.ts).
+    const stride = tractStride(props.scene);
+    for (let s = 0; s < tg.count; s += stride) {
       const start = tg.offsets[s]!;
       const end = tg.offsets[s + 1]!;
       for (let i = start; i < end - 1; i++) {
@@ -1196,6 +1194,7 @@ export function VolumeRenderer(props: Props) {
     props.showTracts,
     props.tractOpacity,
     props.tractsRegistered,
+    props.scene,
     props.volume,
     props.threshold,
   ]);

@@ -15,7 +15,8 @@ import {
   Waves,
   Workflow,
 } from "lucide-react";
-import { VolumeRenderer, type Palette, type RenderMode, type Scene } from "./VolumeRenderer";
+import { tractStride, type Scene } from "./scenes";
+import { VolumeRenderer, type Palette, type RenderMode } from "./VolumeRenderer";
 import { SliceView } from "./SliceView";
 import { EegTraces, SpectrumPlot, Topomap } from "./EegPanels";
 import {
@@ -124,7 +125,7 @@ export function ResearchConsole() {
   const [showElectrodes, setShowElectrodes] = useState(true);
   const [showConnections, setShowConnections] = useState(true);
   const [showTracts, setShowTracts] = useState(true);
-  const [tractOpacity, setTractOpacity] = useState(0.55);
+  const [tractOpacity, setTractOpacity] = useState(0.3);
   const [showLesion, setShowLesion] = useState(true);
   const [showHud, setShowHud] = useState(true);
   const [topK, setTopK] = useState(18);
@@ -456,7 +457,7 @@ export function ResearchConsole() {
       setMode("volume");
       setPalette("neural");
       setShowTracts(true);
-      setTractOpacity(0.55);
+      setTractOpacity(0.3);
       setShowElectrodes(true);
       setShowConnections(true);
       setShowLesion(true);
@@ -782,7 +783,11 @@ export function ResearchConsole() {
                 <HudLayer
                   on={showTracts}
                   label="TRACTS"
-                  detail={`${tractogram.count.toLocaleString()} fibres · ${
+                  detail={`${
+                    tractStride(scene) > 1 && tractogram.count > 1
+                      ? `${Math.ceil(tractogram.count / tractStride(scene)).toLocaleString()} of ${tractogram.count.toLocaleString()}`
+                      : tractogram.count.toLocaleString()
+                  } fibres · ${
                     tractSource === "upload"
                       ? "file"
                       : tractSource === "bundled"
