@@ -1,15 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ResearchConsole } from "@/components/research/ResearchConsole";
+import { Workstation } from "@/components/workstation/Workstation";
 
 export const Route = createFileRoute("/research")({
   head: () => ({
     meta: [
-      { title: "NIMBLE Research OS — Cognivance Labs" },
+      { title: "Research Imaging Viewer — Cognivance Labs" },
       {
         name: "description",
         content:
-          "GPU volume rendering of MRI fused with EEG spectral analysis, in one coordinate frame.",
+          "Research viewer for DICOM/NIfTI MRI with synchronised multiplanar views, segmentation, tractography and EEG. For research/educational use.",
       },
     ],
   }),
@@ -26,5 +26,5 @@ function Research() {
   }, [navigate]);
 
   if (!ready) return <div className="min-h-screen bg-[#020405]" />;
-  return <ResearchConsole />;
+  return <Workstation />;
 }

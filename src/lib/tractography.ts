@@ -14,22 +14,26 @@
  */
 
 export type Tractogram = {
-  /** x, y, z interleaved, in the file's own millimetre space. */
+  /** x, y, z interleaved. Units and frame are given by `space`. */
   points: Float32Array;
   /** Start index (in points, not floats) of each streamline; last entry = total. */
   offsets: Uint32Array;
   count: number;
   totalInFile: number;
-  format: "trk" | "tck" | "synthetic" | "bundled";
+  format: "trk" | "tck" | "bundled";
   /** Honest provenance for the UI. */
   description: string;
   /**
-   * "mm": points are millimetres in the file's own space, and the renderer fits
-   * their extent to the loaded brain. "grid": points are already registered to
-   * the bundled template, as 0–1 coordinates of its voxel grid, and are placed
-   * exactly — no fitting.
+   * "lps":      patient-space LPS mm, the frame every other layer uses.
+   * "grid":     0–1 coordinates of the bundled template's voxel grid; converted
+   *             to LPS with the template's affine before display.
+   * "unplaced": the file carries no usable geometry. Never displayed — tracts
+   *             are not stretched to fit a brain.
    */
-  space?: "mm" | "grid";
+  space: "lps" | "grid" | "unplaced";
+  /** Tracking parameters as recorded in the file (MRtrix header keys, etc.). */
+  parameters: Record<string, string>;
+  warnings: string[];
 };
 
 /**
@@ -69,7 +73,13 @@ class Builder {
     this.offs.push(this.pts.length / 3);
     this.kept++;
   }
-  done(format: Tractogram["format"], description: string): Tractogram {
+  done(
+    format: Tractogram["format"],
+    description: string,
+    space: Tractogram["space"],
+    parameters: Record<string, string> = {},
+    warnings: string[] = [],
+  ): Tractogram {
     return {
       points: new Float32Array(this.pts),
       offsets: new Uint32Array(this.offs),
@@ -77,6 +87,9 @@ class Builder {
       totalInFile: this.total,
       format,
       description,
+      space,
+      parameters,
+      warnings,
     };
   }
 }
@@ -99,6 +112,33 @@ export function parseTrk(buffer: ArrayBuffer): Tractogram {
   const nProps = view.getInt16(238, little);
   const declared = view.getInt32(988, little); // 0 means "not recorded"
 
+  // Geometry (TrackVis v2): voxel size and the voxel-to-RAS affine. Points are
+  // "voxmm" — voxel index × voxel size, measured from the first voxel's
+  // corner — so RAS = vox_to_ras · (voxmm / voxel_size − 0.5), the convention
+  // nibabel uses.
+  const vs = [
+    view.getFloat32(12, little),
+    view.getFloat32(16, little),
+    view.getFloat32(20, little),
+  ];
+  const v2r: number[] = [];
+  for (let i = 0; i < 16; i++) v2r.push(view.getFloat32(440 + i * 4, little));
+  const voxelOrder = String.fromCharCode(...new Uint8Array(buffer, 948, 3))
+    .replace(/\0/g, "")
+    .toUpperCase();
+  const warnings: string[] = [];
+  let placed = v2r[15] !== 0 && vs.every((v) => v > 0);
+  if (!placed)
+    warnings.push(
+      "No voxel-to-RAS matrix (TrackVis v1 or unset): the tractogram cannot be placed in patient space.",
+    );
+  if (placed && voxelOrder.length === 3 && voxelOrder !== axisCodes(v2r)) {
+    warnings.push(
+      `Header voxel_order ${voxelOrder} disagrees with vox_to_ras (${axisCodes(v2r)}); refusing to guess which is right.`,
+    );
+    placed = false;
+  }
+
   // Choose a stride from the declared count; when unknown, estimate from size.
   const estimate =
     declared > 0 ? declared : Math.max(1, Math.floor((buffer.byteLength - 1000) / 400));
@@ -116,15 +156,25 @@ export function parseTrk(buffer: ArrayBuffer): Tractogram {
     const s: number[] = new Array(m * 3);
     for (let p = 0; p < m; p++) {
       const base = o + p * perPoint * 4;
-      s[p * 3] = view.getFloat32(base, little);
-      s[p * 3 + 1] = view.getFloat32(base + 4, little);
-      s[p * 3 + 2] = view.getFloat32(base + 8, little);
+      const i = view.getFloat32(base, little) / vs[0]! - 0.5;
+      const j = view.getFloat32(base + 4, little) / vs[1]! - 0.5;
+      const k = view.getFloat32(base + 8, little) / vs[2]! - 0.5;
+      // RAS, then to LPS by negating x and y.
+      s[p * 3] = -(v2r[0]! * i + v2r[1]! * j + v2r[2]! * k + v2r[3]!);
+      s[p * 3 + 1] = -(v2r[4]! * i + v2r[5]! * j + v2r[6]! * k + v2r[7]!);
+      s[p * 3 + 2] = v2r[8]! * i + v2r[9]! * j + v2r[10]! * k + v2r[11]!;
     }
     b.add(s);
     o += need;
   }
   if (!b.kept) throw new Error("No streamlines found in this .trk file.");
-  return b.done("trk", "TrackVis tractogram (voxel-mm space)");
+  return b.done(
+    "trk",
+    "TrackVis tractogram",
+    placed ? "lps" : "unplaced",
+    { voxel_size: vs.map((v) => v.toFixed(3)).join(" × "), voxel_order: voxelOrder || "unset" },
+    warnings,
+  );
 }
 
 /* ----------------------------------------------------------------- .tck */
@@ -171,140 +221,17 @@ export function parseTck(buffer: ArrayBuffer): Tractogram {
       if (x === Infinity || x === -Infinity) break;
       continue;
     }
-    cur.push(x, y, z);
+    // MRtrix stores scanner RAS mm; LPS negates x and y.
+    cur.push(-x, -y, z);
   }
   if (cur.length) b.add(cur);
   if (!b.kept) throw new Error("No streamlines found in this .tck file.");
-  return b.done("tck", "MRtrix3 tractogram (scanner RAS mm)");
-}
-
-/* ------------------------------------------------------------- synthetic */
-
-/**
- * A procedural demo bundle of the major white-matter systems.
- *
- * NOT derived from any data. It exists so the tractography layer shows the
- * classic shape of the tracts before a real file is loaded, and the UI labels
- * it as synthetic wherever it appears. Coordinates are in a normalised head
- * frame (−1…1, RAS), which the renderer fits to the loaded brain.
- */
-export function syntheticTractogram(seed = 11): Tractogram {
-  let s = seed >>> 0;
-  const rnd = () => {
-    s = (s * 1664525 + 1013904223) >>> 0;
-    return s / 4294967296;
-  };
-  const jitter = (a: number) => (rnd() - 0.5) * a;
-  const b = new Builder(1);
-
-  const curve = (pts: [number, number, number][]) => {
-    // Catmull-Rom through control points gives smooth fibre-like paths.
-    const out: number[] = [];
-    const steps = 22;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[Math.max(0, i - 1)]!;
-      const p1 = pts[i]!;
-      const p2 = pts[i + 1]!;
-      const p3 = pts[Math.min(pts.length - 1, i + 2)]!;
-      for (let k = 0; k < steps; k++) {
-        const t = k / steps;
-        const t2 = t * t;
-        const t3 = t2 * t;
-        for (let d = 0; d < 3; d++) {
-          out.push(
-            0.5 *
-              (2 * p1[d]! +
-                (-p0[d]! + p2[d]!) * t +
-                (2 * p0[d]! - 5 * p1[d]! + 4 * p2[d]! - p3[d]!) * t2 +
-                (-p0[d]! + 3 * p1[d]! - 3 * p2[d]! + p3[d]!) * t3),
-          );
-        }
-      }
-    }
-    const last = pts[pts.length - 1]!;
-    out.push(last[0], last[1], last[2]);
-    return out;
-  };
-
-  // Corpus callosum — commissural arcs crossing the midline over the ventricles.
-  for (let i = 0; i < 520; i++) {
-    const y = -0.62 + rnd() * 1.18;
-    const spread = 0.55 + rnd() * 0.3;
-    const lift = 0.2 + 0.08 * Math.cos(y * 2.4);
-    b.add(
-      curve([
-        [-spread, y + jitter(0.08), 0.28 + jitter(0.18)],
-        [-0.28, y + jitter(0.04), lift + 0.12],
-        [0, y, lift + 0.16 + jitter(0.03)],
-        [0.28, y + jitter(0.04), lift + 0.12],
-        [spread, y + jitter(0.08), 0.28 + jitter(0.18)],
-      ]),
-    );
+  // Everything the header records about how the tracks were made.
+  const parameters: Record<string, string> = {};
+  for (const [k, v] of fields) {
+    if (!["file", "datatype", "timestamp"].includes(k)) parameters[k] = v;
   }
-
-  // Corticospinal tracts — projection fibres from motor cortex to brainstem.
-  for (const side of [-1, 1]) {
-    for (let i = 0; i < 240; i++) {
-      const top = side * (0.18 + rnd() * 0.42);
-      b.add(
-        curve([
-          [top, -0.05 + jitter(0.3), 0.82 + jitter(0.08)],
-          [side * 0.22 + jitter(0.06), -0.02 + jitter(0.08), 0.35],
-          [side * 0.12 + jitter(0.03), 0.0 + jitter(0.05), -0.12],
-          [side * 0.06 + jitter(0.02), -0.12 + jitter(0.03), -0.72],
-        ]),
-      );
-    }
-  }
-
-  // Superior longitudinal / arcuate — association fibres, front to back.
-  for (const side of [-1, 1]) {
-    for (let i = 0; i < 230; i++) {
-      const x = side * (0.5 + rnd() * 0.18);
-      b.add(
-        curve([
-          [x - side * 0.04, 0.6 + jitter(0.1), 0.2 + jitter(0.1)],
-          [x, 0.15 + jitter(0.06), 0.4 + jitter(0.06)],
-          [x, -0.3 + jitter(0.06), 0.36 + jitter(0.06)],
-          [x - side * 0.05, -0.55 + jitter(0.08), 0.06 + jitter(0.08)],
-          [x - side * 0.1, -0.35 + jitter(0.08), -0.25 + jitter(0.08)],
-        ]),
-      );
-    }
-  }
-
-  // Cingulum — along the midline, above the corpus callosum.
-  for (const side of [-1, 1]) {
-    for (let i = 0; i < 140; i++) {
-      const x = side * (0.08 + rnd() * 0.06);
-      b.add(
-        curve([
-          [x, 0.62 + jitter(0.06), 0.02 + jitter(0.06)],
-          [x, 0.35, 0.42 + jitter(0.05)],
-          [x, -0.2, 0.46 + jitter(0.05)],
-          [x, -0.52 + jitter(0.06), 0.18 + jitter(0.06)],
-          [x, -0.45, -0.22 + jitter(0.06)],
-        ]),
-      );
-    }
-  }
-
-  // Inferior fronto-occipital — the long ventral association pathway.
-  for (const side of [-1, 1]) {
-    for (let i = 0; i < 150; i++) {
-      const x = side * (0.3 + rnd() * 0.12);
-      b.add(
-        curve([
-          [x, 0.72 + jitter(0.06), -0.05 + jitter(0.08)],
-          [x + side * 0.05, 0.25, -0.18 + jitter(0.05)],
-          [x + side * 0.06, -0.3, -0.12 + jitter(0.05)],
-          [x, -0.82 + jitter(0.06), 0.02 + jitter(0.08)],
-        ]),
-      );
-    }
-  }
-
-  return b.done("synthetic", "Synthetic demo bundle — procedural, not derived from data");
+  return b.done("tck", "MRtrix3 tractogram (scanner space)", "lps", parameters);
 }
 
 /**
@@ -375,5 +302,46 @@ export function parseBundledTractogram(buffer: ArrayBuffer, description: string)
     format: "bundled",
     description,
     space: "grid",
+    parameters: {},
+    warnings: [],
   };
+}
+
+/** Axis codes (e.g. "LAS") of a row-major 4×4 voxel-to-RAS affine. */
+export function axisCodes(m: number[]): string {
+  const letters = [
+    ["L", "R"],
+    ["P", "A"],
+    ["I", "S"],
+  ];
+  let out = "";
+  for (let c = 0; c < 3; c++) {
+    const col = [m[c]!, m[4 + c]!, m[8 + c]!];
+    const r = col.map(Math.abs).indexOf(Math.max(...col.map(Math.abs)));
+    out += letters[r]![col[r]! >= 0 ? 1 : 0];
+  }
+  return out;
+}
+
+/**
+ * Place a grid-space tractogram (the bundled one) in patient space using the
+ * affine of the volume it was registered to.
+ */
+export function gridToLps(
+  tg: Tractogram,
+  ijkToLps: Float64Array,
+  dims: [number, number, number],
+): Tractogram {
+  if (tg.space !== "grid") return tg;
+  const out = new Float32Array(tg.points.length);
+  const m = ijkToLps;
+  for (let p = 0; p < tg.points.length; p += 3) {
+    const i = tg.points[p]! * (dims[0] - 1);
+    const j = tg.points[p + 1]! * (dims[1] - 1);
+    const k = tg.points[p + 2]! * (dims[2] - 1);
+    out[p] = m[0]! * i + m[1]! * j + m[2]! * k + m[3]!;
+    out[p + 1] = m[4]! * i + m[5]! * j + m[6]! * k + m[7]!;
+    out[p + 2] = m[8]! * i + m[9]! * j + m[10]! * k + m[11]!;
+  }
+  return { ...tg, points: out, space: "lps" };
 }

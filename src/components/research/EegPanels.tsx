@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { ChannelSpectrum } from "@/lib/signal";
 import { MONTAGE_1020 } from "@/lib/montage";
+import { viridis } from "@/components/workstation/colormaps";
 
 /* ------------------------------------------------------------------ Topomap */
 
@@ -137,23 +138,10 @@ export function Topomap({
   );
 }
 
+/** Viridis: perceptually uniform, so equal steps in power look equal. */
 function ramp(v: number): [number, number, number] {
-  const stops: [number, number, number][] = [
-    [8, 28, 90],
-    [30, 99, 196],
-    [127, 216, 255],
-    [245, 250, 255],
-  ];
-  const t = Math.max(0, Math.min(1, v)) * (stops.length - 1);
-  const i = Math.min(stops.length - 2, Math.floor(t));
-  const f = t - i;
-  const a = stops[i]!;
-  const b = stops[i + 1]!;
-  return [
-    Math.round(a[0] + (b[0] - a[0]) * f),
-    Math.round(a[1] + (b[1] - a[1]) * f),
-    Math.round(a[2] + (b[2] - a[2]) * f),
-  ];
+  const [r, g, b] = viridis(v);
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
 /* ------------------------------------------------------------------ Traces */
