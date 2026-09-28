@@ -39,14 +39,16 @@ export const viridisGradient = () =>
   `linear-gradient(90deg, ${VIRIDIS.map((c, i) => `${toCss(c)} ${(i / (VIRIDIS.length - 1)) * 100}%`).join(", ")})`;
 
 /**
- * Diverging blue–white–orange (colour-blind-safe pair), for signed quantities
- * such as z-scores or percentage change. t in [−1, 1].
+ * Diverging blue ↔ red with a neutral grey midpoint (dark-surface steps of the
+ * validated reference palette), for signed quantities such as z-scores or
+ * percentage change. t in [−1, 1]; 0 is "no difference" and reads as grey,
+ * never as a hue.
  */
 export function diverging(t: number): [number, number, number] {
   const x = Math.max(-1, Math.min(1, Number.isFinite(t) ? t : 0));
-  const neutral: [number, number, number] = [0.95, 0.95, 0.95];
-  const neg: [number, number, number] = [0.13, 0.4, 0.67];
-  const pos: [number, number, number] = [0.8, 0.4, 0.0];
+  const neutral: [number, number, number] = [0x38 / 255, 0x38 / 255, 0x35 / 255];
+  const neg: [number, number, number] = [0x39 / 255, 0x87 / 255, 0xe5 / 255];
+  const pos: [number, number, number] = [0xe6 / 255, 0x67 / 255, 0x67 / 255];
   const end = x < 0 ? neg : pos;
   const f = Math.abs(x);
   return [
@@ -55,3 +57,6 @@ export function diverging(t: number): [number, number, number] {
     neutral[2] + (end[2] - neutral[2]) * f,
   ];
 }
+
+/** Chart series colours (dark-surface categorical slots 1–3, validated). */
+export const SERIES = { left: "#3987e5", right: "#d95926", third: "#199e70" } as const;

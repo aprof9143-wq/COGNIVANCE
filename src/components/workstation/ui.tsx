@@ -14,10 +14,10 @@ export function Panel({
 }: {
   title: string;
   /** Evidence type: measured, interpolated, inferred, derived, literature, … */
-  tag?: string;
-  note?: string;
+  tag?: string | undefined;
+  note?: string | undefined;
   children: React.ReactNode;
-  flush?: boolean;
+  flush?: boolean | undefined;
   actions?: React.ReactNode;
 }) {
   return (
