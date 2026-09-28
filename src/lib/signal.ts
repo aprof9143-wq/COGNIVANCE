@@ -127,7 +127,7 @@ export function welchPsd(
       const power = re[k]! * re[k]! + im[k]! * im[k]!;
       // Double the interior bins to fold in the negative frequencies.
       const folded = k === 0 || k === bins - 1 ? power : power * 2;
-      acc[k] += folded * scale;
+      acc[k]! += folded * scale;
     }
     segments++;
   }
@@ -189,8 +189,8 @@ export function analyseChannel(
   for (let i = 0; i < samples.length; i++) sumSq += samples[i]! * samples[i]!;
   const rms = samples.length ? Math.sqrt(sumSq / samples.length) : Number.NaN;
 
-  const alpha = absolute.alpha ?? 0;
-  const thetaAlphaRatio = alpha > 0 ? (absolute.theta ?? 0) / alpha : Number.NaN;
+  const alpha = absolute["alpha"] ?? 0;
+  const thetaAlphaRatio = alpha > 0 ? (absolute["theta"] ?? 0) / alpha : Number.NaN;
 
   return { label, freqs, psd, relative, absolute, thetaAlphaRatio, peakFrequency, rms };
 }
@@ -214,4 +214,137 @@ export function decimate(samples: Float32Array, width: number): Float32Array {
     out[i] = Math.abs(hi) >= Math.abs(lo) ? hi : lo;
   }
   return out;
+}
+
+/* ----------------------------------------------------------- connectivity */
+
+export type CoherenceMatrix = {
+  labels: string[];
+  /** Symmetric, row-major, diagonal = 1. Magnitude-squared coherence, 0–1. */
+  values: Float32Array;
+  band: string;
+  segments: number;
+};
+
+/**
+ * Band-averaged magnitude-squared coherence between every channel pair.
+ *
+ * Coherence asks how consistently two channels keep a fixed phase and
+ * amplitude relationship across time windows: 1 means perfectly locked, 0
+ * means unrelated. It is computed from Welch cross-spectra — the same Hann
+ * windows and overlap as the PSD — so a single segment is never enough (one
+ * segment always gives exactly 1, which is meaningless). The estimate needs
+ * many segments, and its floor for truly independent signals is roughly
+ * 1 / segments, which the UI subtracts before drawing.
+ *
+ * Caveat that matters for interpretation: scalp EEG against a common
+ * reference inflates coherence between neighbouring electrodes through volume
+ * conduction. The measure is real; reading it as "connectivity" between brain
+ * regions needs that caveat, and the console states it.
+ */
+export function coherenceMatrix(
+  channels: { label: string; data: Float32Array }[],
+  sampleRate: number,
+  band: Band,
+  maxSeconds = 120,
+  segmentSeconds = 2,
+): CoherenceMatrix {
+  const n = channels.length;
+  const labels = channels.map((c) => c.label);
+  const values = new Float32Array(n * n);
+  for (let i = 0; i < n; i++) values[i * n + i] = 1;
+
+  const segLen = nextPow2(Math.round(segmentSeconds * sampleRate));
+  const step = segLen / 2;
+  const limit = Math.min(
+    ...channels.map((c) => Math.min(c.data.length, Math.round(maxSeconds * sampleRate))),
+  );
+  if (!n || limit < segLen * 2) return { labels, values, band: band.name, segments: 0 };
+
+  const loBin = Math.max(1, Math.ceil((band.lo * segLen) / sampleRate));
+  const hiBin = Math.min(segLen / 2, Math.floor((band.hi * segLen) / sampleRate));
+  const nb = hiBin - loBin + 1;
+  if (nb < 1) return { labels, values, band: band.name, segments: 0 };
+
+  const win = new Float64Array(segLen);
+  for (let i = 0; i < segLen; i++) win[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (segLen - 1));
+
+  const segStarts: number[] = [];
+  for (let s = 0; s + segLen <= limit; s += step) segStarts.push(s);
+  const S = segStarts.length;
+
+  // Per channel, per segment, the complex spectrum over the band's bins only.
+  const re = new Float32Array(n * S * nb);
+  const im = new Float32Array(n * S * nb);
+  const bufR = new Float64Array(segLen);
+  const bufI = new Float64Array(segLen);
+
+  for (let c = 0; c < n; c++) {
+    const data = channels[c]!.data;
+    for (let s = 0; s < S; s++) {
+      const start = segStarts[s]!;
+      let mean = 0;
+      for (let i = 0; i < segLen; i++) mean += data[start + i]!;
+      mean /= segLen;
+      for (let i = 0; i < segLen; i++) {
+        bufR[i] = (data[start + i]! - mean) * win[i]!;
+        bufI[i] = 0;
+      }
+      fft(bufR, bufI);
+      const base = (c * S + s) * nb;
+      for (let b = 0; b < nb; b++) {
+        re[base + b] = bufR[loBin + b]!;
+        im[base + b] = bufI[loBin + b]!;
+      }
+    }
+  }
+
+  // Auto-spectra once per channel.
+  const auto = new Float64Array(n * nb);
+  for (let c = 0; c < n; c++) {
+    for (let b = 0; b < nb; b++) {
+      let acc = 0;
+      for (let s = 0; s < S; s++) {
+        const k = (c * S + s) * nb + b;
+        acc += re[k]! * re[k]! + im[k]! * im[k]!;
+      }
+      auto[c * nb + b] = acc / S;
+    }
+  }
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      // Power-weighted mean over the band. An unweighted mean gives every bin
+      // an equal vote, so a rhythm living in one or two bins is outvoted by the
+      // band's empty bins — a perfectly locked 10 Hz pair read 0.28 that way.
+      // Weighting by sqrt(Sxx·Syy) lets the bins that carry the rhythm decide,
+      // without summing complex cross-spectra across bins (which can cancel
+      // when the phase lag varies with frequency).
+      let cohSum = 0;
+      let wSum = 0;
+      for (let b = 0; b < nb; b++) {
+        let sr = 0;
+        let si = 0;
+        for (let s = 0; s < S; s++) {
+          const a = (i * S + s) * nb + b;
+          const c = (j * S + s) * nb + b;
+          // X · conj(Y)
+          sr += re[a]! * re[c]! + im[a]! * im[c]!;
+          si += im[a]! * re[c]! - re[a]! * im[c]!;
+        }
+        sr /= S;
+        si /= S;
+        const denom = auto[i * nb + b]! * auto[j * nb + b]!;
+        if (denom <= 0) continue;
+        const w = Math.sqrt(denom);
+        cohSum += ((sr * sr + si * si) / denom) * w;
+        wSum += w;
+      }
+      const v = wSum > 0 ? cohSum / wSum : 0;
+      values[i * n + j] = v;
+      values[j * n + i] = v;
+    }
+  }
+
+  return { labels, values, band: band.name, segments: S };
 }

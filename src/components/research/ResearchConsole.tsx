@@ -10,23 +10,79 @@ import {
   Pause,
   Play,
   RotateCcw,
-  Scissors,
   Sparkles,
+  Target,
   Waves,
+  Workflow,
 } from "lucide-react";
+import { tractStride, type Scene } from "./scenes";
 import { VolumeRenderer, type Palette, type RenderMode } from "./VolumeRenderer";
 import { SliceView } from "./SliceView";
 import { EegTraces, SpectrumPlot, Topomap } from "./EegPanels";
-import { eegAsymmetry, mriAsymmetry, posteriorDominantRhythm, regionalSummary } from "./fusion";
-import { parseNifti, phantomVolume, readNiftiBytes, type NiftiVolume } from "@/lib/nifti";
+import {
+  alzheimerBiomarkers,
+  eegAsymmetry,
+  mriAsymmetry,
+  posteriorDominantRhythm,
+  regionalSummary,
+} from "./fusion";
+import {
+  BRATS_CLASSES,
+  demonstrationLesion,
+  parseNifti,
+  parseNiftiLabels,
+  phantomVolume,
+  readNiftiBytes,
+  type LabelVolume,
+  type NiftiVolume,
+} from "@/lib/nifti";
+import {
+  parseBundledTractogram,
+  parseTck,
+  parseTrk,
+  syntheticTractogram,
+  type Tractogram,
+} from "@/lib/tractography";
 import { canonicalChannelName, parseEdf, phantomRecording, type EdfRecording } from "@/lib/edf";
-import { analyseChannel, BANDS, type ChannelSpectrum } from "@/lib/signal";
+import { analyseChannel, BANDS, coherenceMatrix, type ChannelSpectrum } from "@/lib/signal";
 import { findElectrode, MONTAGE_1020 } from "@/lib/montage";
 
 /** EEG analysed over at most this many seconds, so a long recording stays responsive. */
 const ANALYSIS_WINDOW_S = 300;
 
 type Source = "phantom" | "upload";
+/** A volume can also be the bundled population template: real anatomy, no patient. */
+type VolumeSource = Source | "template";
+
+const TEMPLATE_URL = "/templates/mni152_template.nii.gz";
+const TEMPLATE_NAME = "MNI152 template (ICBM 2009a)";
+
+const volumeLabel = (src: VolumeSource) =>
+  src === "upload" ? "subject" : src === "template" ? "template" : "phantom";
+
+/** A tractogram can also be the bundled one, computed offline from open data. */
+type TractSource = Source | "bundled";
+
+const TRACTS_URL = "/templates/tractogram_ds000221.bin.gz";
+const TRACTS_NAME = "OpenNeuro ds000221 · DIPY CSD";
+
+async function fetchBundledTracts(): Promise<Tractogram> {
+  const res = await fetch(TRACTS_URL);
+  if (!res.ok) throw new Error(`tractogram: HTTP ${res.status}`);
+  // readNiftiBytes inflates by magic bytes, which is what a .gz here needs too.
+  const buf = await readNiftiBytes(new File([await res.blob()], "tracts.bin.gz"));
+  return parseBundledTractogram(
+    buf,
+    "Whole-brain probabilistic tractography of one healthy adult (OpenNeuro ds000221, CC0), affinely registered to the MNI152 template.",
+  );
+}
+
+async function fetchTemplate(): Promise<NiftiVolume> {
+  const res = await fetch(TEMPLATE_URL);
+  if (!res.ok) throw new Error(`template: HTTP ${res.status}`);
+  const file = new File([await res.blob()], "mni152_template.nii.gz");
+  return parseNifti(await readNiftiBytes(file), 160);
+}
 
 export function ResearchConsole() {
   const navigate = useNavigate();
@@ -34,11 +90,23 @@ export function ResearchConsole() {
   // -- data -----------------------------------------------------------------
   const [volume, setVolume] = useState<NiftiVolume>(() => phantomVolume(144));
   const [volumeName, setVolumeName] = useState("Synthetic phantom");
-  const [volumeSource, setVolumeSource] = useState<Source>("phantom");
+  const [volumeSource, setVolumeSource] = useState<VolumeSource>("phantom");
 
   const [recording, setRecording] = useState<EdfRecording>(() => phantomRecording(30));
   const [recordingName, setRecordingName] = useState("Synthetic 10-20 recording");
   const [recordingSource, setRecordingSource] = useState<Source>("phantom");
+
+  const [tractogram, setTractogram] = useState<Tractogram>(() => syntheticTractogram());
+  const [tractName, setTractName] = useState("Synthetic demo bundle");
+  const [tractSource, setTractSource] = useState<TractSource>("phantom");
+
+  // The demonstration lesion only ever appears on the phantom or the population
+  // template, neither of which is a person. On an uploaded scan a synthetic
+  // lesion would read as a finding, so it is switched off there.
+  const [lesion, setLesion] = useState<LabelVolume | null>(() => demonstrationLesion(144));
+  const [lesionName, setLesionName] = useState("Demonstration lesion");
+  const [lesionSource, setLesionSource] = useState<Source>("phantom");
+  const [lesionWarning, setLesionWarning] = useState<string | null>(null);
 
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,9 +123,54 @@ export function ResearchConsole() {
   const [band, setBand] = useState("alpha");
   const [hovered, setHovered] = useState<string | null>(null);
   const [showElectrodes, setShowElectrodes] = useState(true);
+  const [showConnections, setShowConnections] = useState(true);
+  const [showTracts, setShowTracts] = useState(true);
+  const [tractOpacity, setTractOpacity] = useState(0.3);
+  const [showLesion, setShowLesion] = useState(true);
+  const [showHud, setShowHud] = useState(true);
+  const [topK, setTopK] = useState(18);
   const [autoRotate, setAutoRotate] = useState(true);
+  const [scene, setScene] = useState<Scene>("fusion");
   const [playing, setPlaying] = useState(true);
   const [clock, setClock] = useState("");
+
+  // Open on the population template rather than the phantom: a visitor sees real
+  // cortical anatomy immediately. It is an average of many brains, not a person,
+  // so it is labelled "template" and nothing on it is a finding. If the fetch
+  // fails the phantom stays, and the console still works.
+  const template = useRef<NiftiVolume | null>(null);
+  const bundledTracts = useRef<Tractogram | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    // Real tractography replaces the synthetic bundles once it arrives.
+    fetchBundledTracts()
+      .then((tg) => {
+        bundledTracts.current = tg;
+        if (cancelled) return;
+        setTractSource((src) => {
+          if (src !== "phantom") return src;
+          setTractogram(tg);
+          setTractName(TRACTS_NAME);
+          return "bundled";
+        });
+      })
+      .catch(() => {});
+    fetchTemplate()
+      .then((vol) => {
+        template.current = vol;
+        if (cancelled) return;
+        setVolumeSource((src) => {
+          if (src !== "phantom") return src;
+          setVolume(vol);
+          setVolumeName(TEMPLATE_NAME);
+          return "template";
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const tick = () => {
@@ -132,6 +245,47 @@ export function ResearchConsole() {
     return v.length ? v.reduce((a, b) => a + b, 0) / v.length : Number.NaN;
   }, [spectra]);
 
+  // Coherence over the 10-20 channels only, so arcs always have two endpoints.
+  const coherence = useMemo(() => {
+    const montageChannels = channels.filter((c) => findElectrode(c.label));
+    const selected = BANDS.find((b) => b.name === band) ?? BANDS[2]!;
+    return coherenceMatrix(montageChannels, sampleRate, selected);
+  }, [channels, sampleRate, band]);
+
+  const alphaCoherence = useMemo(() => {
+    const montageChannels = channels.filter((c) => findElectrode(c.label));
+    return coherenceMatrix(
+      montageChannels,
+      sampleRate,
+      BANDS.find((b) => b.name === "alpha")!,
+    );
+  }, [channels, sampleRate]);
+
+  /**
+   * The strongest pairs, after removing the estimator's own floor. With S
+   * segments, coherence between two unrelated signals averages about 1/S, so
+   * anything near that is noise and is not drawn as a connection.
+   */
+  const connections = useMemo(() => {
+    const { labels, values, segments } = coherence;
+    const n = labels.length;
+    const floor = segments ? 1 / segments : 0;
+    const out: { a: string; b: string; value: number }[] = [];
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const v = values[i * n + j]!;
+        if (v > floor * 3) out.push({ a: labels[i]!, b: labels[j]!, value: v });
+      }
+    }
+    out.sort((x, y) => y.value - x.value);
+    return out.slice(0, topK);
+  }, [coherence, topK]);
+
+  const biomarkers = useMemo(
+    () => alzheimerBiomarkers(spectra, alphaCoherence),
+    [spectra, alphaCoherence],
+  );
+
   const focus = hovered
     ? (spectra.get(hovered) ?? null)
     : (spectra.get("O1") ?? [...spectra.values()][0] ?? null);
@@ -154,6 +308,16 @@ export function ResearchConsole() {
       setAxial(0.5);
       setCoronal(0.5);
       setSagittal(0.5);
+      // A synthetic lesion drawn on a real patient's anatomy would read as a
+      // finding. Retire it; only a real segmentation brings the layer back.
+      setLesionSource((src) => {
+        if (src === "phantom") {
+          setLesion(null);
+          setLesionName("No segmentation loaded");
+        }
+        return src;
+      });
+      setLesionWarning(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not read that MRI file.");
     } finally {
@@ -188,26 +352,129 @@ export function ResearchConsole() {
     }
   }, []);
 
+  const tractInput = useRef<HTMLInputElement>(null);
+  const lesionInput = useRef<HTMLInputElement>(null);
+
+  const loadTracts = useCallback(async (file: File) => {
+    setError(null);
+    setBusy(`Reading ${file.name}…`);
+    try {
+      await new Promise((r) => setTimeout(r, 30));
+      const buf = await file.arrayBuffer();
+      const tg = /\.tck$/i.test(file.name) ? parseTck(buf) : parseTrk(buf);
+      setTractogram(tg);
+      setTractName(file.name);
+      setTractSource("upload");
+      setShowTracts(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not read that tractography file.");
+    } finally {
+      setBusy(null);
+    }
+  }, []);
+
+  const loadLesion = useCallback(
+    async (file: File) => {
+      setError(null);
+      setBusy(`Reading ${file.name}…`);
+      try {
+        await new Promise((r) => setTimeout(r, 30));
+        const lv = parseNiftiLabels(await readNiftiBytes(file), 160);
+        setLesion(lv);
+        setLesionName(file.name);
+        setLesionSource("upload");
+        setShowLesion(true);
+        // Alignment rests on the segmentation sharing the anatomy's grid.
+        const same = lv.dims.every((d, i) => d === volume.dims[i]);
+        setLesionWarning(
+          same
+            ? null
+            : `Segmentation grid ${lv.dims.join("×")} differs from the scan's ${volume.dims.join("×")}. Overlay alignment assumes they share a field of view — check it before reading the overlay.`,
+        );
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Could not read that segmentation.");
+      } finally {
+        setBusy(null);
+      }
+    },
+    [volume.dims],
+  );
+
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       for (const file of Array.from(e.dataTransfer.files)) {
-        if (/\.nii(\.gz)?$/i.test(file.name)) void loadMri(file);
-        else if (/\.edf$/i.test(file.name)) void loadEeg(file);
-        else setError(`${file.name}: drop a .nii / .nii.gz scan or an .edf recording.`);
+        const name = file.name;
+        // A NIfTI named like a segmentation is routed to the lesion layer, so
+        // dropping a BraTS folder's files all at once does the right thing.
+        if (/\.nii(\.gz)?$/i.test(name) && /(seg|label|mask|lesion)/i.test(name))
+          void loadLesion(file);
+        else if (/\.nii(\.gz)?$/i.test(name)) void loadMri(file);
+        else if (/\.edf$/i.test(name)) void loadEeg(file);
+        else if (/\.(trk|tck)$/i.test(name)) void loadTracts(file);
+        else
+          setError(
+            `${name}: drop a .nii scan, a segmentation, an .edf recording, or a .trk / .tck tractogram.`,
+          );
       }
     },
-    [loadMri, loadEeg],
+    [loadMri, loadEeg, loadTracts, loadLesion],
   );
 
   const resetAll = () => {
-    setVolume(phantomVolume(144));
-    setVolumeName("Synthetic phantom");
-    setVolumeSource("phantom");
+    if (template.current) {
+      setVolume(template.current);
+      setVolumeName(TEMPLATE_NAME);
+      setVolumeSource("template");
+    } else {
+      setVolume(phantomVolume(144));
+      setVolumeName("Synthetic phantom");
+      setVolumeSource("phantom");
+    }
     setRecording(phantomRecording(30));
     setRecordingName("Synthetic 10-20 recording");
     setRecordingSource("phantom");
+    if (bundledTracts.current) {
+      setTractogram(bundledTracts.current);
+      setTractName(TRACTS_NAME);
+      setTractSource("bundled");
+    } else {
+      setTractogram(syntheticTractogram());
+      setTractName("Synthetic demo bundle");
+      setTractSource("phantom");
+    }
+    setLesion(demonstrationLesion(144));
+    setLesionName("Demonstration lesion");
+    setLesionSource("phantom");
+    setLesionWarning(null);
     setError(null);
+  };
+
+  // Each scene is a preset over the same layers; every toggle stays adjustable.
+  const applyScene = (next: Scene) => {
+    setScene(next);
+    if (next === "fusion") {
+      setMode("volume");
+      setPalette("neural");
+      setShowTracts(true);
+      setTractOpacity(0.3);
+      setShowElectrodes(true);
+      setShowConnections(true);
+      setShowLesion(true);
+    } else if (next === "fibres") {
+      setShowTracts(true);
+      setTractOpacity(0.85);
+      setShowElectrodes(false);
+      setShowConnections(false);
+      setShowLesion(false);
+    } else {
+      setMode("glass");
+      setPalette("neural");
+      setShowTracts(false);
+      setShowElectrodes(false);
+      setShowConnections(false);
+      setShowLesion(true);
+    }
   };
 
   const signOut = () => {
@@ -239,7 +506,7 @@ export function ResearchConsole() {
           <div className="hidden h-8 w-px bg-[#16305e] md:block" />
 
           <div className="flex flex-wrap items-center gap-2">
-            <StatusChip on label="MRI" detail={volumeSource === "upload" ? "subject" : "phantom"} />
+            <StatusChip on label="MRI" detail={volumeLabel(volumeSource)} />
             <StatusChip
               on
               label="EEG"
@@ -295,6 +562,18 @@ export function ResearchConsole() {
                 hint=".edf"
                 onClick={() => eegInput.current?.click()}
               />
+              <UploadButton
+                icon={<Workflow className="h-4 w-4" />}
+                label="Load tractography"
+                hint=".trk · .tck"
+                onClick={() => tractInput.current?.click()}
+              />
+              <UploadButton
+                icon={<Target className="h-4 w-4" />}
+                label="Load lesion segmentation"
+                hint="BraTS seg · .nii.gz"
+                onClick={() => lesionInput.current?.click()}
+              />
               <button
                 type="button"
                 onClick={resetAll}
@@ -315,6 +594,28 @@ export function ResearchConsole() {
               }}
             />
             <input
+              ref={tractInput}
+              type="file"
+              accept=".trk,.tck"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void loadTracts(f);
+                e.target.value = "";
+              }}
+            />
+            <input
+              ref={lesionInput}
+              type="file"
+              accept=".nii,.gz"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void loadLesion(f);
+                e.target.value = "";
+              }}
+            />
+            <input
               ref={eegInput}
               type="file"
               accept=".edf"
@@ -327,7 +628,7 @@ export function ResearchConsole() {
             />
           </Panel>
 
-          <Panel title="MRI volume" meta={volumeSource === "upload" ? "subject" : "phantom"}>
+          <Panel title="MRI volume" meta={volumeLabel(volumeSource)}>
             <p className="truncate font-mono text-[0.72rem] text-[#7fd8ff]" title={volumeName}>
               {volumeName}
             </p>
@@ -426,12 +727,8 @@ export function ResearchConsole() {
               />
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <Toggle
-                on={showElectrodes}
-                onClick={() => setShowElectrodes((v) => !v)}
-                label="Electrodes"
-              />
               <Toggle on={autoRotate} onClick={() => setAutoRotate((v) => !v)} label="Rotate" />
+              <Toggle on={showHud} onClick={() => setShowHud((v) => !v)} label="HUD" />
             </div>
           </Panel>
         </aside>
@@ -443,7 +740,7 @@ export function ResearchConsole() {
             meta={`${volume.size.join("³ / ").split(" / ")[0]} texture · ${mapped.length} electrodes`}
             flush
           >
-            <div className="relative h-[clamp(24rem,52vh,40rem)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_45%,#0a1f4a_0%,#01071a_55%,#00030b_100%)]">
+            <div className="relative h-[clamp(28rem,62vh,46rem)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_45%,#0a1f4a_0%,#01071a_55%,#00030b_100%)]">
               <VolumeRenderer
                 volume={volume}
                 mode={mode}
@@ -454,6 +751,17 @@ export function ResearchConsole() {
                 slice={axial}
                 electrodes={electrodes}
                 showElectrodes={showElectrodes}
+                connections={connections}
+                showConnections={showConnections}
+                tractogram={tractogram}
+                showTracts={showTracts}
+                tractOpacity={tractOpacity}
+                lesion={lesion}
+                showLesion={showLesion}
+                lesionSynthetic={lesionSource !== "upload"}
+                showHud={showHud}
+                scene={scene}
+                tractsRegistered={tractSource !== "bundled" || volumeSource === "template"}
                 autoRotate={autoRotate && !hovered}
                 onHoverElectrode={setHovered}
                 hoveredElectrode={hovered}
@@ -470,8 +778,58 @@ export function ResearchConsole() {
                   · {palette.toUpperCase()}
                 </span>
                 <span>{volume.extent.map((v) => v.toFixed(0)).join(" × ")} mm</span>
-                <span>BAND · {band.toUpperCase()}</span>
+                <span className="mt-2 text-[#5e719a]">LAYERS · ONE COORDINATE FRAME</span>
+                <HudLayer on label="MRI" detail={volumeLabel(volumeSource)} colour="#7fd8ff" />
+                <HudLayer
+                  on={showTracts}
+                  label="TRACTS"
+                  detail={`${
+                    tractStride(scene) > 1 && tractogram.count > 1
+                      ? `${Math.ceil(tractogram.count / tractStride(scene)).toLocaleString()} of ${tractogram.count.toLocaleString()}`
+                      : tractogram.count.toLocaleString()
+                  } fibres · ${
+                    tractSource === "upload"
+                      ? "file"
+                      : tractSource === "bundled"
+                        ? volumeSource === "template"
+                          ? "ds000221 · registered"
+                          : "ds000221 · fitted"
+                        : "synthetic"
+                  }`}
+                  colour="#63b0ff"
+                  warn={
+                    tractSource === "phantom" ||
+                    (tractSource === "bundled" && volumeSource !== "template")
+                  }
+                />
+                <HudLayer
+                  on={showLesion && Boolean(lesion)}
+                  label="LESION"
+                  detail={
+                    lesion
+                      ? lesionSource === "upload"
+                        ? "segmentation"
+                        : "demonstration"
+                      : "none loaded"
+                  }
+                  colour="#ff4860"
+                  warn={lesionSource !== "upload" && Boolean(lesion)}
+                />
+                <HudLayer
+                  on={showConnections}
+                  label="EEG COHERENCE"
+                  detail={`${connections.length} pairs · ${band}`}
+                  colour="#b8f0ff"
+                />
               </div>
+
+              {showLesion && lesion && lesionSource !== "upload" ? (
+                <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded border border-[#ff4860]/50 bg-[#1a0508]/80 px-3 py-1.5 font-mono text-[0.6rem] tracking-[0.12em] text-[#ff9aa6] backdrop-blur">
+                  DEMONSTRATION LESION · SYNTHETIC · NOT A FINDING
+                </div>
+              ) : null}
+
+              <SceneSwitch scene={scene} onChange={applyScene} />
 
               {hovered ? (
                 <ElectrodeCard
@@ -483,10 +841,16 @@ export function ResearchConsole() {
 
               <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex flex-wrap items-end justify-between gap-3">
                 <p className="max-w-[46ch] font-mono text-[0.6rem] leading-relaxed tracking-[0.06em] text-[#5e719a]">
-                  DRAG TO ORBIT · SCROLL TO ZOOM · HOVER AN ELECTRODE · 10-20 POSITIONS PROJECTED
-                  ONTO THIS SCALP (APPROXIMATE, NO FIDUCIALS)
+                  DRAG TO ORBIT · SCROLL TO ZOOM · HOVER AN ELECTRODE · ELECTRODES PROJECTED ONTO
+                  THIS SCALP — APPROXIMATE, NOT CO-REGISTERED ·{" "}
+                  {tractSource === "bundled" && volumeSource === "template"
+                    ? "TRACTS AFFINELY REGISTERED TO THIS TEMPLATE"
+                    : "TRACTS FITTED TO THIS BRAIN"}
                 </p>
-                <BandLegend band={band} />
+                <div className="flex flex-col items-end gap-1.5">
+                  {showTracts ? <TractLegend /> : null}
+                  <BandLegend band={band} />
+                </div>
               </div>
 
               {busy ? (
@@ -567,6 +931,59 @@ export function ResearchConsole() {
                 sampleRate={sampleRate}
                 hovered={hovered}
                 playing={playing}
+              />
+            </div>
+          </Panel>
+          <Panel title="Layers" meta="one frame">
+            <div className="grid grid-cols-2 gap-1.5 lg:grid-cols-4">
+              <LayerRow
+                on={showTracts}
+                onClick={() => setShowTracts((v) => !v)}
+                colour="#63b0ff"
+                label="Tractography"
+                detail={`${tractogram.count.toLocaleString()} fibres`}
+              />
+              <LayerRow
+                on={showLesion}
+                onClick={() => setShowLesion((v) => !v)}
+                colour="#ff4860"
+                label="Lesion"
+                detail={lesion ? `${lesion.counts.size} classes` : "none"}
+                disabled={!lesion}
+              />
+              <LayerRow
+                on={showElectrodes}
+                onClick={() => setShowElectrodes((v) => !v)}
+                colour="#7fd8ff"
+                label="Electrodes"
+                detail={`${mapped.length} on scalp`}
+              />
+              <LayerRow
+                on={showConnections}
+                onClick={() => setShowConnections((v) => !v)}
+                colour="#b8f0ff"
+                label="EEG coherence"
+                detail={`${connections.length} arcs`}
+              />
+            </div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <Slider
+                id="tract-opacity"
+                label="Fibre brightness"
+                value={tractOpacity}
+                min={0.1}
+                max={1}
+                step={0.01}
+                onChange={setTractOpacity}
+              />
+              <Slider
+                id="top-k"
+                label="Strongest pairs"
+                value={topK}
+                min={4}
+                max={60}
+                step={1}
+                onChange={(v) => setTopK(Math.round(v))}
               />
             </div>
           </Panel>
@@ -677,6 +1094,64 @@ export function ResearchConsole() {
             outputs are gated behind the published benchmarks.
           </p>
         </aside>
+
+        {/* ======================= CLINICAL ANALYTICS ROW ======================= */}
+        <section className="grid min-w-0 gap-3 xl:col-span-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,1fr)]">
+          <Panel
+            title="Lesion localisation"
+            meta={
+              lesion
+                ? lesionSource === "upload"
+                  ? "segmentation"
+                  : "demonstration"
+                : "no segmentation"
+            }
+          >
+            {lesion ? (
+              <LesionPanel
+                lesion={lesion}
+                source={lesionSource}
+                name={lesionName}
+                warning={lesionWarning}
+              />
+            ) : (
+              <EmptyState
+                icon={<Target className="h-5 w-5" />}
+                title="No segmentation loaded"
+                body="Load a BraTS segmentation to localise tumour sub-regions in 3D with measured volumes. Detection from a raw scan needs a trained segmentation model — see DEMO_DATA.md."
+                action="Load segmentation"
+                onAction={() => lesionInput.current?.click()}
+              />
+            )}
+          </Panel>
+
+          <Panel title="Alzheimer's EEG biomarkers" meta="measured · no verdict">
+            <p className="mb-3 text-[0.72rem] leading-relaxed text-[#8095bf]">
+              Markers the literature reports altered in Alzheimer's, each computed from this
+              recording. The arrow shows the direction associated with disease — it is not a flag on
+              this subject.
+            </p>
+            <div className="flex flex-col">
+              {biomarkers.map((b) => (
+                <BiomarkerRow key={b.id} marker={b} />
+              ))}
+            </div>
+            <div className="mt-3 rounded border border-[#d9a441]/35 bg-[#d9a441]/[0.06] px-3 py-2 text-[0.66rem] leading-relaxed text-[#e8c98a]">
+              <span className="font-semibold">No risk score is shown, by design.</span> Combining
+              these into a prediction needs a model trained and validated on labelled cohorts. That
+              gate has not been passed — see <span className="font-mono">/benchmarks</span>.
+            </div>
+          </Panel>
+
+          <Panel title="Coherence matrix" meta={`${band} · ${coherence.segments} segments`}>
+            <CoherenceGrid matrix={coherence} hovered={hovered} onHover={setHovered} />
+            <p className="mt-2 text-[0.64rem] leading-relaxed text-[#5e719a]">
+              Magnitude-squared coherence, power-weighted across the band. Scalp EEG against a
+              common reference inflates coupling between neighbours through volume conduction — read
+              strong local pairs with that in mind.
+            </p>
+          </Panel>
+        </section>
       </main>
     </div>
   );
@@ -860,7 +1335,9 @@ function Slider({
     <label htmlFor={id} className="block">
       <span className="mb-1 flex justify-between font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[#8095bf]">
         {label}
-        <span className="tabular-nums text-[#e6efff]">{value.toFixed(2)}</span>
+        <span className="tabular-nums text-[#e6efff]">
+          {Number.isInteger(step) ? value.toFixed(0) : value.toFixed(2)}
+        </span>
       </span>
       <input
         id={id}
@@ -888,10 +1365,12 @@ function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; labe
           : "border-[#16305e] text-[#8095bf] hover:text-[#e6efff]"
       }`}
     >
-      {label === "Electrodes" ? (
-        <Layers className="h-3.5 w-3.5" />
+      {label === "Rotate" ? (
+        <RotateCcw className="h-3.5 w-3.5" />
+      ) : label === "HUD" ? (
+        <Sparkles className="h-3.5 w-3.5" />
       ) : (
-        <Scissors className="h-3.5 w-3.5" />
+        <Layers className="h-3.5 w-3.5" />
       )}
       {label}
     </button>
@@ -1016,4 +1495,370 @@ function fmt(n: number): string {
   if (a >= 1000) return n.toFixed(0);
   if (a >= 10) return n.toFixed(1);
   return n.toFixed(2);
+}
+
+/* ============================ LAYER PARTS ============================ */
+
+function HudLayer({
+  on,
+  label,
+  detail,
+  colour,
+  warn,
+}: {
+  on: boolean;
+  label: string;
+  detail: string;
+  colour: string;
+  warn?: boolean;
+}) {
+  return (
+    <span className="flex items-center gap-2" style={{ opacity: on ? 1 : 0.38 }}>
+      <span
+        className="h-1.5 w-1.5 rounded-full"
+        style={{ background: colour, boxShadow: on ? `0 0 6px ${colour}` : "none" }}
+      />
+      <span className="text-[#e6efff]">{label}</span>
+      <span className={warn ? "text-[#e8c98a]" : "text-[#8095bf]"}>· {detail}</span>
+    </span>
+  );
+}
+
+/** The tractography colour convention, so a viewer never has to guess it. */
+function TractLegend() {
+  return (
+    <div className="flex items-center gap-2.5 rounded border border-[#16305e] bg-[#00030b]/70 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-[0.1em] text-[#8095bf]">
+      <span className="flex items-center gap-1">
+        <span className="h-1.5 w-3 rounded-full bg-[#ff5a5a]" /> L–R
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="h-1.5 w-3 rounded-full bg-[#5aff8c]" /> A–P
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="h-1.5 w-3 rounded-full bg-[#5a8cff]" /> S–I
+      </span>
+    </div>
+  );
+}
+
+function LayerRow({
+  on,
+  onClick,
+  colour,
+  label,
+  detail,
+  disabled,
+}: {
+  on: boolean;
+  onClick: () => void;
+  colour: string;
+  label: string;
+  detail: string;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={on}
+      className={`flex items-center gap-2.5 rounded-md border px-2.5 py-2 text-left transition disabled:cursor-not-allowed disabled:opacity-40 ${
+        on ? "border-[#16305e] bg-[#061733]" : "border-[#0e2247] bg-transparent"
+      } hover:border-[#3d8bf5]`}
+    >
+      <span
+        className="h-2.5 w-2.5 shrink-0 rounded-full transition"
+        style={{
+          background: on ? colour : "transparent",
+          border: `1.5px solid ${colour}`,
+          boxShadow: on ? `0 0 8px ${colour}` : "none",
+        }}
+      />
+      <span className="min-w-0 flex-1">
+        <span
+          className={`block text-[0.76rem] font-medium ${on ? "text-[#e6efff]" : "text-[#8095bf]"}`}
+        >
+          {label}
+        </span>
+        <span className="block font-mono text-[0.58rem] text-[#5e719a]">{detail}</span>
+      </span>
+      <span
+        className={`font-mono text-[0.56rem] tracking-[0.1em] ${on ? "text-[#7fd8ff]" : "text-[#5e719a]"}`}
+      >
+        {on ? "ON" : "OFF"}
+      </span>
+    </button>
+  );
+}
+
+const SCENES: { id: Scene; label: string; hint: string }[] = [
+  { id: "fusion", label: "Fusion", hint: "Every layer in one frame" },
+  { id: "fibres", label: "Fibres", hint: "Tractography through MRI slice planes" },
+  { id: "tumour", label: "Tumour", hint: "Segmentation as a particle field in a glass brain" },
+];
+
+function SceneSwitch({ scene, onChange }: { scene: Scene; onChange: (s: Scene) => void }) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Scene"
+      className="absolute right-3 top-3 z-10 flex gap-1 rounded-md border border-[#16305e] bg-[#01071a]/80 p-1 backdrop-blur"
+    >
+      {SCENES.map((s) => (
+        <button
+          key={s.id}
+          type="button"
+          role="radio"
+          aria-checked={scene === s.id}
+          title={s.hint}
+          onClick={() => onChange(s.id)}
+          className={`rounded px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.12em] transition ${
+            scene === s.id
+              ? "bg-[#1e63c4] text-white shadow-[0_0_14px_#1e63c4]"
+              : "text-[#8095bf] hover:text-[#e6efff]"
+          }`}
+        >
+          {s.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function EmptyState({
+  icon,
+  title,
+  body,
+  action,
+  onAction,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+  action: string;
+  onAction: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-start gap-2.5 py-2">
+      <span className="grid h-9 w-9 place-items-center rounded-md bg-[#ff4860]/10 text-[#ff8a98]">
+        {icon}
+      </span>
+      <p className="text-[0.82rem] font-medium text-[#e6efff]">{title}</p>
+      <p className="text-[0.72rem] leading-relaxed text-[#8095bf]">{body}</p>
+      <button
+        type="button"
+        onClick={onAction}
+        className="mt-1 rounded-md border border-[#ff4860]/50 px-3 py-1.5 text-[0.72rem] text-[#ff9aa6] transition hover:bg-[#ff4860]/10"
+      >
+        {action}
+      </button>
+    </div>
+  );
+}
+
+function LesionPanel({
+  lesion,
+  source,
+  name,
+  warning,
+}: {
+  lesion: LabelVolume;
+  source: "phantom" | "upload";
+  name: string;
+  warning: string | null;
+}) {
+  const rows = [...lesion.volumesCm3.entries()].sort((a, b) => a[0] - b[0]);
+  const total = rows.reduce((acc, [, v]) => acc + v, 0);
+  // Tumour core = necrotic + enhancing, the BraTS "TC" sub-region.
+  const core = rows.filter(([l]) => l === 1 || l === 3 || l === 4).reduce((a, [, v]) => a + v, 0);
+  return (
+    <div>
+      <p className="truncate font-mono text-[0.7rem] text-[#ff9aa6]" title={name}>
+        {name}
+      </p>
+      {source !== "upload" ? (
+        <p className="mt-1.5 rounded border border-[#ff4860]/35 bg-[#ff4860]/[0.06] px-2.5 py-1.5 text-[0.64rem] leading-relaxed text-[#ffb3bc]">
+          Synthetic demonstration of the overlay. Not derived from any scan and not a finding.
+        </p>
+      ) : null}
+      {warning ? (
+        <p className="mt-1.5 rounded border border-[#d9a441]/40 bg-[#d9a441]/[0.07] px-2.5 py-1.5 text-[0.64rem] leading-relaxed text-[#e8c98a]">
+          {warning}
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex flex-col gap-2">
+        {rows.map(([label, cm3]) => {
+          const cls = BRATS_CLASSES[label];
+          const [r, g, b] = cls?.colour ?? [210, 140, 255];
+          return (
+            <div key={label}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="flex min-w-0 items-center gap-2 text-[0.74rem] text-[#e6efff]">
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-sm"
+                    style={{ background: `rgb(${r},${g},${b})` }}
+                  />
+                  <span className="truncate">{cls?.name ?? `Label ${label}`}</span>
+                  <span className="font-mono text-[0.58rem] text-[#5e719a]">
+                    {cls?.short ?? label}
+                  </span>
+                </span>
+                <span className="font-mono text-[0.74rem] tabular-nums text-[#e6efff]">
+                  {cm3.toFixed(2)} cm³
+                </span>
+              </div>
+              <div className="mt-1 h-1 overflow-hidden rounded-full bg-[#0e2247]">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${total ? (cm3 / total) * 100 : 0}%`,
+                    background: `rgb(${r},${g},${b})`,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <dl className="mt-3 grid grid-cols-2 gap-1.5">
+        <Stat k="Whole tumour" v={`${total.toFixed(2)} cm³`} />
+        <Stat k="Tumour core" v={`${core.toFixed(2)} cm³`} />
+      </dl>
+      <p className="mt-2 text-[0.62rem] leading-relaxed text-[#5e719a]">
+        Volumes counted at the segmentation&apos;s native resolution. The reticle marks the largest
+        labelled region.
+      </p>
+    </div>
+  );
+}
+
+function BiomarkerRow({ marker }: { marker: import("./fusion").Biomarker }) {
+  const up = marker.adDirection === "higher";
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-0.5 border-t border-[#0e2247] py-2.5 first:border-t-0">
+      <div className="min-w-0">
+        <p className="text-[0.78rem] font-medium text-[#e6efff]">{marker.name}</p>
+        <p className="text-[0.64rem] leading-relaxed text-[#8095bf]">{marker.meaning}</p>
+      </div>
+      <div className="flex flex-col items-end">
+        <span className="font-mono text-[1.02rem] font-semibold tabular-nums text-white">
+          {marker.format(marker.value)}
+        </span>
+        <span className="font-mono text-[0.56rem] text-[#5e719a]">{marker.unit}</span>
+      </div>
+      <p className="col-span-2 flex items-center gap-1.5 text-[0.62rem] text-[#5e719a]">
+        <span
+          className="inline-flex h-4 items-center gap-1 rounded border border-[#16305e] px-1.5 font-mono text-[0.56rem] text-[#8095bf]"
+          title="Direction the Alzheimer's literature associates with disease"
+        >
+          AD {up ? "↑" : "↓"}
+        </span>
+        <span className="min-w-0">{marker.basis}</span>
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Channel × channel coherence as a heatmap. Hovering a cell selects its row
+ * electrode, so the matrix, topomap, 3D arcs and spectrum stay linked.
+ */
+function CoherenceGrid({
+  matrix,
+  hovered,
+  onHover,
+}: {
+  matrix: { labels: string[]; values: Float32Array };
+  hovered: string | null;
+  onHover: (label: string | null) => void;
+}) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const n = matrix.labels.length;
+
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas || !n) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const pad = 26;
+    const cell = 14;
+    const S = pad + n * cell;
+    canvas.width = S;
+    canvas.height = S;
+    ctx.clearRect(0, 0, S, S);
+
+    // Off-diagonal range, so the colour scale is not pinned by the diagonal's 1s.
+    let lo = 1;
+    let hi = 0;
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const v = matrix.values[i * n + j]!;
+        if (v < lo) lo = v;
+        if (v > hi) hi = v;
+      }
+    const span = hi - lo || 1;
+
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        const v = i === j ? 1 : (matrix.values[i * n + j]! - lo) / span;
+        const t = Math.max(0, Math.min(1, v));
+        const r = Math.round(8 + t * (184 - 8));
+        const g = Math.round(28 + t * (240 - 28));
+        const b = Math.round(90 + t * (255 - 90));
+        ctx.fillStyle = i === j ? "#16305e" : `rgb(${r},${g},${b})`;
+        ctx.fillRect(pad + j * cell, pad + i * cell, cell - 1, cell - 1);
+      }
+    }
+    // Axis labels, the hovered electrode emphasised on both axes.
+    ctx.font = "600 8px ui-monospace, monospace";
+    for (let i = 0; i < n; i++) {
+      const label = matrix.labels[i]!;
+      ctx.fillStyle = label === hovered ? "#ffffff" : "rgba(128,149,191,0.9)";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, pad - 3, pad + i * cell + cell / 2);
+      ctx.save();
+      ctx.translate(pad + i * cell + cell / 2, pad - 3);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = "left";
+      ctx.fillText(label, 0, 0);
+      ctx.restore();
+    }
+    if (hovered) {
+      const k = matrix.labels.indexOf(hovered);
+      if (k >= 0) {
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(pad - 0.5, pad + k * cell - 0.5, n * cell, cell);
+        ctx.strokeRect(pad + k * cell - 0.5, pad - 0.5, cell, n * cell);
+      }
+    }
+  }, [matrix, hovered, n]);
+
+  const handleMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const scale = e.currentTarget.width / rect.width;
+    const y = (e.clientY - rect.top) * scale;
+    const row = Math.floor((y - 26) / 14);
+    onHover(row >= 0 && row < n ? matrix.labels[row]! : null);
+  };
+
+  if (!n)
+    return (
+      <p className="text-[0.72rem] text-[#8095bf]">Not enough recording to estimate coherence.</p>
+    );
+  return (
+    <div className="flex justify-center">
+      <canvas
+        ref={ref}
+        onMouseMove={handleMove}
+        onMouseLeave={() => onHover(null)}
+        className="h-auto w-full max-w-[19rem] cursor-crosshair [image-rendering:pixelated]"
+        aria-label="Coherence matrix between electrode pairs"
+      />
+    </div>
+  );
 }

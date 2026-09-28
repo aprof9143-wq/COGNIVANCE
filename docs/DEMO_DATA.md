@@ -69,6 +69,80 @@ source.
 
 ---
 
+## What ships with the console
+
+`/research` opens on real data without any download:
+
+| Layer | What it is | Source | Licence |
+| --- | --- | --- | --- |
+| MRI | MNI152 ICBM 2009a T1 template, 1.5 mm | McConnell Brain Imaging Centre, via `nilearn` | MNI/McGill permissive notice — `public/templates/NOTICE.md` |
+| Tractography | 20,000 whole-brain streamlines, CSD + deterministic tracking, affinely registered to the template | OpenNeuro **ds000221** (MPI-Leipzig Mind-Brain-Body), subject 010002 | CC0 |
+| Lesion | **Synthetic** demonstration lesion — labelled so on screen | generated in code | — |
+
+The tractogram is rebuilt, byte for byte, by
+[`tools/demo-assets/build_tractogram.py`](../tools/demo-assets/build_tractogram.py)
+from the public diffusion data. The script prints its own registration check
+(share of fibre points on template tissue — 0.98 for the shipped file).
+
+---
+
+## Tractography — data sources
+
+The console reads **TrackVis `.trk`** and **MRtrix3 `.tck`**. Drop either onto
+the page; it is fitted to the loaded brain (or placed exactly, for the bundled
+tractogram on the template).
+
+### Ready-made tractograms
+
+- **HCP-842 population atlas** (Yeh et al., *NeuroImage* 2018) — 80 named
+  bundles in MNI space, `.trk`. Easiest route is DIPY:
+  `python -c "from dipy.data import fetch_bundle_atlas_hcp842 as f; f()"`
+  (~300 MB, figshare). Being in MNI space, it lines up with the bundled template.
+- **TractoInferno** — OpenNeuro **ds003900**, CC0. 284 subjects, multi-site,
+  with reference bundle tractograms built for machine learning on tractography.
+  The strongest dataset to cite for a "trained on real tractography" roadmap.
+- **ORG fibre-clustering atlas** (O'Donnell Research Group, Zhang et al.,
+  *NeuroImage* 2018) — <https://dmri.slicer.org/atlases/>. 800-cluster
+  whole-brain atlas from 100 HCP subjects.
+
+### Raw diffusion MRI to track yourself
+
+- **OpenNeuro ds000221** — what the bundled tractogram is built from. CC0.
+- **Human Connectome Project** — <https://db.humanconnectome.org>. The reference
+  standard for diffusion quality; free account and open-access data terms.
+- Run the same pipeline on any of them with the script above, or with
+  MRtrix3 (`tckgen`) / DSI Studio, and drop the resulting `.tck`/`.trk` in.
+
+### Tumour patients with diffusion MRI — the pilot pairing
+
+- **OpenNeuro ds001226 (BTC_preop)** — CC0. T1 and diffusion MRI of glioma and
+  meningioma patients before surgery (and ds002080, **BTC_postop**, after). This
+  is the dataset for the flagship view: a tumour and the fibres it displaces,
+  in one frame. It has no tumour masks in its subject folders, so pair it with
+  a segmentation (below).
+- **UCSF-PDGM** (The Cancer Imaging Archive) — preoperative diffuse glioma MRI
+  with diffusion and BraTS-style tumour segmentations. Check the collection's
+  licence and citation terms on TCIA before use in a pitch.
+
+---
+
+## Tumour segmentation — data sources
+
+The lesion layer reads an integer **label map** in NIfTI (`*seg*.nii.gz`,
+`*label*`, `*mask*` or `*lesion*` in the name routes it automatically). It
+localises what the labels say and measures their volumes at native resolution.
+It does **not** detect tumours from a raw scan — that needs a trained model.
+
+- **BraTS** (RSNA-ASNR-MICCAI Brain Tumor Segmentation) — via Synapse, free
+  registration. Expert multi-class labels: 1 necrotic core, 2 oedema, 3/4
+  enhancing tumour. This is the convention the console colours by.
+- **Medical Segmentation Decathlon, Task01_BrainTumour** — CC-BY-SA 4.0.
+  ⚠ Different label convention (1 oedema, 2 non-enhancing, 3 enhancing). It will
+  load, but classes will be named as BraTS classes. Relabel first.
+- **UCSF-PDGM** — as above; segmentations included.
+
+---
+
 ## Before you present
 
 1. **Use Chrome or Edge.** The volume renderer needs WebGL2. Safari decompresses
@@ -82,8 +156,13 @@ source.
 
 ## Demo script — about three minutes
 
-1. **Open `/research`.** It opens on phantoms, so the screen is never empty.
-   The header chips read `MRI · phantom`, `EEG · phantom`.
+1. **Open `/research`.** It opens on the MNI template with real whole-brain
+   tractography, so the screen is never empty. The header chips read
+   `MRI · template`, `EEG · phantom`.
+   *Try the scene switch, top right:* **Fibres** cuts the tractogram with MRI
+   slice planes; **Tumour** turns the brain to glass and draws the lesion as a
+   particle field with a measured-volume callout. On the template the lesion is
+   the synthetic demonstration lesion, and the screen says so.
 2. **Drop the MRI file onto the page.** The whole head renders as a true 3D
    volume, with axial, coronal and sagittal slices below.
    *Say:* "This is the full volume on the GPU — every voxel, not a slice."
@@ -98,6 +177,17 @@ source.
    switches to it — one selection driving every view.
 7. **Point at the Fusion readout.** The same question — hemispheric asymmetry —
    asked of the anatomy and of the brain's electrical activity, side by side.
+
+---
+
+## NIMBLE hardware simulation — `/nimble`
+
+A live twin of the acquisition layer, public, no sign-in. Switch **Simulated
+source → Bench MCU link** and the link health changes (latency, jitter, loss)
+while the analysis reading from it does not — that is the hardware abstraction
+layer's claim, made visible. Then inject faults: **Electrode lift** on O1 turns
+the self-test from PASS to DIVERGED, which is the point: the platform notices.
+Every value on that page is simulated in the browser, and it says so.
 
 ---
 
