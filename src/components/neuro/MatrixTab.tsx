@@ -66,7 +66,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
         tag="literature"
         note="associations, not localisations"
       >
-        <div className="mb-3 flex flex-wrap items-center gap-3 text-[12px] text-[#aab6c8]">
+        <div className="mb-3 flex flex-wrap items-center gap-3 text-[12px] text-[#a9bbdc]">
           <label className="flex items-center gap-2">
             Selected reference range: |z| ≥
             <input
@@ -97,7 +97,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
             supporting
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="rounded border border-[#e8eef8] px-1 text-[11px]">
+            <span className="rounded border border-[#e6efff] px-1 text-[11px]">
               ◆ outside range
             </span>{" "}
             subject measurement outside the selected reference range in that network (compatible
@@ -108,11 +108,11 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
           <table className="w-full min-w-[56rem] border-separate border-spacing-0.5 text-[12px]">
             <thead>
               <tr>
-                <th className="w-44 text-left font-normal text-[#8a97ab]">Domain ↓ · Network →</th>
+                <th className="w-44 text-left font-normal text-[#8095bf]">Domain ↓ · Network →</th>
                 {networks.map((n) => (
                   <th
                     key={n}
-                    className="max-w-[9rem] px-1 text-left align-bottom font-normal text-[#aab6c8]"
+                    className="max-w-[9rem] px-1 text-left align-bottom font-normal text-[#a9bbdc]"
                   >
                     {n}
                   </th>
@@ -123,7 +123,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
               {SymptomDomain.options.map((d) => (
                 <tr key={d}>
                   <th
-                    className={`pr-2 text-left font-normal ${recorded.has(d) ? "text-[#ffe59a]" : "text-[#e8eef8]"}`}
+                    className={`pr-2 text-left font-normal ${recorded.has(d) ? "text-[#ffe59a]" : "text-[#e6efff]"}`}
                   >
                     {DOMAIN_LABEL[d]}
                     {recorded.has(d) ? (
@@ -132,7 +132,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
                   </th>
                   {networks.map((n) => {
                     const a = associations.find((x) => x.domain === d && x.network === n);
-                    if (!a) return <td key={n} className="rounded bg-[#10151d]" />;
+                    if (!a) return <td key={n} className="rounded bg-[#030b20]" />;
                     const f = flagged(a);
                     const tip = [
                       `${DOMAIN_LABEL[d]} ↔ ${n}`,
@@ -150,17 +150,17 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
                       <td
                         key={n}
                         title={tip}
-                        className="h-11 rounded px-1.5 align-middle text-[#e8eef8]"
+                        className="h-11 rounded px-1.5 align-middle text-[#e6efff]"
                         style={{ background: STRENGTH_BG[a.strength] }}
                       >
                         <span className="text-[11px]">{a.strength}</span>
                         {f.hits.length ? (
-                          <span className="ml-1 rounded border border-[#e8eef8] px-1 text-[11px]">
+                          <span className="ml-1 rounded border border-[#e6efff] px-1 text-[11px]">
                             ◆
                           </span>
                         ) : null}
                         {!f.measured ? (
-                          <span className="block text-[10.5px] text-[#aab6c8]">no data</span>
+                          <span className="block text-[10.5px] text-[#a9bbdc]">no data</span>
                         ) : null}
                       </td>
                     );
@@ -170,7 +170,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-[12px] text-[#8a97ab]">
+        <p className="mt-2 text-[12px] text-[#8095bf]">
           Activities of daily living reflect overall severity and have no specific localisation.
           Highlighting a network does not mean it explains a symptom; atypical presentations and
           mixed pathologies produce different patterns. Hover a cell for its sources, uncertainty
@@ -209,7 +209,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
       >
         <div className="overflow-x-auto">
           <table className="w-full min-w-[64rem] text-[12px]">
-            <thead className="text-left text-[#8a97ab]">
+            <thead className="text-left text-[#8095bf]">
               <tr>
                 {[
                   "Domain",
@@ -229,12 +229,12 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
             </thead>
             <tbody>
               {associations.map((a) => (
-                <tr key={a.id} className="border-t border-[#222b38] align-top text-[#e8eef8]">
+                <tr key={a.id} className="border-t border-[#0e2247] align-top text-[#e6efff]">
                   <td className="p-1">{DOMAIN_LABEL[a.domain]}</td>
                   <td className="p-1">
                     <Text value={a.network} onChange={(v) => update(a.id, { network: v })} />
                   </td>
-                  <td className="p-1 text-[11px] text-[#aab6c8]">
+                  <td className="p-1 text-[11px] text-[#a9bbdc]">
                     {associationRegionIds(a)
                       .map(
                         (id) =>
@@ -263,7 +263,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
                       options={["low", "medium", "high"] as const}
                     />
                   </td>
-                  <td className="p-1 text-[11px] text-[#aab6c8]">
+                  <td className="p-1 text-[11px] text-[#a9bbdc]">
                     {a.citations.length ? (
                       a.citations.map(cite).join(" · ")
                     ) : (
@@ -276,7 +276,7 @@ export function MatrixTab({ c, rows, associations, setAssociations, zLimit, setZ
                       aria-label="Remove association"
                       onClick={() => setAssociations(associations.filter((x) => x.id !== a.id))}
                     >
-                      <Trash2 className="h-4 w-4 text-[#8a97ab] hover:text-[#f2a7a7]" />
+                      <Trash2 className="h-4 w-4 text-[#8095bf] hover:text-[#f2a7a7]" />
                     </button>
                   </td>
                 </tr>

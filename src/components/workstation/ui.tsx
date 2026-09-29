@@ -21,11 +21,11 @@ export function Panel({
   actions?: React.ReactNode;
 }) {
   return (
-    <section className="flex min-w-0 flex-col rounded-md border border-[#2a3444] bg-[#121821]">
-      <header className="flex flex-wrap items-center gap-2 border-b border-[#2a3444] px-3 py-2">
-        <h3 className="text-[13px] font-semibold text-[#e8eef8]">{title}</h3>
+    <section className="flex min-w-0 flex-col rounded-md border border-[#16305e] bg-[#04102b]">
+      <header className="flex flex-wrap items-center gap-2 border-b border-[#16305e] px-3 py-2">
+        <h3 className="text-[13px] font-semibold text-[#e6efff]">{title}</h3>
         {tag ? <Tag kind={tag} /> : null}
-        {note ? <span className="ml-auto text-[12px] text-[#8a97ab]">{note}</span> : null}
+        {note ? <span className="ml-auto text-[12px] text-[#8095bf]">{note}</span> : null}
         {actions ? <div className={note ? "" : "ml-auto"}>{actions}</div> : null}
       </header>
       <div className={flush ? "" : "p-3"}>{children}</div>
@@ -39,14 +39,14 @@ const TAG_STYLE: Record<string, string> = {
   inferred: "border-[#6b4f3d] text-[#e0b89a]",
   derived: "border-[#3d5a7a] text-[#a7c4e6]",
   literature: "border-[#5a4a7a] text-[#c8b6ea]",
-  entered: "border-[#4a5566] text-[#c3cbd6]",
+  entered: "border-[#2a4a80] text-[#c4d2ee]",
   "research only": "border-[#7a3d3d] text-[#eaa7a7]",
 };
 
 export function Tag({ kind }: { kind: string }) {
   return (
     <span
-      className={`rounded border px-1.5 py-px text-[11px] uppercase tracking-wide ${TAG_STYLE[kind] ?? "border-[#4a5566] text-[#c3cbd6]"}`}
+      className={`rounded border px-1.5 py-px text-[11px] uppercase tracking-wide ${TAG_STYLE[kind] ?? "border-[#2a4a80] text-[#c4d2ee]"}`}
     >
       {kind}
     </span>

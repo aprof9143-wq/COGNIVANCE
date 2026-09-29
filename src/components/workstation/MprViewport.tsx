@@ -520,7 +520,7 @@ function Marker({ className, children }: { className: string; children: React.Re
 function Corner({ className, children }: { className: string; children: React.ReactNode }) {
   return (
     <div
-      className={`pointer-events-none absolute flex flex-col gap-0.5 font-mono text-[11px] leading-tight text-[#d6deeb] [text-shadow:0_0_3px_#000,0_0_2px_#000] ${className}`}
+      className={`pointer-events-none absolute flex flex-col gap-0.5 font-mono text-[11px] leading-tight text-[#d5e2fa] [text-shadow:0_0_3px_#000,0_0_2px_#000] ${className}`}
     >
       {children}
     </div>

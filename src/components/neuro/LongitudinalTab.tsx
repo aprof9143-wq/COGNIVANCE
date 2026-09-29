@@ -21,12 +21,12 @@ import { newId } from "@/lib/neuro/ids";
 type Props = { c: CaseFile; set: (f: (c: CaseFile) => CaseFile) => void };
 
 const INK = {
-  primary: "#e8eef8",
-  secondary: "#aab6c8",
-  muted: "#8a97ab",
-  grid: "#2c2c2a",
-  axis: "#383835",
-  surface: "#121821",
+  primary: "#e6efff",
+  secondary: "#a9bbdc",
+  muted: "#8095bf",
+  grid: "#0e2247",
+  axis: "#16305e",
+  surface: "#04102b",
 };
 
 const t = (d: string) => Date.parse(d);
@@ -85,7 +85,7 @@ export function LongitudinalTab({ c, set }: Props) {
     ...c.events.map((e) => ({
       x: t(e.date),
       label: e.label,
-      colour: e.kind === "treatment" ? SERIES.third : "#6b7a90",
+      colour: e.kind === "treatment" ? SERIES.third : "#5e719a",
     })),
   ];
 
@@ -99,7 +99,7 @@ export function LongitudinalTab({ c, set }: Props) {
     return (
       <Panel key={title} title={title} tag={lines.length > 1 ? "derived" : "entered"} note={unit}>
         {!has ? (
-          <p className="py-6 text-center text-[13px] text-[#aab6c8]">
+          <p className="py-6 text-center text-[13px] text-[#a9bbdc]">
             Insufficient data — no usable values.
           </p>
         ) : (
@@ -125,7 +125,7 @@ export function LongitudinalTab({ c, set }: Props) {
                 <Tooltip
                   contentStyle={{
                     background: INK.surface,
-                    border: "1px solid #334055",
+                    border: "1px solid #1e3a6e",
                     fontSize: 12,
                   }}
                   labelStyle={{ color: INK.secondary }}
@@ -196,7 +196,7 @@ export function LongitudinalTab({ c, set }: Props) {
           );
         })}
       </div>
-      <p className="text-[12px] text-[#8a97ab]">
+      <p className="text-[12px] text-[#8095bf]">
         Longitudinal structural change. Whole-brain and other regional series appear when those
         measurements are imported. Changes across scanner or protocol changes (see the Imaging tab
         warnings) may not be biological.
@@ -230,7 +230,7 @@ export function LongitudinalTab({ c, set }: Props) {
         }
       >
         {!c.events.length ? (
-          <p className="text-[13px] text-[#aab6c8]">No events.</p>
+          <p className="text-[13px] text-[#a9bbdc]">No events.</p>
         ) : (
           c.events.map((e) => (
             <div
@@ -273,7 +273,7 @@ export function LongitudinalTab({ c, set }: Props) {
                   set((x) => ({ ...x, events: x.events.filter((y) => y.id !== e.id) }))
                 }
               >
-                <Trash2 className="h-4 w-4 text-[#8a97ab]" />
+                <Trash2 className="h-4 w-4 text-[#8095bf]" />
               </button>
             </div>
           ))

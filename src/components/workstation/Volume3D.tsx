@@ -313,7 +313,7 @@ function disposeChildren(group: THREE.Group) {
   group.clear();
 }
 
-function textSprite(text: string, colour = "#e8eef8"): THREE.Sprite {
+function textSprite(text: string, colour = "#e6efff"): THREE.Sprite {
   const c = document.createElement("canvas");
   c.width = 128;
   c.height = 48;
@@ -456,9 +456,9 @@ export function Volume3D(props: Props) {
         const g = c.getContext("2d")!;
         g.fillStyle = "#1b2433";
         g.fillRect(0, 0, 64, 64);
-        g.strokeStyle = "#6b7a90";
+        g.strokeStyle = "#5e719a";
         g.strokeRect(1, 1, 62, 62);
-        g.fillStyle = "#e8eef8";
+        g.fillStyle = "#e6efff";
         g.font = "600 34px ui-sans-serif, system-ui";
         g.textAlign = "center";
         g.textBaseline = "middle";
