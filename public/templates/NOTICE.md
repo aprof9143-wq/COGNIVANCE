@@ -21,3 +21,20 @@ from the use or misuse of this software package.
 
 References: Fonov et al., NeuroImage 54 (2011); Fonov et al., NeuroImage 47
 (2009) S102; Collins et al., Human Brain Mapping (1999).
+
+# mni152_aseg.nii.gz
+
+FreeSurfer-convention subcortical labels (aseg: hippocampus, amygdala,
+ventricles, thalamus, basal ganglia, ...) for the template above, so the
+research console and Neurodegeneration Tracking have regional volumes to show
+on the template. The labels describe the population-average template, not a
+person.
+
+Source: TemplateFlow, `tpl-MNI152NLin2009cAsym_res-01_seg-aseg_dseg.nii.gz`
+(ICBM 152 Nonlinear Asymmetrical 2009c; same McGill licence as above). They
+were carried onto the 2009a symmetric grid by MNI coordinates, using a
+27-point majority vote per voxel. The brain-mask Dice against the template is
+0.986. Rebuilt by `tools/demo-assets/build_template_aseg.py`.
+
+References: Fonov et al., NeuroImage 54 (2011); Ciric et al., Nature Methods 19
+(2022) (TemplateFlow).

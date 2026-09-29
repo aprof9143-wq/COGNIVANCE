@@ -79,7 +79,8 @@ on real data without any download:
 | --- | --- | --- | --- |
 | MRI | MNI152 ICBM 2009a T1 template, 1.5 mm | McConnell Brain Imaging Centre, via `nilearn` | MNI/McGill permissive notice — `public/templates/NOTICE.md` |
 | Tractography | 20,000 whole-brain streamlines, CSD + deterministic tracking, affinely registered to the template | OpenNeuro **ds000221** (MPI-Leipzig Mind-Brain-Body), subject 010002 | CC0 |
-| Lesion | None. Without a loaded label map the viewer shows "No validated segmentation loaded". | — | — |
+| Lesion | Console: a demonstration lesion, labelled synthetic wherever it appears. Viewer: none; it shows "No validated segmentation loaded". | generated in code | — |
+| Regional labels | FreeSurfer aseg for the template (hippocampus, ventricles, …), used for the tracking dashboard's template volumes | TemplateFlow MNI152NLin2009cAsym | MNI/McGill notice — `public/templates/NOTICE.md` |
 | EEG | The console opens on a synthetic 10-20 recording, labelled "phantom"; the viewer has none until one is loaded. | generated in code | — |
 
 The tractogram is rebuilt, byte for byte, by
@@ -162,10 +163,12 @@ that needs a trained model.
 
 ## Walkthrough — about three minutes
 
-1. **Open `/research`.** The research console opens on the MNI template
-   (labelled "template") as a GPU-raymarched 3D volume with the 10-20
-   electrodes, three linked slices, and the EEG analysis of the loaded
-   recording. Load a NIfTI, an EDF, or a FreeSurfer label map; the
+1. **Open `/research`.** The research console opens on the MNI template with
+   the Fusion scene: the raymarched brain, 2,000 of the 20,000 ds000221
+   streamlines, the demonstration lesion (labelled synthetic), 10-20
+   electrodes and EEG coherence. **Fibres** shows the whole tractogram through
+   the slice planes; **Tumour** shows the lesion classes in a glass brain.
+   Load a NIfTI, an EDF, a BraTS segmentation or a FreeSurfer label map; the
    Neurodegeneration panel updates as each one loads.
 2. **Open the diagnostic viewer (`/viewer`)** and load a DICOM series or NIfTI. Orientation markers, slice n/N, spacing and
    the acquired-versus-reformatted plane come from the file's own geometry.

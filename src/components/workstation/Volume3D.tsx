@@ -695,17 +695,21 @@ export function Volume3D(props: Props) {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(pos.subarray(0, w), 3));
     geo.setAttribute("color", new THREE.BufferAttribute(col.subarray(0, w), 3));
-    s.layers.tracts.add(
-      new THREE.LineSegments(
-        geo,
-        new THREE.LineBasicMaterial({
-          vertexColors: true,
-          transparent: true,
-          opacity: tr.opacity,
-          depthWrite: false,
-        }),
-      ),
+    const lines = new THREE.LineSegments(
+      geo,
+      new THREE.LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: tr.opacity,
+        depthWrite: false,
+        // The raymarched volume writes no depth, so depth-tested lines drawn
+        // before it end up hidden under the cortex. Drawn after it instead,
+        // the whole tractogram shows through; the opacity slider balances it.
+        depthTest: false,
+      }),
     );
+    lines.renderOrder = 3;
+    s.layers.tracts.add(lines);
   }, [tr, tr?.visible, tr?.opacity]);
 
   /* ------------------------------------------- electrodes and connections */

@@ -7,8 +7,18 @@ import {
   exportProvenanceJson,
   parseCaseFile,
 } from "@/lib/neuro/io";
-import { applyLinked, useLinked, type LinkedState } from "@/lib/neuro/linked";
+import {
+  applyLinked,
+  clearLinkedHistory,
+  isFreeSurfer,
+  planLinked,
+  scanDate,
+  setScanDate,
+  useLinked,
+  type LinkedState,
+} from "@/lib/neuro/linked";
 import { regionRows } from "@/lib/neuro/results";
+import { linkTemplateAseg } from "@/lib/neuro/templateAtlas";
 import { emptyCase, type CaseFile } from "@/lib/neuro/schema";
 import { DEFAULT_ASSOCIATIONS, DOMAIN_LABEL, type Association } from "@/lib/neuro/symptomMap";
 import { DISCLAIMER, Panel, Pill } from "@/components/workstation/ui";
@@ -61,6 +71,13 @@ export function NeuroDashboard() {
   useEffect(() => {
     setC((x) => applyLinked(x, linked));
   }, [linked]);
+  // If the template is linked before its FreeSurfer labels finished loading
+  // (the dashboard opened quickly), fetch them from here.
+  const templateWithoutLabels =
+    linked.mri?.kind === "template" && !linked.segmentation && typeof window !== "undefined";
+  useEffect(() => {
+    if (templateWithoutLabels) void linkTemplateAseg(linked.mri!.origin).catch(() => {});
+  }, [templateWithoutLabels, linked.mri]);
 
   const set = (f: (c: CaseFile) => CaseFile) => setC((x) => f(x));
   const rows = useMemo(() => {
@@ -268,12 +285,13 @@ function Summary({ c }: { c: CaseFile }) {
 
 /** What the imaging pages have loaded, and what it put into this case. */
 function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
-  const { mri, segmentation: seg, eeg } = linked;
+  const plan = planLinked(
+    linked,
+    c.visits.filter((v) => !v.id.startsWith("linked-")).map((v) => v.date),
+  );
   const nMeasurements = c.measurements.filter((m) => m.id.startsWith("linked-")).length;
   const nMarkers = c.biomarkers.filter((b) => b.id.startsWith("linked-")).length;
-  const when = (iso: string) => new Date(iso).toLocaleTimeString();
-  const from = (o: "console" | "viewer") =>
-    o === "console" ? "research console" : "diagnostic viewer";
+  const from = (o: "console" | "viewer") => (o === "console" ? "console" : "viewer");
   const kindPill = (k: "subject" | "template" | "phantom") =>
     k === "subject" ? (
       <Pill tone="ok">subject</Pill>
@@ -282,85 +300,131 @@ function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
     ) : (
       <Pill tone="warn">synthetic phantom</Pill>
     );
+  const scans = [
+    ...plan.included.map((scan) => ({ scan, reason: null as string | null })),
+    ...plan.excluded.map(({ scan, reason }) => ({ scan, reason })),
+  ];
+  const hidden = linked.scans.length - scans.length;
   return (
     <Panel
       title="Linked imaging & EEG"
       tag="derived"
-      note="updates live from the console and viewer"
+      note="updates live from the research console and viewer"
+      actions={
+        linked.scans.length > 1 || linked.recordings.length > 1 ? (
+          <button type="button" className="chip" onClick={() => clearLinkedHistory()}>
+            Clear history
+          </button>
+        ) : null
+      }
     >
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div className="min-w-0">
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">MRI</p>
-          {mri ? (
-            <div className="mt-1 flex flex-col gap-1 text-[13px]">
-              <span className="flex flex-wrap items-center gap-2">
-                {mri.label} {kindPill(mri.kind)}
-              </span>
-              <span className="font-mono text-[12px] text-[#a9bbdc]">
-                {mri.dims.join(" × ")} · {mri.spacingMm.map((x) => x.toFixed(2)).join(" × ")} mm
-              </span>
-              <span className="text-[12px] text-[#8095bf]">
-                From the {from(mri.origin)} · {when(mri.linkedAt)} · added as visit “linked-visit”
-              </span>
-            </div>
-          ) : (
-            <p className="mt-1 text-[13px] text-[#a9bbdc]">
-              No MRI loaded. Open the research console or diagnostic viewer.
-            </p>
-          )}
-        </div>
-        <div className="min-w-0">
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">Segmentation</p>
-          {seg ? (
-            <div className="mt-1 flex flex-col gap-1 text-[13px]">
-              <span>
-                {seg.label} · {seg.classes.length} labels
-              </span>
-              <span className="text-[12px] text-[#a9bbdc]">
-                {nMeasurements
-                  ? `${nMeasurements} regional volumes added (QC pending) — see Regional imaging.`
-                  : "Label IDs do not follow the FreeSurfer convention, so no atlas regions were added."}
-              </span>
-              <span className="text-[12px] text-[#8095bf]">
-                From the {from(seg.origin)} · {when(seg.linkedAt)}
-              </span>
-            </div>
-          ) : (
-            <p className="mt-1 text-[13px] text-[#a9bbdc]">
-              No label map loaded. Load a FreeSurfer aseg/aparc label map in the console or viewer
-              to get hippocampal, ventricular and cortical volumes — or import aseg.stats under
-              Regional imaging.
-            </p>
-          )}
-        </div>
-        <div className="min-w-0">
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">EEG</p>
-          {eeg ? (
-            <div className="mt-1 flex flex-col gap-1 text-[13px]">
-              <span className="flex flex-wrap items-center gap-2">
-                {eeg.label} {kindPill(eeg.kind)}
-              </span>
-              <ul className="font-mono text-[12px] text-[#e6efff]">
-                {eeg.markers.map((m) => (
-                  <li key={m.id}>
-                    {m.name}:{" "}
-                    {m.value === null
-                      ? "—"
-                      : m.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}{" "}
-                    <span className="text-[#8095bf]">{m.unit}</span>
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">
+            Scans → visits ({plan.included.length})
+          </p>
+          {scans.length ? (
+            <ul className="mt-1 flex flex-col gap-2">
+              {scans.map(({ scan, reason }) => {
+                const d = scanDate(scan);
+                const seg = scan.segmentation;
+                const regions = seg && isFreeSurfer(seg.convention) ? seg.classes.length : 0;
+                return (
+                  <li
+                    key={scan.key}
+                    className="rounded border border-[#0e2247] bg-[#030b20] px-3 py-2 text-[13px]"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium">{scan.mri.label}</span>
+                      {kindPill(scan.mri.kind)}
+                      <span className="font-mono text-[12px] text-[#a9bbdc]">
+                        {scan.mri.dims.join("×")} ·{" "}
+                        {scan.mri.spacingMm.map((x) => x.toFixed(2)).join("×")} mm
+                      </span>
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[#a9bbdc]">
+                      <span>Scan date</span>
+                      <input
+                        type="date"
+                        className="field w-40"
+                        value={d.date}
+                        onChange={(e) => setScanDate(scan.key, e.target.value || null)}
+                        aria-label="Scan date"
+                      />
+                      <span className="text-[#8095bf]">
+                        {d.source === "file"
+                          ? "from the file (month)"
+                          : d.source === "entered"
+                            ? "entered"
+                            : "date loaded — enter the real scan date"}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[12px] text-[#a9bbdc]">
+                      {regions
+                        ? `${regions} FreeSurfer regions → regional volumes (QC pending)`
+                        : "No FreeSurfer label map for this scan — load one for regional volumes."}{" "}
+                      <span className="text-[#8095bf]">· from the {from(scan.mri.origin)}</span>
+                    </p>
+                    {reason ? <p className="mt-1 text-[12px] text-[#f0d68a]">{reason}</p> : null}
                   </li>
-                ))}
-              </ul>
-              <span className="text-[12px] text-[#8095bf]">
-                {nMarkers} EEG measures added under Ratings &amp; biomarkers · from the{" "}
-                {from(eeg.origin)} · {when(eeg.linkedAt)}
-              </span>
-            </div>
+                );
+              })}
+            </ul>
           ) : (
-            <p className="mt-1 text-[13px] text-[#a9bbdc]">No EEG loaded.</p>
+            <p className="mt-1 text-[13px] text-[#a9bbdc]">
+              No MRI loaded yet. Open the research console or the diagnostic viewer.
+            </p>
+          )}
+          {hidden > 0 ? (
+            <p className="mt-2 text-[12px] text-[#8095bf]">
+              {hidden} template/demo scan{hidden > 1 ? "s" : ""} hidden while subject data is
+              linked.
+            </p>
+          ) : null}
+        </div>
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">
+            EEG recordings ({plan.recordings.length})
+          </p>
+          {plan.recordings.length ? (
+            <ul className="mt-1 flex flex-col gap-2">
+              {plan.recordings.map(({ key, eeg }) => (
+                <li
+                  key={key}
+                  className="rounded border border-[#0e2247] bg-[#030b20] px-3 py-2 text-[13px]"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium">{eeg.label}</span> {kindPill(eeg.kind)}
+                  </div>
+                  <ul className="mt-1 font-mono text-[12px] text-[#e6efff]">
+                    {eeg.markers.map((m) => (
+                      <li key={m.id}>
+                        {m.name}:{" "}
+                        {m.value === null
+                          ? "—"
+                          : m.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}{" "}
+                        <span className="text-[#8095bf]">{m.unit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-1 text-[12px] text-[#8095bf]">
+                    {eeg.channels} channels · {Math.round(eeg.analysedSeconds)} s analysed · from
+                    the {from(eeg.origin)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-1 text-[13px] text-[#a9bbdc]">No EEG loaded yet.</p>
           )}
         </div>
       </div>
+      <p className="mt-3 text-[12px] text-[#8095bf]">
+        In this case: {plan.included.length} linked visit{plan.included.length === 1 ? "" : "s"},{" "}
+        {nMeasurements} regional measurements and {nMarkers} EEG measures — see Regional imaging,
+        Longitudinal, 3D map and Ratings &amp; biomarkers. Symptoms and cognitive scores are
+        clinical observations and are entered below; they cannot be derived from a scan.
+      </p>
     </Panel>
   );
 }
