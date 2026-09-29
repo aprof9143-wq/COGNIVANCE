@@ -21,8 +21,12 @@ import { diverging, toCss } from "@/components/workstation/colormaps";
 import { MprViewport } from "@/components/workstation/MprViewport";
 import { Volume3D } from "@/components/workstation/Volume3D";
 import { Panel, Pill, Tag } from "@/components/workstation/ui";
+import { getLinkedFiles } from "@/lib/neuro/linkedFiles";
+import { TEMPLATE_ASEG_URL } from "@/lib/neuro/templateAtlas";
 
-type Metric = "z" | "change";
+const TEMPLATE_URL = "/templates/mni152_template.nii.gz";
+
+type Metric = "z" | "change" | "asym";
 
 /**
  * Regional values painted onto a subject's own parcellation. Nothing here is
@@ -47,17 +51,14 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
   const t1Input = useRef<HTMLInputElement>(null);
   const parcInput = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    client.current = new ImagingClient();
-    return () => client.current?.dispose();
-  }, []);
+  const loadT1 = async (files: File[]) => loadT1Inputs(await readFiles(files));
 
-  const loadT1 = async (files: File[]) => {
+  const loadT1Inputs = async (inputs: { name: string; buffer: ArrayBuffer }[]) => {
     if (!client.current) return;
     setBusy("Decoding image…");
     setError(null);
     try {
-      const { nifti, series, failures } = await client.current.load(await readFiles(files));
+      const { nifti, series, failures } = await client.current.load(inputs);
       const vol = nifti ?? (series[0] ? await client.current.build(series[0].uid) : null);
       if (!vol) throw new Error(failures[0]?.message ?? "No image found.");
       setT1(vol);
@@ -77,24 +78,46 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
     }
   };
 
-  const loadParc = async (f: File) => {
+  const loadParc = async (f: File) =>
+    loadParcInput({ name: f.name, buffer: await f.arrayBuffer() });
+
+  const loadParcInput = async (input: { name: string; buffer: ArrayBuffer }) => {
     if (!client.current) return;
     setBusy("Reading parcellation…");
     setError(null);
     try {
-      setParc(
-        await client.current.segmentation(
-          { name: f.name, buffer: await f.arrayBuffer() },
-          undefined,
-          "FreeSurfer LUT",
-        ),
-      );
+      setParc(await client.current.segmentation(input, undefined, "FreeSurfer LUT"));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(null);
     }
   };
+
+  // Open on whatever the research console has loaded: the template with its
+  // FreeSurfer labels, or the subject's scan and label map from this session.
+  // Buffers are copied, because sending them to the decoder transfers them.
+  useEffect(() => {
+    client.current = new ImagingClient();
+    const linked = getLinkedFiles();
+    void (async () => {
+      try {
+        if (linked?.source === "subject") {
+          await loadT1Inputs([{ name: linked.t1.name, buffer: linked.t1.buffer.slice(0) }]);
+          if (linked.parc)
+            await loadParcInput({ name: linked.parc.name, buffer: linked.parc.buffer.slice(0) });
+        } else {
+          const [t, a] = await Promise.all([fetch(TEMPLATE_URL), fetch(TEMPLATE_ASEG_URL)]);
+          if (!t.ok || !a.ok) return;
+          await loadT1Inputs([{ name: "mni152_template.nii.gz", buffer: await t.arrayBuffer() }]);
+          await loadParcInput({ name: "mni152_aseg.nii.gz", buffer: await a.arrayBuffer() });
+        }
+      } catch {
+        // Manual loading below still works.
+      }
+    })();
+    return () => client.current?.dispose();
+  }, []);
 
   // Value per atlas ID from the regional table.
   const values = useMemo(() => {
@@ -105,6 +128,8 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
         const m = s?.measurement;
         if (!m || !s) continue;
         if (metric === "z" && s.norm.state === "value") out.set(m.regionId, s.norm.z);
+        if (metric === "asym" && r.asymmetry?.state === "value")
+          out.set(m.regionId, r.asymmetry.value);
         if (
           metric === "change" &&
           s.change.state === "value" &&
@@ -117,6 +142,16 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
   }, [rows, metric]);
 
   const range = metric === "z" ? 3 : Math.max(1, ...[...values.values()].map(Math.abs));
+
+  // With no compatible reference or second visit, start on the one measure the
+  // loaded data does support: left–right asymmetry.
+  const hasZ = rows.some((r) => [r.left, r.right, r.single].some((s) => s?.norm.state === "value"));
+  const hasChange = rows.some((r) =>
+    [r.left, r.right, r.single].some((s) => s?.change.state === "value"),
+  );
+  useEffect(() => {
+    setMetric((m) => (m === "z" && !hasZ ? (hasChange ? "change" : "asym") : m));
+  }, [hasZ, hasChange]);
 
   const { overlay, hiddenSet } = useMemo(() => {
     const hidden = new Set<number>();
@@ -179,7 +214,7 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
       <Panel
         title="3D neurodegeneration map"
         tag="derived"
-        note="regional values on the subject's own parcellation"
+        note="regional values on the loaded scan's own parcellation"
       >
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" className="btn" onClick={() => t1Input.current?.click()}>
@@ -228,6 +263,10 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
               Longitudinal change (%/yr) <Tag kind="derived" />
             </label>
             <label className="flex items-center gap-2">
+              <input type="radio" checked={metric === "asym"} onChange={() => setMetric("asym")} />{" "}
+              Left–right asymmetry (%) <Tag kind="derived" />
+            </label>
+            <label className="flex items-center gap-2">
               <input type="checkbox" checked={wmh} onChange={(e) => setWmh(e.target.checked)} /> WMH
               label (77) from the parcellation <Tag kind="derived" />
             </label>
@@ -237,7 +276,8 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
               </label>
             ))}
             <label className="mt-2 flex flex-col gap-1">
-              Show |{metric === "z" ? "z" : "%/yr"}| ≥ {threshold.toFixed(1)}
+              Show |{metric === "z" ? "z" : metric === "change" ? "%/yr" : "%"}| ≥{" "}
+              {threshold.toFixed(1)}
               <input
                 type="range"
                 min={0}
@@ -273,7 +313,9 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
               <p className="mt-1">
                 {metric === "z"
                   ? "z-score against a compatible reference (blue: smaller than reference)"
-                  : "Annualised change, % per year (blue: loss)"}
+                  : metric === "change"
+                    ? "Annualised change, % per year (blue: loss)"
+                    : "Asymmetry (L − R) / mean × 100, shown on both hemispheres (blue: left smaller)"}
                 . Visit {latest?.date ?? "—"}. {values.size} regions with a usable value; others
                 uncoloured.
                 {pending ? ` ${pending} values await QC review.` : ""}
@@ -283,8 +325,8 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
           <div>
             {!t1 || !views || !win ? (
               <p className="grid h-80 place-items-center rounded border border-[#16305e] bg-black text-[13px] text-[#a9bbdc]">
-                Load the subject's T1 and its parcellation (e.g. FreeSurfer aparc+aseg in the same
-                space).
+                {busy ??
+                  "Load the subject's T1 and its parcellation (e.g. FreeSurfer aparc+aseg in the same space)."}
               </p>
             ) : (
               <div className="grid h-[34rem] grid-cols-2 grid-rows-2 gap-1 bg-[#16305e] p-px">

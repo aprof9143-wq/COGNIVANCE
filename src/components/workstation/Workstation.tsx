@@ -43,7 +43,8 @@ import {
   type SeriesSummary,
 } from "@/lib/imaging/loader";
 import { LABEL_CONVENTIONS } from "@/lib/imaging/nifti";
-import { offerLinked, setLinked } from "@/lib/neuro/linked";
+import { fingerprint, offerLinked, setLinked, TEMPLATE_FINGERPRINT } from "@/lib/neuro/linked";
+import { linkTemplateAseg } from "@/lib/neuro/templateAtlas";
 import { alignment as segAlignment, classVolumes } from "@/lib/imaging/segmentation";
 import type {
   ElectrodeSet,
@@ -357,6 +358,7 @@ export function Workstation() {
         : md.format === "dicom"
           ? `DICOM series${md.modality ? ` (${md.modality})` : ""}`
           : "Uploaded NIfTI volume",
+      fingerprint: isTemplate ? TEMPLATE_FINGERPRINT : fingerprint(volume.data),
       dims: volume.dims,
       spacingMm: volume.spacing,
       acquisitionMonth: md.acquisitionDate ? md.acquisitionDate.slice(0, 7) : null,
@@ -366,8 +368,8 @@ export function Workstation() {
       sequence: md.seriesDescription ?? md.protocolName,
       linkedAt: new Date().toISOString(),
     });
-    // A label map belongs to the scan it was made from.
-    if (!isTemplate) setLinked({ segmentation: null });
+    // The template comes with its own FreeSurfer labels; a subject needs a label map.
+    if (isTemplate) void linkTemplateAseg("viewer").catch(() => {});
   }, [volume, isTemplate]);
 
   useEffect(() => {
@@ -377,6 +379,7 @@ export function Workstation() {
         origin: "viewer",
         label: "Label map loaded in the viewer",
         convention: segClasses.convention,
+        method: "label map loaded by the user",
         classes: segVolumes
           .filter((k) => k.voxels > 0)
           .map((k) => ({ label: k.label, name: k.name, mm3: k.mm3 })),

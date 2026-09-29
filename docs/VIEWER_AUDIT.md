@@ -227,17 +227,33 @@ These are import-only (with provenance) or out of scope, and the UI says so:
 
 ## 10. Follow-up after review (routes and linking)
 
-- `/research` is the research console again, with the original GPU-raymarched
-  3D volume (Volume / Surface / Glass, Neural / Thermal / Grey palettes,
-  electrodes, cutaway) opening on the MNI template. It shows no demonstration
-  lesion, no tract overlay and no coherence arcs.
-- The DICOM/NIfTI multiplanar viewer described in §§1–9 moved to `/viewer`,
-  unchanged in behaviour.
-- `/neurodegeneration` is linked to both pages through
-  `src/lib/neuro/linked.ts`. The link carries descriptive summaries only: no
-  pixels, file names or identifiers. It merges them into the case as items
-  with ids starting `linked-`, replaced on every update. A template or phantom
-  never replaces a subject's linked data unless the user resets explicitly.
-  Covered by `src/lib/neuro/linked.test.ts`.
-- The viewer and tracking pages use the console's navy palette, so the three
-  pages read as one product.
+- `/research` is the research console exactly as it shipped in PR #8, with a
+  few additions: the Fusion / Fibres / Tumour scenes, the whole-brain ds000221
+  tractogram (20,000 streamlines in Fibres), the demonstration lesion (labelled
+  synthetic on screen and in its callout), BraTS segmentation loading, EEG
+  coherence arcs, and the Alzheimer's EEG biomarker panel.
+  - Additions: links to the viewer and to tracking, a FreeSurfer label-map
+    loader, a live Neurodegeneration panel, and phone layout. On narrow
+    screens the camera steps back so the head fits, and the HUD starts off.
+- The DICOM/NIfTI multiplanar viewer described in §§1–9 moved to `/viewer`.
+  Its tractogram is now drawn after the volume, so the whole tractogram shows
+  through; before, it was hidden under the cortex.
+- `/neurodegeneration` fills in from what the console and viewer load
+  (`src/lib/neuro/linked.ts`):
+  - every distinct scan becomes a visit, dated from the file or by the user;
+  - FreeSurfer label volumes become regional measurements (QC pending);
+  - each recording's EEG measures become biomarkers;
+  - the 3D map opens on the loaded scan and its label map.
+  Template and phantom data are used only until subject data is linked. The
+  link carries summaries only (no pixels, file names or identifiers), plus an
+  in-memory copy of the loaded image for the 3D map. Covered by
+  `src/lib/neuro/linked.test.ts`.
+- The template ships with FreeSurfer subcortical labels
+  (`public/templates/mni152_aseg.nii.gz`: TemplateFlow 2009c aseg carried
+  onto the 2009a grid; brain-mask Dice 0.986; rebuilt by
+  `tools/demo-assets/build_template_aseg.py`). So the dashboard shows regional
+  volumes on the template, labelled as a population average. A subject's
+  regional volumes still need the subject's own FreeSurfer label map: nothing
+  here segments a raw scan.
+- Symptoms and cognitive scores stay manual entries; they are clinical
+  observations, not image measurements.
