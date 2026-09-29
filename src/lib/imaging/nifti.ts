@@ -7,6 +7,7 @@
  * RAS affine is converted to LPS (see geometry.ts).
  */
 
+import { REGIONS } from "@/lib/neuro/atlas";
 import {
   affineFromQuaternion,
   invert,
@@ -307,6 +308,8 @@ export const CLASS_PALETTE: [number, number, number][] = [
  * Label conventions the user can choose. None is assumed: an integer label map
  * does not say what its integers mean.
  */
+export const FREESURFER_CONVENTION = "FreeSurfer (aseg/aparc)";
+
 export const LABEL_CONVENTIONS: Record<string, Record<number, string>> = {
   "BraTS 2021": {
     1: "Necrotic tumour core (NCR)",
@@ -319,6 +322,16 @@ export const LABEL_CONVENTIONS: Record<string, Record<number, string>> = {
     3: "Enhancing tumour (ET)",
   },
   "MSD Task01": { 1: "Oedema", 2: "Non-enhancing tumour", 3: "Enhancing tumour" },
+  // FreeSurfer colour-LUT IDs (aseg + Desikan–Killiany); these volumes also
+  // feed Neurodegeneration Tracking.
+  [FREESURFER_CONVENTION]: Object.fromEntries(
+    REGIONS.map((r) => [
+      r.id,
+      r.hemisphere === "midline"
+        ? r.name
+        : `${r.hemisphere === "left" ? "Left" : "Right"} ${r.name}`,
+    ]),
+  ),
 };
 
 /** Parse an integer label map at native resolution, in patient space. */

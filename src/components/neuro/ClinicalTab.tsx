@@ -86,11 +86,11 @@ export function ClinicalTab({ c, set }: Props) {
         }
       >
         {!c.symptoms.length ? (
-          <p className="text-[13px] text-[#aab6c8]">No symptoms recorded.</p>
+          <p className="text-[13px] text-[#a9bbdc]">No symptoms recorded.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[60rem] text-[12px]">
-              <thead className="text-left text-[#8a97ab]">
+              <thead className="text-left text-[#8095bf]">
                 <tr>
                   {[
                     "Domain",
@@ -112,7 +112,7 @@ export function ClinicalTab({ c, set }: Props) {
               </thead>
               <tbody>
                 {c.symptoms.map((s) => (
-                  <tr key={s.id} className="border-t border-[#222b38] align-top">
+                  <tr key={s.id} className="border-t border-[#0e2247] align-top">
                     <td className="p-1">
                       <Select
                         value={s.domain}
@@ -191,7 +191,7 @@ export function ClinicalTab({ c, set }: Props) {
                           set((x) => ({ ...x, symptoms: x.symptoms.filter((y) => y.id !== s.id) }))
                         }
                       >
-                        <Trash2 className="h-4 w-4 text-[#8a97ab] hover:text-[#f2a7a7]" />
+                        <Trash2 className="h-4 w-4 text-[#8095bf] hover:text-[#f2a7a7]" />
                       </button>
                     </td>
                   </tr>
@@ -239,13 +239,13 @@ export function ClinicalTab({ c, set }: Props) {
         }
       >
         {!c.assessments.length ? (
-          <p className="text-[13px] text-[#aab6c8]">No assessments recorded.</p>
+          <p className="text-[13px] text-[#a9bbdc]">No assessments recorded.</p>
         ) : (
           <div className="flex flex-col gap-3">
             {c.assessments.map((a) => (
               <div
                 key={a.id}
-                className="grid gap-2 rounded border border-[#222b38] p-2 sm:grid-cols-4 lg:grid-cols-6"
+                className="grid gap-2 rounded border border-[#0e2247] p-2 sm:grid-cols-4 lg:grid-cols-6"
               >
                 <Field label="Instrument">
                   <Select
@@ -330,14 +330,14 @@ export function ClinicalTab({ c, set }: Props) {
                       }))
                     }
                   >
-                    <Trash2 className="h-4 w-4 text-[#8a97ab] hover:text-[#f2a7a7]" />
+                    <Trash2 className="h-4 w-4 text-[#8095bf] hover:text-[#f2a7a7]" />
                   </button>
                 </div>
               </div>
             ))}
           </div>
         )}
-        <p className="mt-2 text-[12px] text-[#8a97ab]">
+        <p className="mt-2 text-[12px] text-[#8095bf]">
           Interpretation must account for age, education, language, culture and sensory limitations,
           using the instrument's own norms. This module applies no universal cut-off.
         </p>

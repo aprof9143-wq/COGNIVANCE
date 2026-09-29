@@ -216,7 +216,7 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
         }
       >
         {!c.visits.length ? (
-          <p className="text-[13px] text-[#aab6c8]">
+          <p className="text-[13px] text-[#a9bbdc]">
             No visits. Add a visit, then import its measurements.
           </p>
         ) : (
@@ -224,7 +224,7 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
             {c.visits.map((v) => (
               <div
                 key={v.id}
-                className={`grid gap-2 rounded border p-2 sm:grid-cols-4 lg:grid-cols-8 ${v.id === visitId ? "border-[#c9a227]" : "border-[#222b38]"}`}
+                className={`grid gap-2 rounded border p-2 sm:grid-cols-4 lg:grid-cols-8 ${v.id === visitId ? "border-[#c9a227]" : "border-[#0e2247]"}`}
               >
                 <Field label="Date">
                   <DateInput value={v.date} onChange={(d) => upVisit(v.id, { date: d })} />
@@ -327,13 +327,13 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
           />
           {message ? <Pill tone={message.tone}>{message.text}</Pill> : null}
         </div>
-        <p className="mt-2 text-[12px] text-[#8a97ab]">
+        <p className="mt-2 text-[12px] text-[#8095bf]">
           Accepted: FreeSurfer aseg.stats (volumes, eTIV) and lh/rh.aparc.stats (thickness, grey
           volume), or a table with visit_id, region_id, metric, value, unit, software,
           software_version, qc_status. Blank values import as "Not measured". Imported values start
           with QC pending.
         </p>
-        <p className="mt-1 text-[12px] text-[#8a97ab]">
+        <p className="mt-1 text-[12px] text-[#8095bf]">
           Normative references:{" "}
           {c.norms.length
             ? c.norms.map((n) => `${n.name} (${n.cohort}; ${n.software}; ${n.atlas})`).join(" · ")
@@ -358,7 +358,7 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
         tag="derived"
         note={rows[0] ? `latest visit ${rows[0].visit.date}` : undefined}
         actions={
-          <label className="flex items-center gap-2 text-[12px] text-[#aab6c8]">
+          <label className="flex items-center gap-2 text-[12px] text-[#a9bbdc]">
             Norm comparison on
             <select
               className="field"
@@ -372,13 +372,13 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
         }
       >
         {!rows.length ? (
-          <p className="text-[13px] text-[#aab6c8]">
+          <p className="text-[13px] text-[#a9bbdc]">
             No regional measurements. Import FreeSurfer or equivalent outputs above.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[64rem] text-[12px]">
-              <thead className="text-left text-[#8a97ab]">
+              <thead className="text-left text-[#8095bf]">
                 <tr>
                   <th className="px-1 font-normal">Region</th>
                   <th className="px-1 font-normal">Metric</th>
@@ -404,13 +404,13 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
                   return (
                     <tr
                       key={`${r.key}-${r.metric}`}
-                      className="border-t border-[#222b38] align-top text-[#e8eef8]"
+                      className="border-t border-[#0e2247] align-top text-[#e6efff]"
                     >
                       <td className="p-1">
                         {r.name}
                         {r.single ? " (midline)" : ""}
                       </td>
-                      <td className="p-1 text-[#aab6c8]">
+                      <td className="p-1 text-[#a9bbdc]">
                         {r.metric} ({r.unit})
                       </td>
                       <td className="p-1">
@@ -453,7 +453,7 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
                           />
                         ))}
                       </td>
-                      <td className="p-1 text-[#aab6c8]">
+                      <td className="p-1 text-[#a9bbdc]">
                         {ms[0] ? `${ms[0].provenance.software} ${ms[0].provenance.version}` : "—"}
                       </td>
                     </tr>
@@ -463,7 +463,7 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
             </table>
           </div>
         )}
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-[#aab6c8]">
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-[#a9bbdc]">
           <label className="flex items-center gap-2">
             Reviewer (for QC decisions)
             <input
@@ -474,7 +474,7 @@ export function ImagingTab({ c, set, normalisation, setNormalisation }: Props) {
             />
           </label>
         </div>
-        <p className="mt-2 text-[12px] text-[#8a97ab]">
+        <p className="mt-2 text-[12px] text-[#8095bf]">
           Asymmetry = (L − R) / mean(L, R) × 100. Change is the least-squares slope over usable
           visits, as % of the fitted baseline per year. Regional volume loss is structural change,
           not a neuron count. A single measurement is never labelled normal or abnormal; outside a
@@ -500,7 +500,7 @@ function QcControl({
   const stamp = () => ({ reviewer: reviewer || null, date: new Date().toISOString().slice(0, 10) });
   return (
     <div className="mb-1 flex flex-wrap items-center gap-1">
-      <span className="text-[11px] text-[#8a97ab]">{m.hemisphere[0]!.toUpperCase()}</span>
+      <span className="text-[11px] text-[#8095bf]">{m.hemisphere[0]!.toUpperCase()}</span>
       <select
         className="field py-0 text-[11px]"
         value={m.qc.status}
@@ -561,7 +561,7 @@ function QcControl({
           </button>
         </span>
       ) : null}
-      {m.qc.notes ? <span className="w-full text-[11px] text-[#8a97ab]">{m.qc.notes}</span> : null}
+      {m.qc.notes ? <span className="w-full text-[11px] text-[#8095bf]">{m.qc.notes}</span> : null}
     </div>
   );
 }

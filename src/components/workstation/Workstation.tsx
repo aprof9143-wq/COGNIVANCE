@@ -43,6 +43,7 @@ import {
   type SeriesSummary,
 } from "@/lib/imaging/loader";
 import { LABEL_CONVENTIONS } from "@/lib/imaging/nifti";
+import { offerLinked, setLinked } from "@/lib/neuro/linked";
 import { alignment as segAlignment, classVolumes } from "@/lib/imaging/segmentation";
 import type {
   ElectrodeSet,
@@ -343,6 +344,47 @@ export function Workstation() {
   const segAlign = useMemo(() => (seg && volume ? segAlignment(seg, volume) : null), [seg, volume]);
   const segDisplayable = segAlign ? segAlign.status !== "no-overlap" : false;
 
+  /* ------------------------------------- link to Neurodegeneration Tracking */
+  // Descriptive metadata and computed volumes only — never pixels or identifiers.
+  useEffect(() => {
+    if (!volume) return;
+    const md = volume.metadata;
+    offerLinked("mri", {
+      origin: "viewer",
+      kind: isTemplate ? "template" : "subject",
+      label: isTemplate
+        ? TEMPLATE_NAME
+        : md.format === "dicom"
+          ? `DICOM series${md.modality ? ` (${md.modality})` : ""}`
+          : "Uploaded NIfTI volume",
+      dims: volume.dims,
+      spacingMm: volume.spacing,
+      acquisitionMonth: md.acquisitionDate ? md.acquisitionDate.slice(0, 7) : null,
+      manufacturer: md.manufacturer,
+      model: md.model,
+      fieldStrength: md.magneticFieldStrength,
+      sequence: md.seriesDescription ?? md.protocolName,
+      linkedAt: new Date().toISOString(),
+    });
+    // A label map belongs to the scan it was made from.
+    if (!isTemplate) setLinked({ segmentation: null });
+  }, [volume, isTemplate]);
+
+  useEffect(() => {
+    if (!segClasses || !segVolumes) return;
+    setLinked({
+      segmentation: {
+        origin: "viewer",
+        label: "Label map loaded in the viewer",
+        convention: segClasses.convention,
+        classes: segVolumes
+          .filter((k) => k.voxels > 0)
+          .map((k) => ({ label: k.label, name: k.name, mm3: k.mm3 })),
+        linkedAt: new Date().toISOString(),
+      },
+    });
+  }, [segClasses, segVolumes]);
+
   const tracts = useMemo<{
     tg: Tractogram;
     source: string;
@@ -518,7 +560,7 @@ export function Workstation() {
       `Measurements: ${annotations.length}. Patient identifiers are never read into the viewer and are not in this image.`,
       DISCLAIMER,
     ];
-    g.fillStyle = "#e8eef8";
+    g.fillStyle = "#e6efff";
     g.font = "13px monospace";
     lines.forEach((l, i) => g.fillText(l, 12, T * 2 + 26 + i * 25));
     const a = document.createElement("a");
@@ -620,15 +662,15 @@ export function Workstation() {
     ) : null;
 
   return (
-    <div ref={hostRef} className="ws min-h-screen bg-[#0a0d12] text-[#e8eef8]">
+    <div ref={hostRef} className="ws min-h-screen bg-[#00030b] text-[#e6efff]">
       {/* ------------------------------------------------------------ header */}
-      <header className="flex flex-wrap items-center gap-3 border-b border-[#2a3444] bg-[#0d1118] px-4 py-2.5">
+      <header className="flex flex-wrap items-center gap-3 border-b border-[#16305e] bg-[#01071a] px-4 py-2.5">
         <Link to="/" className="flex items-center gap-2">
           <img src="/logo-mark.png" alt="Cognivance" className="h-7 w-7" />
         </Link>
         <div className="leading-tight">
-          <h1 className="text-[15px] font-semibold">Research imaging viewer</h1>
-          <p className="text-[12px] text-[#8a97ab]">
+          <h1 className="text-[15px] font-semibold">Diagnostic imaging viewer</h1>
+          <p className="text-[12px] text-[#8095bf]">
             MRI · segmentation · tractography · EEG — decision-support visualisation
           </p>
         </div>
@@ -645,6 +687,9 @@ export function Workstation() {
           <button type="button" className="btn" onClick={exportImage} disabled={!volume}>
             <Download className="h-4 w-4" /> Export PNG
           </button>
+          <Link to="/research" className="btn">
+            Research console
+          </Link>
           <Link to="/neurodegeneration" className="btn">
             Neurodegeneration tracking
           </Link>
@@ -693,7 +738,7 @@ export function Workstation() {
 
       {/* ----------------------------------------------------------- toolbar */}
       <div
-        className="flex flex-wrap items-center gap-1.5 border-b border-[#2a3444] bg-[#0d1118] px-4 py-2"
+        className="flex flex-wrap items-center gap-1.5 border-b border-[#16305e] bg-[#01071a] px-4 py-2"
         role="toolbar"
         aria-label="Viewer tools"
       >
@@ -709,7 +754,7 @@ export function Workstation() {
             <span>{TOOL_LABELS[t]}</span>
           </button>
         ))}
-        <span className="mx-2 h-5 w-px bg-[#2a3444]" />
+        <span className="mx-2 h-5 w-px bg-[#16305e]" />
         <button type="button" className="tool" onClick={() => setFitNonce((n) => n + 1)} title="F">
           <Maximize className="h-4 w-4" /> Fit
         </button>
@@ -739,7 +784,7 @@ export function Workstation() {
           {layout === "quad" ? <Square className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}{" "}
           {layout === "quad" ? "Single view" : "Four views"}
         </button>
-        <span className="ml-auto text-[12px] text-[#8a97ab]">
+        <span className="ml-auto text-[12px] text-[#8095bf]">
           Wheel: slice · Ctrl+wheel: zoom · middle-drag: pan · right-drag: zoom · ↑↓ PgUp PgDn · 1–9
           windows · O original · Space cine
         </span>
@@ -753,7 +798,7 @@ export function Workstation() {
             {volume ? (
               <div className="text-[13px]">
                 <p className="font-medium">{volume.name}</p>
-                <p className="text-[12px] text-[#8a97ab]">
+                <p className="text-[12px] text-[#8095bf]">
                   {isTemplate
                     ? "Population-average template — not a patient."
                     : volume.metadata.format === "dicom"
@@ -762,12 +807,12 @@ export function Workstation() {
                 </p>
               </div>
             ) : !busy ? (
-              <p className="text-[13px] text-[#aab6c8]">
+              <p className="text-[13px] text-[#a9bbdc]">
                 No image loaded. Open a DICOM series (files or folder) or a NIfTI volume.
               </p>
             ) : null}
             {series.length > 1 ? (
-              <label className="mt-2 flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+              <label className="mt-2 flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
                 Series in this load
                 <select
                   className="field"
@@ -795,7 +840,7 @@ export function Workstation() {
                   </li>
                 ))}
                 {failures.length > 6 ? (
-                  <li className="text-[12px] text-[#8a97ab]">…and {failures.length - 6} more</li>
+                  <li className="text-[12px] text-[#8095bf]">…and {failures.length - 6} more</li>
                 ) : null}
               </ul>
             ) : null}
@@ -861,19 +906,19 @@ export function Workstation() {
             >
               {tracts ? (
                 <>
-                  <p className="text-[12px] text-[#8a97ab]">{tracts.status}</p>
+                  <p className="text-[12px] text-[#8095bf]">{tracts.status}</p>
                   <dl className="mt-1 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-2 gap-y-0.5 text-[11.5px]">
                     {tracts.provenance.map(([k, v]) => (
                       <div key={k} className="contents">
-                        <dt className="text-[#8a97ab]">{k}</dt>
-                        <dd className="text-[#c3cbd6]">{v}</dd>
+                        <dt className="text-[#8095bf]">{k}</dt>
+                        <dd className="text-[#c4d2ee]">{v}</dd>
                       </div>
                     ))}
                   </dl>
-                  <p className="mt-1 text-[11.5px] text-[#8a97ab]">
+                  <p className="mt-1 text-[11.5px] text-[#8095bf]">
                     Colour: fibre direction (red L–R, green A–P, blue S–I), not a measured value.
                   </p>
-                  <label className="mt-1 flex items-center gap-2 text-[12px] text-[#aab6c8]">
+                  <label className="mt-1 flex items-center gap-2 text-[12px] text-[#a9bbdc]">
                     Opacity
                     <input
                       type="range"
@@ -902,18 +947,18 @@ export function Workstation() {
             >
               {electrodes ? (
                 <>
-                  <p className="text-[12px] text-[#8a97ab]">
+                  <p className="text-[12px] text-[#8095bf]">
                     {electrodes.electrodes.length} electrodes · {electrodes.coordinateSystem} ·{" "}
                     {electrodes.provenance.method}
                   </p>
-                  <p className="text-[12px] text-[#8a97ab]">{electrodes.provenance.notes.at(-1)}</p>
+                  <p className="text-[12px] text-[#8095bf]">{electrodes.provenance.notes.at(-1)}</p>
                   {eeg ? (
                     <div className="mt-1">
-                      <p className="text-[12px] text-[#aab6c8]">
+                      <p className="text-[12px] text-[#a9bbdc]">
                         Colour: measured relative {eeg.band} power
                       </p>
                       <div className="mt-1 h-2 rounded" style={{ background: viridisGradient() }} />
-                      <div className="flex justify-between text-[11px] text-[#8a97ab]">
+                      <div className="flex justify-between text-[11px] text-[#8095bf]">
                         <span>lowest</span>
                         <span>highest (this recording)</span>
                       </div>
@@ -930,7 +975,7 @@ export function Workstation() {
               available={Boolean(eeg && electrodes?.registered)}
               empty="Needs an EEG recording and registered electrodes."
             >
-              <p className="text-[12px] text-[#8a97ab]">
+              <p className="text-[12px] text-[#8095bf]">
                 Strongest {eeg?.pairs.length ?? 0} pairs in {eeg?.band}; a statistical estimate of
                 coupling.
               </p>
@@ -950,12 +995,12 @@ export function Workstation() {
                 </button>
               ))}
             </div>
-            <p className="mt-2 text-[12px] text-[#8a97ab]">
+            <p className="mt-2 text-[12px] text-[#8095bf]">
               Grayscale transfer function from the current window.
             </p>
             <Range label="Opacity" value={opacity3d} set={setOpacity3d} />
             <Range label="Threshold (of window)" value={threshold3d} set={setThreshold3d} />
-            <p className="mt-2 text-[12px] font-semibold text-[#c3cbd6]">Clipping (patient axes)</p>
+            <p className="mt-2 text-[12px] font-semibold text-[#c4d2ee]">Clipping (patient axes)</p>
             {(
               [
                 ["x", "R ↔ L"],
@@ -965,7 +1010,7 @@ export function Workstation() {
             ).map(([axis, label]) => (
               <div
                 key={axis}
-                className="mt-1 grid grid-cols-[3.2rem_1fr_1fr] items-center gap-2 text-[12px] text-[#aab6c8]"
+                className="mt-1 grid grid-cols-[3.2rem_1fr_1fr] items-center gap-2 text-[12px] text-[#a9bbdc]"
               >
                 <span>{label}</span>
                 <input
@@ -998,7 +1043,7 @@ export function Workstation() {
                 />
               </div>
             ))}
-            <p className="mt-2 text-[12px] font-semibold text-[#c3cbd6]">Camera</p>
+            <p className="mt-2 text-[12px] font-semibold text-[#c4d2ee]">Camera</p>
             <div className="mt-1 grid grid-cols-3 gap-1">
               {(
                 ["anterior", "posterior", "left", "right", "superior", "inferior"] as CameraPreset[]
@@ -1019,11 +1064,11 @@ export function Workstation() {
         {/* ------------------------------------------------------- viewports */}
         <section className="min-w-0">
           {!volume ? (
-            <div className="grid h-[70vh] place-items-center rounded-md border border-[#2a3444] bg-black text-[14px] text-[#aab6c8]">
+            <div className="grid h-[70vh] place-items-center rounded-md border border-[#16305e] bg-black text-[14px] text-[#a9bbdc]">
               {busy ?? "No image loaded."}
             </div>
           ) : layout === "quad" ? (
-            <div className="grid h-[calc(100vh-10rem)] min-h-[40rem] grid-cols-2 grid-rows-2 gap-1 rounded-md border border-[#2a3444] bg-[#2a3444] p-px">
+            <div className="grid h-[calc(100vh-10rem)] min-h-[40rem] grid-cols-2 grid-rows-2 gap-1 rounded-md border border-[#16305e] bg-[#16305e] p-px">
               {PLANES.map((p) => (
                 <div key={p} className="min-h-0 min-w-0">
                   {viewport(p)}
@@ -1031,14 +1076,14 @@ export function Workstation() {
               ))}
               <div className="relative min-h-0 min-w-0">
                 {threeD}
-                <span className="pointer-events-none absolute left-2 top-1.5 font-mono text-[11px] text-[#d6deeb] [text-shadow:0_0_3px_#000]">
+                <span className="pointer-events-none absolute left-2 top-1.5 font-mono text-[11px] text-[#d5e2fa] [text-shadow:0_0_3px_#000]">
                   3D · {mode3d === "composite" ? "volume" : mode3d} ·{" "}
                   <Box className="inline h-3 w-3" /> patient space
                 </span>
               </div>
             </div>
           ) : (
-            <div className="h-[calc(100vh-10rem)] min-h-[40rem] rounded-md border border-[#2a3444]">
+            <div className="h-[calc(100vh-10rem)] min-h-[40rem] rounded-md border border-[#16305e]">
               {viewport(focus)}
             </div>
           )}
@@ -1080,7 +1125,7 @@ export function Workstation() {
       <div className="px-3 pb-6">
         <EegSection onDerived={setEeg} />
       </div>
-      <footer className="border-t border-[#2a3444] px-4 py-3 text-[12px] text-[#8a97ab]">
+      <footer className="border-t border-[#16305e] px-4 py-3 text-[12px] text-[#8095bf]">
         {DISCLAIMER} Coordinates are DICOM patient space (LPS, mm); axial and coronal views follow
         radiological convention. No compliance with DICOM, FDA, CE/MDR or HIPAA is claimed.
       </footer>
@@ -1106,7 +1151,7 @@ function LayerBlock({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="border-t border-[#222b38] py-2 first:border-t-0 first:pt-0">
+    <div className="border-t border-[#0e2247] py-2 first:border-t-0 first:pt-0">
       <div className="flex items-center gap-2">
         <label className="flex items-center gap-1.5 text-[13px]">
           <input
@@ -1120,14 +1165,14 @@ function LayerBlock({
         <Tag kind={tag} />
       </div>
       <div className="mt-1">{available || children ? children : null}</div>
-      {!available ? <p className="mt-1 text-[12px] text-[#8a97ab]">{empty}</p> : null}
+      {!available ? <p className="mt-1 text-[12px] text-[#8095bf]">{empty}</p> : null}
     </div>
   );
 }
 
 function Range({ label, value, set }: { label: string; value: number; set: (n: number) => void }) {
   return (
-    <label className="mt-2 flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+    <label className="mt-2 flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
       <span className="flex justify-between">
         {label}
         <span className="font-mono">{value.toFixed(2)}</span>

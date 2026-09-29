@@ -43,15 +43,15 @@
   --radius: 0.25rem;
 
   /* ---- brand primitives, sampled from the mark + hero ---- */
-  --void: #00030b;        /* page ground */
-  --abyss: #01071a;       /* alternating band */
-  --slab: #04102b;        /* card / panel */
-  --deep: #001050;        /* logo core navy */
-  --electric: #1e63c4;    /* primary blue */
-  --beam: #3d8bf5;        /* bright blue */
-  --lift: #63b0ff;        /* lifted blue */
-  --ion: #7fd8ff;         /* cyan filament — live/active only */
-  --nebula: #8a6bff;      /* violet — glow only, never a data series */
+  --void: #00030b; /* page ground */
+  --abyss: #01071a; /* alternating band */
+  --slab: #04102b; /* card / panel */
+  --deep: #001050; /* logo core navy */
+  --electric: #1e63c4; /* primary blue */
+  --beam: #3d8bf5; /* bright blue */
+  --lift: #63b0ff; /* lifted blue */
+  --ion: #7fd8ff; /* cyan filament — live/active only */
+  --nebula: #8a6bff; /* violet — glow only, never a data series */
 
   /* ---- semantic tokens ---- */
   --background: var(--void);
@@ -118,7 +118,6 @@
   color: var(--foreground);
 }
 
-
 @layer base {
   * {
     border-color: var(--color-border);
@@ -144,7 +143,6 @@
   ::selection {
     background: color-mix(in oklab, var(--beam) 32%, transparent);
   }
-
 }
 
 /* ---------- type scale ---------- */
@@ -153,7 +151,7 @@
   font-weight: 600;
   font-size: clamp(2.5rem, 6.4vw, 5.5rem);
   letter-spacing: -0.04em;
-  line-height: 1.0;
+  line-height: 1;
 }
 
 @utility t-section {
@@ -236,8 +234,7 @@
 @utility instrument {
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(120% 100% at 50% 0%, #0a1f4a 0%, #01081c 70%);
+  background: radial-gradient(120% 100% at 50% 0%, #0a1f4a 0%, #01081c 70%);
   &::after {
     content: "";
     position: absolute;
@@ -255,11 +252,18 @@
 
 @utility grid-fine {
   background-image:
-    linear-gradient(to right, color-mix(in oklab, var(--lift) 10%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, var(--lift) 10%, transparent) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--lift) 10%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--lift) 10%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 28px 28px;
 }
-
 
 @utility rule-link {
   position: relative;
@@ -391,23 +395,24 @@
 
 /* ------------------------------------------------------------------------
  * Research imaging workstation (/research). Scoped under .ws so nothing here
- * reaches the marketing pages. Neutral surfaces; colour is for data.
+ * reaches the marketing pages. Same navy surfaces as the research console;
+ * colour on the images is for data.
  * --------------------------------------------------------------------- */
 .ws .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  border: 1px solid #334055;
-  background: #161d28;
-  color: #e8eef8;
+  border: 1px solid #1e3a6e;
+  background: #061733;
+  color: #e6efff;
   border-radius: 6px;
   padding: 0.35rem 0.7rem;
   font-size: 13px;
   line-height: 1.2;
 }
 .ws .btn:hover:not(:disabled) {
-  background: #1d2634;
-  border-color: #46566e;
+  background: #0a1f45;
+  border-color: #3d8bf5;
 }
 .ws .btn:disabled {
   opacity: 0.45;
@@ -415,53 +420,53 @@
 .ws .chip {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #334055;
-  background: #141a24;
-  color: #c9d2de;
+  border: 1px solid #1e3a6e;
+  background: #061733;
+  color: #c4d2ee;
   border-radius: 5px;
   padding: 0.2rem 0.5rem;
   font-size: 12px;
 }
 .ws .chip:hover {
-  border-color: #46566e;
+  border-color: #3d8bf5;
   color: #ffffff;
 }
 .ws .chip-on {
-  border-color: #c9a227;
-  background: #2a230c;
-  color: #ffe59a;
+  border-color: #7fd8ff;
+  background: #0b2a5c;
+  color: #e6f7ff;
 }
 .ws .tool {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   border: 1px solid transparent;
-  color: #c9d2de;
+  color: #c4d2ee;
   border-radius: 5px;
   padding: 0.3rem 0.55rem;
   font-size: 12.5px;
 }
 .ws .tool:hover {
-  background: #161d28;
+  background: #061733;
   color: #ffffff;
 }
 .ws .tool-on {
-  border-color: #c9a227;
-  background: #2a230c;
-  color: #ffe59a;
+  border-color: #7fd8ff;
+  background: #0b2a5c;
+  color: #e6f7ff;
 }
 .ws .field {
-  border: 1px solid #334055;
-  background: #0d1118;
-  color: #e8eef8;
+  border: 1px solid #1e3a6e;
+  background: #01071a;
+  color: #e6efff;
   border-radius: 5px;
   padding: 0.3rem 0.45rem;
   font-size: 13px;
 }
 .ws input[type="range"] {
-  accent-color: #c9a227;
+  accent-color: #7fd8ff;
 }
 .ws :focus-visible {
-  outline: 2px solid #ffc400;
+  outline: 2px solid #7fd8ff;
   outline-offset: 1px;
 }

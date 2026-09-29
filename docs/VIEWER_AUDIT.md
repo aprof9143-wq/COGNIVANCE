@@ -222,3 +222,22 @@ These are import-only (with provenance) or out of scope, and the UI says so:
 - EEG spectral and coherence methods against established toolboxes.
 - Regulatory classification (e.g. EU MDR Rule 11, FDA software as a medical
   device) before any clinical use. No compliance is claimed.
+
+---
+
+## 10. Follow-up after review (routes and linking)
+
+- `/research` is the research console again, with the original GPU-raymarched
+  3D volume (Volume / Surface / Glass, Neural / Thermal / Grey palettes,
+  electrodes, cutaway) opening on the MNI template. It shows no demonstration
+  lesion, no tract overlay and no coherence arcs.
+- The DICOM/NIfTI multiplanar viewer described in §§1–9 moved to `/viewer`,
+  unchanged in behaviour.
+- `/neurodegeneration` is linked to both pages through
+  `src/lib/neuro/linked.ts`. The link carries descriptive summaries only: no
+  pixels, file names or identifiers. It merges them into the case as items
+  with ids starting `linked-`, replaced on every update. A template or phantom
+  never replaces a subject's linked data unless the user resets explicitly.
+  Covered by `src/lib/neuro/linked.test.ts`.
+- The viewer and tracking pages use the console's navy palette, so the three
+  pages read as one product.

@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Download, FileUp } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { ArrowLeft, Download, FileUp, ScanLine } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   exportCaseFile,
   exportMeasurementsTsv,
   exportProvenanceJson,
   parseCaseFile,
 } from "@/lib/neuro/io";
+import { applyLinked, useLinked, type LinkedState } from "@/lib/neuro/linked";
 import { regionRows } from "@/lib/neuro/results";
 import { emptyCase, type CaseFile } from "@/lib/neuro/schema";
 import { DEFAULT_ASSOCIATIONS, DOMAIN_LABEL, type Association } from "@/lib/neuro/symptomMap";
@@ -55,6 +56,12 @@ export function NeuroDashboard() {
   const [msg, setMsg] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const caseInput = useRef<HTMLInputElement>(null);
 
+  // Whatever the console or viewer has loaded is merged in as it changes.
+  const linked = useLinked();
+  useEffect(() => {
+    setC((x) => applyLinked(x, linked));
+  }, [linked]);
+
   const set = (f: (c: CaseFile) => CaseFile) => setC((x) => f(x));
   const rows = useMemo(() => {
     try {
@@ -67,14 +74,17 @@ export function NeuroDashboard() {
   const stamp = `${c.subjectCode.replace(/[^\w-]/g, "_")}-${new Date().toISOString().slice(0, 10)}`;
 
   return (
-    <div className="ws min-h-screen bg-[#0a0d12] text-[#e8eef8]">
-      <header className="flex flex-wrap items-center gap-3 border-b border-[#2a3444] bg-[#0d1118] px-4 py-2.5">
+    <div className="ws min-h-screen bg-[#00030b] text-[#e6efff]">
+      <header className="flex flex-wrap items-center gap-3 border-b border-[#16305e] bg-[#01071a] px-4 py-2.5">
         <Link to="/research" className="btn">
-          <ArrowLeft className="h-4 w-4" /> Imaging viewer
+          <ArrowLeft className="h-4 w-4" /> Research console
+        </Link>
+        <Link to="/viewer" className="btn">
+          <ScanLine className="h-4 w-4" /> Diagnostic viewer
         </Link>
         <div className="leading-tight">
           <h1 className="text-[15px] font-semibold">Neurodegeneration tracking</h1>
-          <p className="text-[12px] text-[#8a97ab]">
+          <p className="text-[12px] text-[#8095bf]">
             Structural change tracking · symptom–network research map · no diagnosis or probability
           </p>
         </div>
@@ -117,7 +127,7 @@ export function NeuroDashboard() {
               e.target.value = "";
               if (!f) return;
               try {
-                setC(parseCaseFile(await f.text()));
+                setC(applyLinked(parseCaseFile(await f.text()), linked));
                 setMsg({ tone: "ok", text: `Loaded ${f.name}.` });
               } catch (err) {
                 setMsg({ tone: "error", text: err instanceof Error ? err.message : String(err) });
@@ -132,12 +142,14 @@ export function NeuroDashboard() {
         <p className="mt-1 text-[12px] text-[#c9b886]">
           {DISCLAIMER} This module computes no Alzheimer’s diagnosis, probability, severity or
           “neuron degeneration” score. Regional volume loss is structural change, not a neuron
-          count. The case stays in this browser tab and is not saved unless exported.
+          count. The case stays in this browser tab and is not saved unless exported; what the
+          research console and viewer have loaded is linked in automatically (summaries only, kept
+          in this browser).
         </p>
       </div>
 
       <nav
-        className="flex flex-wrap gap-1 border-b border-[#2a3444] bg-[#0d1118] px-4 py-2"
+        className="flex flex-wrap gap-1 border-b border-[#16305e] bg-[#01071a] px-4 py-2"
         role="tablist"
       >
         {TABS.map(([id, label]) => (
@@ -162,6 +174,7 @@ export function NeuroDashboard() {
       <main className="p-3">
         {tab === "summary" ? (
           <div className="flex flex-col gap-3">
+            <LinkedSources linked={linked} c={c} />
             <Summary c={c} />
             <ClinicalTab c={c} set={set} />
           </div>
@@ -207,25 +220,25 @@ function Summary({ c }: { c: CaseFile }) {
     >
       <div className="grid gap-4 md:grid-cols-3">
         <div>
-          <p className="text-[12px] font-semibold text-[#c3cbd6]">Symptoms (by domain)</p>
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">Symptoms (by domain)</p>
           {present.length ? (
             <ul className="mt-1 text-[13px]">
               {present.map((s) => (
                 <li key={s.id}>
                   {DOMAIN_LABEL[s.domain]} — {s.severity ?? "severity unrated"}, {s.progression}
                   {s.onset ? `, since ${s.onset}` : ""}{" "}
-                  <span className="text-[12px] text-[#8a97ab]">
+                  <span className="text-[12px] text-[#8095bf]">
                     ({s.source === "clinician" ? "clinician observation" : `${s.source} report`})
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-[13px] text-[#aab6c8]">None recorded.</p>
+            <p className="mt-1 text-[13px] text-[#a9bbdc]">None recorded.</p>
           )}
         </div>
         <div>
-          <p className="text-[12px] font-semibold text-[#c3cbd6]">Functional impact</p>
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">Functional impact</p>
           <p className="mt-1 text-[13px]">
             {c.symptoms.some((s) => s.domain === "adl" && s.present)
               ? "Impaired activities of daily living recorded."
@@ -233,7 +246,7 @@ function Summary({ c }: { c: CaseFile }) {
           </p>
         </div>
         <div>
-          <p className="text-[12px] font-semibold text-[#c3cbd6]">Latest cognitive scores</p>
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">Latest cognitive scores</p>
           {latestByInstrument.size ? (
             <ul className="mt-1 text-[13px]">
               {[...latestByInstrument.values()].map((a) => (
@@ -245,7 +258,106 @@ function Summary({ c }: { c: CaseFile }) {
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-[13px] text-[#aab6c8]">None recorded.</p>
+            <p className="mt-1 text-[13px] text-[#a9bbdc]">None recorded.</p>
+          )}
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+/** What the imaging pages have loaded, and what it put into this case. */
+function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
+  const { mri, segmentation: seg, eeg } = linked;
+  const nMeasurements = c.measurements.filter((m) => m.id.startsWith("linked-")).length;
+  const nMarkers = c.biomarkers.filter((b) => b.id.startsWith("linked-")).length;
+  const when = (iso: string) => new Date(iso).toLocaleTimeString();
+  const from = (o: "console" | "viewer") =>
+    o === "console" ? "research console" : "diagnostic viewer";
+  const kindPill = (k: "subject" | "template" | "phantom") =>
+    k === "subject" ? (
+      <Pill tone="ok">subject</Pill>
+    ) : k === "template" ? (
+      <Pill tone="info">template — not a subject</Pill>
+    ) : (
+      <Pill tone="warn">synthetic phantom</Pill>
+    );
+  return (
+    <Panel
+      title="Linked imaging & EEG"
+      tag="derived"
+      note="updates live from the console and viewer"
+    >
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">MRI</p>
+          {mri ? (
+            <div className="mt-1 flex flex-col gap-1 text-[13px]">
+              <span className="flex flex-wrap items-center gap-2">
+                {mri.label} {kindPill(mri.kind)}
+              </span>
+              <span className="font-mono text-[12px] text-[#a9bbdc]">
+                {mri.dims.join(" × ")} · {mri.spacingMm.map((x) => x.toFixed(2)).join(" × ")} mm
+              </span>
+              <span className="text-[12px] text-[#8095bf]">
+                From the {from(mri.origin)} · {when(mri.linkedAt)} · added as visit “linked-visit”
+              </span>
+            </div>
+          ) : (
+            <p className="mt-1 text-[13px] text-[#a9bbdc]">
+              No MRI loaded. Open the research console or diagnostic viewer.
+            </p>
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">Segmentation</p>
+          {seg ? (
+            <div className="mt-1 flex flex-col gap-1 text-[13px]">
+              <span>
+                {seg.label} · {seg.classes.length} labels
+              </span>
+              <span className="text-[12px] text-[#a9bbdc]">
+                {nMeasurements
+                  ? `${nMeasurements} regional volumes added (QC pending) — see Regional imaging.`
+                  : "Label IDs do not follow the FreeSurfer convention, so no atlas regions were added."}
+              </span>
+              <span className="text-[12px] text-[#8095bf]">
+                From the {from(seg.origin)} · {when(seg.linkedAt)}
+              </span>
+            </div>
+          ) : (
+            <p className="mt-1 text-[13px] text-[#a9bbdc]">
+              No label map loaded. Load a FreeSurfer aseg/aparc label map in the console or viewer
+              to get hippocampal, ventricular and cortical volumes — or import aseg.stats under
+              Regional imaging.
+            </p>
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold text-[#c4d2ee]">EEG</p>
+          {eeg ? (
+            <div className="mt-1 flex flex-col gap-1 text-[13px]">
+              <span className="flex flex-wrap items-center gap-2">
+                {eeg.label} {kindPill(eeg.kind)}
+              </span>
+              <ul className="font-mono text-[12px] text-[#e6efff]">
+                {eeg.markers.map((m) => (
+                  <li key={m.id}>
+                    {m.name}:{" "}
+                    {m.value === null
+                      ? "—"
+                      : m.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}{" "}
+                    <span className="text-[#8095bf]">{m.unit}</span>
+                  </li>
+                ))}
+              </ul>
+              <span className="text-[12px] text-[#8095bf]">
+                {nMarkers} EEG measures added under Ratings &amp; biomarkers · from the{" "}
+                {from(eeg.origin)} · {when(eeg.linkedAt)}
+              </span>
+            </div>
+          ) : (
+            <p className="mt-1 text-[13px] text-[#a9bbdc]">No EEG loaded.</p>
           )}
         </div>
       </div>

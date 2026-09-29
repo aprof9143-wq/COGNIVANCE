@@ -68,7 +68,7 @@ export function WindowPanel({
       note={`VOI ${volume.voiFunction} · ${volume.photometric}`}
     >
       <div className="grid grid-cols-2 gap-2">
-        <label className="flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+        <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
           Width ({unit})
           <input
             type="number"
@@ -84,7 +84,7 @@ export function WindowPanel({
             }
           />
         </label>
-        <label className="flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+        <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
           Level ({unit})
           <input
             type="number"
@@ -101,7 +101,7 @@ export function WindowPanel({
           />
         </label>
       </div>
-      <p className="mt-2 text-[12px] text-[#8a97ab]">Current: {win.label}</p>
+      <p className="mt-2 text-[12px] text-[#8095bf]">Current: {win.label}</p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {options.map((o, i) => (
           <button
@@ -111,7 +111,7 @@ export function WindowPanel({
             onClick={() => onWindow(o)}
             title={`W ${o.width.toFixed(0)} / L ${o.center.toFixed(0)} · ${o.source === "dicom" ? "from the file" : o.source === "preset" ? "CT preset" : "from the data"}`}
           >
-            {i < 9 ? <span className="mr-1 text-[#8a97ab]">{i + 1}</span> : null}
+            {i < 9 ? <span className="mr-1 text-[#8095bf]">{i + 1}</span> : null}
             {o.label}
           </button>
         ))}
@@ -121,18 +121,18 @@ export function WindowPanel({
         className="mt-3 h-20 w-full"
         aria-label="Intensity histogram with the current window"
       />
-      <div className="mt-1 flex justify-between font-mono text-[11px] text-[#8a97ab]">
+      <div className="mt-1 flex justify-between font-mono text-[11px] text-[#8095bf]">
         <span>{histogram.min.toFixed(0)}</span>
         <span>{volume.unit}</span>
         <span>{histogram.max.toFixed(0)}</span>
       </div>
       <p
-        className={`mt-2 text-[12px] ${clip.below + clip.above > 0.02 ? "text-[#f0d68a]" : "text-[#8a97ab]"}`}
+        className={`mt-2 text-[12px] ${clip.below + clip.above > 0.02 ? "text-[#f0d68a]" : "text-[#8095bf]"}`}
       >
         Shown fully black: {(clip.below * 100).toFixed(1)} % of voxels · fully white:{" "}
         {(clip.above * 100).toFixed(1)} %
       </p>
-      <p className="mt-1 text-[12px] text-[#8a97ab]">
+      <p className="mt-1 text-[12px] text-[#8095bf]">
         Drag with the W/L tool: horizontal = width, vertical = level. Keys 1–9 select a window.
       </p>
     </Panel>
@@ -168,7 +168,7 @@ export function DisplayPanel({
     step: number,
     off: number,
   ) => (
-    <label className="flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+    <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
       <span className="flex justify-between">
         {label}
         <span className="font-mono">
@@ -203,7 +203,7 @@ export function DisplayPanel({
           Linear interpolation
         </button>
       </div>
-      <p className="mt-3 text-[12px] font-semibold text-[#c3cbd6]">
+      <p className="mt-3 text-[12px] font-semibold text-[#c4d2ee]">
         Display enhancement — off by default, not clinically validated
       </p>
       <div className="mt-2 grid gap-2">
@@ -237,7 +237,7 @@ export function DisplayPanel({
         </button>
       </div>
       {split !== null ? (
-        <label className="mt-2 flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+        <label className="mt-2 flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
           Split position (left = original)
           <input
             type="range"
@@ -249,7 +249,7 @@ export function DisplayPanel({
           />
         </label>
       ) : null}
-      <p className="mt-2 text-[12px] text-[#8a97ab]">
+      <p className="mt-2 text-[12px] text-[#8095bf]">
         No generative or AI enhancement is used. Probe values and measurements always read the
         source volume.
       </p>
@@ -293,8 +293,8 @@ export function SegmentationPanel({
   if (!volumes) {
     return (
       <Panel title="Segmentation">
-        <p className="text-[13px] text-[#aab6c8]">No validated segmentation loaded.</p>
-        <p className="mt-1 text-[12px] text-[#8a97ab]">
+        <p className="text-[13px] text-[#a9bbdc]">No validated segmentation loaded.</p>
+        <p className="mt-1 text-[12px] text-[#8095bf]">
           Load an integer label map (NIfTI). Class names are not assumed; choose the convention the
           file follows.
         </p>
@@ -303,7 +303,7 @@ export function SegmentationPanel({
   }
   return (
     <Panel title="Segmentation" tag="measured" note="volumes from the native label grid">
-      <label className="flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+      <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
         Label convention
         <select
           className="field"
@@ -324,7 +324,7 @@ export function SegmentationPanel({
         </p>
       ) : null}
       <table className="mt-3 w-full text-[12px]">
-        <thead className="text-left text-[#8a97ab]">
+        <thead className="text-left text-[#8095bf]">
           <tr>
             <th className="font-normal" />
             <th className="font-normal">Class</th>
@@ -337,7 +337,7 @@ export function SegmentationPanel({
           {volumes.map((v) => {
             const c = colours.get(v.label) ?? [200, 200, 200];
             return (
-              <tr key={v.label} className="border-t border-[#222b38] text-[#e8eef8]">
+              <tr key={v.label} className="border-t border-[#0e2247] text-[#e6efff]">
                 <td className="py-1">
                   <button
                     type="button"
@@ -346,7 +346,7 @@ export function SegmentationPanel({
                     className="flex items-center gap-1"
                   >
                     {hidden.has(v.label) ? (
-                      <EyeOff className="h-3.5 w-3.5 text-[#8a97ab]" />
+                      <EyeOff className="h-3.5 w-3.5 text-[#8095bf]" />
                     ) : (
                       <Eye className="h-3.5 w-3.5" />
                     )}
@@ -365,11 +365,11 @@ export function SegmentationPanel({
           })}
         </tbody>
       </table>
-      <p className="mt-2 text-[12px] text-[#8a97ab]">
+      <p className="mt-2 text-[12px] text-[#8095bf]">
         Volume = voxel count × voxel volume. A label map holds one label per voxel, so classes are
         mutually exclusive.
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-3 text-[12px] text-[#aab6c8]">
+      <div className="mt-3 flex flex-wrap items-center gap-3 text-[12px] text-[#a9bbdc]">
         <label className="flex items-center gap-1.5">
           <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} />{" "}
           Show
@@ -392,7 +392,7 @@ export function SegmentationPanel({
         </label>
       </div>
       {provenance.length ? (
-        <ul className="mt-2 list-disc pl-4 text-[12px] text-[#8a97ab]">
+        <ul className="mt-2 list-disc pl-4 text-[12px] text-[#8095bf]">
           {provenance.map((p) => (
             <li key={p}>{p}</li>
           ))}
@@ -429,7 +429,7 @@ export function MeasurementsPanel({
       }
     >
       {!annotations.length ? (
-        <p className="text-[13px] text-[#aab6c8]">
+        <p className="text-[13px] text-[#a9bbdc]">
           None. Use Length, Ellipse ROI or Probe on any view.
         </p>
       ) : (
@@ -445,19 +445,19 @@ export function MeasurementsPanel({
               text = `${Number.isNaN(v.value) ? "outside" : v.value.toFixed(volume.quantitative ? 0 : 1)} ${volume.unit}`;
             }
             return (
-              <li key={a.id} className="flex items-center gap-2 text-[#e8eef8]">
-                <span className="w-16 capitalize text-[#8a97ab]">{a.kind}</span>
-                <span className="w-16 text-[#8a97ab]">{a.plane}</span>
+              <li key={a.id} className="flex items-center gap-2 text-[#e6efff]">
+                <span className="w-16 capitalize text-[#8095bf]">{a.kind}</span>
+                <span className="w-16 text-[#8095bf]">{a.plane}</span>
                 <span className="flex-1 font-mono">{text}</span>
                 <button type="button" onClick={() => remove(a.id)} aria-label="Delete measurement">
-                  <Trash2 className="h-3.5 w-3.5 text-[#8a97ab] hover:text-[#f2a7a7]" />
+                  <Trash2 className="h-3.5 w-3.5 text-[#8095bf] hover:text-[#f2a7a7]" />
                 </button>
               </li>
             );
           })}
         </ul>
       )}
-      <p className="mt-2 text-[12px] text-[#8a97ab]">
+      <p className="mt-2 text-[12px] text-[#8095bf]">
         Values are{" "}
         {volume.quantitative
           ? "Hounsfield units (calibrated CT)"
@@ -508,8 +508,8 @@ export function MetadataPanel({ volume }: { volume: ImageVolume }) {
       <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-3 gap-y-1 text-[12px]">
         {rows.map(([k, v]) => (
           <div key={k} className="contents">
-            <dt className="text-[#8a97ab]">{k}</dt>
-            <dd className="break-words font-mono text-[#e8eef8]">
+            <dt className="text-[#8095bf]">{k}</dt>
+            <dd className="break-words font-mono text-[#e6efff]">
               {v === null || v === "" ? "—" : String(v)}
             </dd>
           </div>
@@ -522,7 +522,7 @@ export function MetadataPanel({ volume }: { volume: ImageVolume }) {
           anonymised.
         </p>
       ) : (
-        <p className="mt-3 text-[12px] text-[#8a97ab]">
+        <p className="mt-3 text-[12px] text-[#8095bf]">
           No identifying attributes found in the header.
         </p>
       )}

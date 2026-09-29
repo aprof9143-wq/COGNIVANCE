@@ -11,7 +11,7 @@ export function Field({
 }) {
   return (
     <label
-      className={`flex flex-col gap-1 text-[12px] text-[#aab6c8] ${wide ? "sm:col-span-2" : ""}`}
+      className={`flex flex-col gap-1 text-[12px] text-[#a9bbdc] ${wide ? "sm:col-span-2" : ""}`}
     >
       {label}
       {children}
@@ -103,7 +103,7 @@ export function DateInput({
 /** Visual state for a value that is not a number. */
 export function Missing({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded border border-dashed border-[#4a5566] px-1.5 py-px text-[11px] text-[#aab6c8]">
+    <span className="rounded border border-dashed border-[#2a4a80] px-1.5 py-px text-[11px] text-[#a9bbdc]">
       {children}
     </span>
   );

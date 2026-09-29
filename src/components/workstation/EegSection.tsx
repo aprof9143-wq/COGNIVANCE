@@ -9,6 +9,7 @@ import {
 import { canonicalChannelName, parseEdf, phantomRecording, type EdfRecording } from "@/lib/edf";
 import { findElectrode, MONTAGE_1020 } from "@/lib/montage";
 import { analyseChannel, BANDS, coherenceMatrix, type ChannelSpectrum } from "@/lib/signal";
+import { offerLinked, toLinkedMarkers } from "@/lib/neuro/linked";
 import { Panel, Pill } from "./ui";
 import { viridis } from "./colormaps";
 
@@ -138,6 +139,22 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
     );
   }, [recording, bandPower, pairs, band, onDerived]);
 
+  // Link the measures to Neurodegeneration Tracking (numbers only, no file name).
+  useEffect(() => {
+    if (!recording || !analysis) return;
+    offerLinked("eeg", {
+      origin: "viewer",
+      kind: source === "file" ? "subject" : "phantom",
+      label: source === "file" ? "Uploaded EDF recording" : "Synthetic demonstration recording",
+      channels: recording.eegSignals.length,
+      mapped: mapped.length,
+      sampleRate: analysis.fs,
+      analysedSeconds: len,
+      markers: toLinkedMarkers(markers),
+      linkedAt: new Date().toISOString(),
+    });
+  }, [recording, analysis, source, mapped.length, len, markers]);
+
   const focus = analysis
     ? ((hovered
         ? analysis.spectra.get(hovered)
@@ -147,7 +164,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
   return (
     <section aria-label="EEG" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="mr-2 text-[15px] font-semibold text-[#e8eef8]">EEG</h2>
+        <h2 className="mr-2 text-[15px] font-semibold text-[#e6efff]">EEG</h2>
         <button type="button" onClick={() => input.current?.click()} className="btn">
           <FileUp className="h-4 w-4" /> Load EDF
         </button>
@@ -176,7 +193,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
           }}
         />
         {recording ? (
-          <span className="text-[13px] text-[#aab6c8]">
+          <span className="text-[13px] text-[#a9bbdc]">
             {name} · {recording.eegSignals.length} channels · {mapped.length} on the 10-20 layout ·{" "}
             {duration.toFixed(0)} s
           </span>
@@ -186,14 +203,14 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
       </div>
 
       {!recording || !analysis ? (
-        <p className="rounded-md border border-[#2a3444] bg-[#0f141c] px-4 py-6 text-center text-[13px] text-[#aab6c8]">
+        <p className="rounded-md border border-[#16305e] bg-[#020a1f] px-4 py-6 text-center text-[13px] text-[#a9bbdc]">
           No EEG loaded. Load an EDF/EDF+ recording. Electrodes appear in the 3D view only if
           registered coordinates (BIDS electrodes.tsv) are also loaded.
         </p>
       ) : (
         <>
-          <div className="flex flex-wrap items-end gap-4 rounded-md border border-[#2a3444] bg-[#0f141c] px-3 py-2">
-            <label className="flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+          <div className="flex flex-wrap items-end gap-4 rounded-md border border-[#16305e] bg-[#020a1f] px-3 py-2">
+            <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
               Band
               <select value={band} onChange={(e) => setBand(e.target.value)} className="field">
                 {BANDS.map((b) => (
@@ -203,7 +220,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+            <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
               Analysis window start (s)
               <input
                 type="number"
@@ -214,7 +231,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 className="field w-28"
               />
             </label>
-            <label className="flex flex-col gap-1 text-[12px] text-[#aab6c8]">
+            <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
               Length (s)
               <input
                 type="number"
@@ -225,7 +242,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 className="field w-24"
               />
             </label>
-            <span className="text-[12px] text-[#8a97ab]">
+            <span className="text-[12px] text-[#8095bf]">
               Welch PSD, 2 s Hann segments, 50 % overlap, over {s0.toFixed(0)}–
               {(s0 + len).toFixed(0)} s
             </span>
@@ -246,7 +263,12 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
               </div>
             </Panel>
             <Panel title={`Scalp map · ${band}`} tag="interpolated" note="relative power">
-              <Topomap values={bandPower.scaled} hovered={hovered} onHover={setHovered} />
+              <Topomap
+                values={bandPower.scaled}
+                hovered={hovered}
+                onHover={setHovered}
+                colormap="viridis"
+              />
               <div className="mt-2">
                 <div
                   className="h-2 rounded"
@@ -259,12 +281,12 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                       .join(",")})`,
                   }}
                 />
-                <div className="mt-1 flex justify-between text-[11px] text-[#8a97ab]">
+                <div className="mt-1 flex justify-between text-[11px] text-[#8095bf]">
                   <span>{(bandPower.lo * 100).toFixed(1)} %</span>
                   <span>{(bandPower.hi * 100).toFixed(1)} %</span>
                 </div>
               </div>
-              <p className="mt-2 text-[12px] leading-snug text-[#8a97ab]">
+              <p className="mt-2 text-[12px] leading-snug text-[#8095bf]">
                 Dots are measured electrodes; colour between them is inverse-distance interpolation
                 on a schematic 10-20 layout, for display only.
               </p>
@@ -292,7 +314,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 topK={topK}
                 setTopK={setTopK}
               />
-              <p className="mt-2 text-[12px] leading-snug text-[#8a97ab]">
+              <p className="mt-2 text-[12px] leading-snug text-[#8095bf]">
                 Magnitude-squared coherence, a statistical estimate of coupling, not a measured
                 connection. Scalp EEG against a common reference inflates coherence between
                 neighbours (volume conduction).
@@ -303,19 +325,19 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 {markers.map((m) => (
                   <div
                     key={m.id}
-                    className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 border-t border-[#222b38] py-2 first:border-t-0"
+                    className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 border-t border-[#0e2247] py-2 first:border-t-0"
                   >
                     <div>
-                      <p className="text-[13px] text-[#e8eef8]">{m.name}</p>
-                      <p className="text-[12px] text-[#8a97ab]">{m.meaning}</p>
-                      <p className="text-[12px] text-[#8a97ab]">
+                      <p className="text-[13px] text-[#e6efff]">{m.name}</p>
+                      <p className="text-[12px] text-[#8095bf]">{m.meaning}</p>
+                      <p className="text-[12px] text-[#8095bf]">
                         Literature direction in Alzheimer's:{" "}
                         {m.adDirection === "higher" ? "higher" : "lower"}. {m.basis}
                       </p>
                     </div>
                     <p className="text-right font-mono text-[15px] text-white">
                       {m.format(m.value)}
-                      <span className="block text-[11px] text-[#8a97ab]">{m.unit}</span>
+                      <span className="block text-[11px] text-[#8095bf]">{m.unit}</span>
                     </p>
                   </div>
                 ))}
@@ -346,11 +368,11 @@ function CoherenceTable({
 }) {
   if (!labels.length)
     return (
-      <p className="text-[13px] text-[#aab6c8]">Not enough 10-20 channels to estimate coherence.</p>
+      <p className="text-[13px] text-[#a9bbdc]">Not enough 10-20 channels to estimate coherence.</p>
     );
   return (
     <div>
-      <label className="mb-2 flex items-center gap-2 text-[12px] text-[#aab6c8]">
+      <label className="mb-2 flex items-center gap-2 text-[12px] text-[#a9bbdc]">
         Strongest pairs
         <input
           type="range"
@@ -362,7 +384,7 @@ function CoherenceTable({
         <span className="font-mono">{topK}</span>
       </label>
       <table className="w-full text-[12px]">
-        <thead className="text-left text-[#8a97ab]">
+        <thead className="text-left text-[#8095bf]">
           <tr>
             <th className="font-normal">Pair</th>
             <th className="font-normal">Coherence</th>
@@ -373,11 +395,11 @@ function CoherenceTable({
           {pairs.map((p) => {
             const [r, g, b] = viridis(p.value);
             return (
-              <tr key={`${p.a}-${p.b}`} className="border-t border-[#222b38]">
-                <td className="py-1 font-mono text-[#e8eef8]">
+              <tr key={`${p.a}-${p.b}`} className="border-t border-[#0e2247]">
+                <td className="py-1 font-mono text-[#e6efff]">
                   {p.a}–{p.b}
                 </td>
-                <td className="font-mono text-[#e8eef8]">{p.value.toFixed(2)}</td>
+                <td className="font-mono text-[#e6efff]">{p.value.toFixed(2)}</td>
                 <td>
                   <div
                     className="h-2 rounded"

@@ -26,11 +26,11 @@ export function EvidenceTab({
     <div className="flex flex-col gap-3">
       <Panel title="Evidence" tag="derived" note="one row per measured value at the latest visit">
         {!sides.length ? (
-          <p className="text-[13px] text-[#aab6c8]">No measurements.</p>
+          <p className="text-[13px] text-[#a9bbdc]">No measurements.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[64rem] text-[12px]">
-              <thead className="text-left text-[#8a97ab]">
+              <thead className="text-left text-[#8095bf]">
                 <tr>
                   {[
                     "Region",
@@ -51,10 +51,10 @@ export function EvidenceTab({
                 {sides.map(({ r, k, s }) => {
                   const m = s!.measurement!;
                   return (
-                    <tr key={m.id} className="border-t border-[#222b38] align-top text-[#e8eef8]">
+                    <tr key={m.id} className="border-t border-[#0e2247] align-top text-[#e6efff]">
                       <td className="p-1">
                         {r.name} {k === "single" ? "" : `(${k})`} · {r.metric}
-                        <span className="block text-[11px] text-[#8a97ab]">
+                        <span className="block text-[11px] text-[#8095bf]">
                           atlas ID {m.regionId}
                         </span>
                       </td>
@@ -70,19 +70,19 @@ export function EvidenceTab({
                       <td className="p-1">
                         <Tag kind={m.evidence === "imaging-measured" ? "measured" : "derived"} />
                       </td>
-                      <td className="p-1 text-[#aab6c8]">
+                      <td className="p-1 text-[#a9bbdc]">
                         {m.provenance.software} {m.provenance.version} · {m.atlas}
                         {m.provenance.parameters ? ` · ${m.provenance.parameters}` : ""}
                       </td>
-                      <td className="p-1 text-[#aab6c8]">
+                      <td className="p-1 text-[#a9bbdc]">
                         {s!.norm.state === "value"
                           ? `${s!.norm.reference} (${s!.norm.bin})`
                           : `No compatible norm: ${s!.norm.reasons.join("; ")}`}
                       </td>
-                      <td className="p-1 text-[#aab6c8]">
+                      <td className="p-1 text-[#a9bbdc]">
                         Not supplied (no test–retest data loaded)
                       </td>
-                      <td className="p-1 text-[#aab6c8]">
+                      <td className="p-1 text-[#a9bbdc]">
                         {m.qc.status}
                         {m.qc.reviewer ? ` · ${m.qc.reviewer}` : ""}
                         {m.qc.date ? ` · ${m.qc.date}` : ""}
@@ -100,13 +100,13 @@ export function EvidenceTab({
       </Panel>
 
       <Panel title="Interpretation" tag="literature">
-        <p className="text-[13px] text-[#e8eef8]">
+        <p className="text-[13px] text-[#e6efff]">
           No composite Alzheimer's probability, severity or “neurodegeneration” score is computed.
           No validated model with a locked specification, compatible population, calibration
           analysis and external validation has been supplied. Findings are summarised by domain
           above; each is nonspecific on its own.
         </p>
-        <p className="mt-2 text-[12px] text-[#aab6c8]">
+        <p className="mt-2 text-[12px] text-[#a9bbdc]">
           Alternative explanations to consider: {ALTERNATIVE_EXPLANATIONS.join(", ")}.
         </p>
       </Panel>
@@ -145,7 +145,7 @@ export function EvidenceTab({
           {c.reviewer?.approved ? (
             <span className="text-[12px] text-[#9fdcb4]">Approved {c.reviewer.date}</span>
           ) : (
-            <span className="text-[12px] text-[#8a97ab]">Not yet reviewed</span>
+            <span className="text-[12px] text-[#8095bf]">Not yet reviewed</span>
           )}
         </div>
       </Panel>

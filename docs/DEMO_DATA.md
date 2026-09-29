@@ -72,14 +72,15 @@ source.
 
 ## What ships with the console
 
-`/research` opens on real data without any download:
+`/research` (the research console) and `/viewer` (the diagnostic viewer) open
+on real data without any download:
 
 | Layer | What it is | Source | Licence |
 | --- | --- | --- | --- |
 | MRI | MNI152 ICBM 2009a T1 template, 1.5 mm | McConnell Brain Imaging Centre, via `nilearn` | MNI/McGill permissive notice — `public/templates/NOTICE.md` |
 | Tractography | 20,000 whole-brain streamlines, CSD + deterministic tracking, affinely registered to the template | OpenNeuro **ds000221** (MPI-Leipzig Mind-Brain-Body), subject 010002 | CC0 |
 | Lesion | None. Without a loaded label map the viewer shows "No validated segmentation loaded". | — | — |
-| EEG | None by default. A synthetic demo recording is available on request and is labelled SYNTHETIC. | generated in code | — |
+| EEG | The console opens on a synthetic 10-20 recording, labelled "phantom"; the viewer has none until one is loaded. | generated in code | — |
 
 The tractogram is rebuilt, byte for byte, by
 [`tools/demo-assets/build_tractogram.py`](../tools/demo-assets/build_tractogram.py)
@@ -161,10 +162,12 @@ that needs a trained model.
 
 ## Walkthrough — about three minutes
 
-1. **Open `/research`.** It opens on the MNI template (labelled "not a
-   patient") in three synchronised planes plus a 3D view, with the registered
-   ds000221 tractogram available as a 3D layer.
-2. **Open a DICOM series or NIfTI.** Orientation markers, slice n/N, spacing and
+1. **Open `/research`.** The research console opens on the MNI template
+   (labelled "template") as a GPU-raymarched 3D volume with the 10-20
+   electrodes, three linked slices, and the EEG analysis of the loaded
+   recording. Load a NIfTI, an EDF, or a FreeSurfer label map; the
+   Neurodegeneration panel updates as each one loads.
+2. **Open the diagnostic viewer (`/viewer`)** and load a DICOM series or NIfTI. Orientation markers, slice n/N, spacing and
    the acquired-versus-reformatted plane come from the file's own geometry.
    *Say:* "Every view is resliced from the source volume in patient space."
 3. **Window/level:** drag with the W/L tool, type values, or press 1–9 for the
@@ -176,9 +179,12 @@ that needs a trained model.
    **Original** and the before/after split are one click away.
 6. **3D:** clip along patient axes, switch camera presets, toggle layers; each
    layer lists its source and method.
-7. **Neurodegeneration tracking** (`/neurodegeneration`): imports FreeSurfer
-   outputs; regional table, symptom–network research matrix, longitudinal
-   charts. No diagnosis or probability is computed.
+7. **Neurodegeneration tracking** (`/neurodegeneration`): whatever the console
+   or viewer has loaded is linked in automatically — the MRI as a visit,
+   FreeSurfer label-map volumes as regional measurements (QC pending), and the
+   EEG measures as nonspecific biomarkers. Template and phantom data are
+   labelled as such. It also imports FreeSurfer stats files. No diagnosis or
+   probability is computed.
 
 ---
 

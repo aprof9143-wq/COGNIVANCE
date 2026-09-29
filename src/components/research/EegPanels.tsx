@@ -17,11 +17,14 @@ export function Topomap({
   values,
   hovered,
   onHover,
+  colormap = "neural",
 }: {
   /** label -> 0..1 */
   values: Map<string, number>;
   hovered: string | null;
   onHover?: (label: string | null) => void;
+  /** "neural" is the console's blue ramp; "viridis" is perceptually uniform. */
+  colormap?: "neural" | "viridis";
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -63,7 +66,7 @@ export function Topomap({
           den += w;
         }
         const v = den ? num / den : 0;
-        const [cr, cg, cb] = ramp(v);
+        const [cr, cg, cb] = colormap === "viridis" ? viridisRgb(v) : neuralRamp(v);
         img.data[o] = cr;
         img.data[o + 1] = cg;
         img.data[o + 2] = cb;
@@ -104,7 +107,7 @@ export function Topomap({
       ctx.fillStyle = "rgba(230,239,255,0.92)";
       ctx.fillText(p.label, p.x, p.y - 7);
     }
-  }, [values, hovered]);
+  }, [values, hovered, colormap]);
 
   const handleMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!onHover) return;
@@ -138,8 +141,27 @@ export function Topomap({
   );
 }
 
+function neuralRamp(v: number): [number, number, number] {
+  const stops: [number, number, number][] = [
+    [8, 28, 90],
+    [30, 99, 196],
+    [127, 216, 255],
+    [245, 250, 255],
+  ];
+  const t = Math.max(0, Math.min(1, v)) * (stops.length - 1);
+  const i = Math.min(stops.length - 2, Math.floor(t));
+  const f = t - i;
+  const a = stops[i]!;
+  const b = stops[i + 1]!;
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * f),
+    Math.round(a[1] + (b[1] - a[1]) * f),
+    Math.round(a[2] + (b[2] - a[2]) * f),
+  ];
+}
+
 /** Viridis: perceptually uniform, so equal steps in power look equal. */
-function ramp(v: number): [number, number, number] {
+function viridisRgb(v: number): [number, number, number] {
   const [r, g, b] = viridis(v);
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
