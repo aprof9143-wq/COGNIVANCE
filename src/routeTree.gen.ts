@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
+import { Route as NeurodegenerationRouteImport } from './routes/neurodegeneration'
 import { Route as NimbleRouteImport } from './routes/nimble'
 import { Route as ResearchRouteImport } from './routes/research'
 
@@ -36,6 +37,11 @@ const BenchmarksRoute = BenchmarksRouteImport.update({
   path: '/benchmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NeurodegenerationRoute = NeurodegenerationRouteImport.update({
+  id: '/neurodegeneration',
+  path: '/neurodegeneration',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NimbleRoute = NimbleRouteImport.update({
   id: '/nimble',
   path: '/nimble',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/benchmarks': typeof BenchmarksRoute
+  '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/benchmarks': typeof BenchmarksRoute
+  '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
 }
@@ -69,20 +77,36 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/benchmarks': typeof BenchmarksRoute
+  '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/auth' | '/benchmarks' | '/nimble' | '/research'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/benchmarks'
+    | '/neurodegeneration'
+    | '/nimble'
+    | '/research'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/auth' | '/benchmarks' | '/nimble' | '/research'
+  to:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/benchmarks'
+    | '/neurodegeneration'
+    | '/nimble'
+    | '/research'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/auth'
     | '/benchmarks'
+    | '/neurodegeneration'
     | '/nimble'
     | '/research'
   fileRoutesById: FileRoutesById
@@ -92,6 +116,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   BenchmarksRoute: typeof BenchmarksRoute
+  NeurodegenerationRoute: typeof NeurodegenerationRoute
   NimbleRoute: typeof NimbleRoute
   ResearchRoute: typeof ResearchRoute
 }
@@ -126,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BenchmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/neurodegeneration': {
+      id: '/neurodegeneration'
+      path: '/neurodegeneration'
+      fullPath: '/neurodegeneration'
+      preLoaderRoute: typeof NeurodegenerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nimble': {
       id: '/nimble'
       path: '/nimble'
@@ -148,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   BenchmarksRoute: BenchmarksRoute,
+  NeurodegenerationRoute: NeurodegenerationRoute,
   NimbleRoute: NimbleRoute,
   ResearchRoute: ResearchRoute,
 }

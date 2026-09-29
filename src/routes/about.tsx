@@ -48,7 +48,10 @@ function About() {
       <section className="haze px-[clamp(1.25rem,4vw,3.5rem)] pt-[clamp(8rem,16vw,12rem)] pb-[clamp(3rem,7vw,5rem)]">
         <div className="mx-auto max-w-[1500px]">
           <p className="t-marker rise text-ash">About us</p>
-          <h1 className="t-hero rise mt-7 max-w-[20ch] text-foreground" style={{ animationDelay: "100ms" }}>
+          <h1
+            className="t-hero rise mt-7 max-w-[20ch] text-foreground"
+            style={{ animationDelay: "100ms" }}
+          >
             We build the instruments, then we build the science.
           </h1>
           <p

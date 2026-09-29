@@ -19,7 +19,6 @@ export function Waitlist() {
         <div className="absolute inset-0 bg-gradient-to-b from-paper via-paper/60 to-paper" />
         <div className="absolute inset-0 bg-[radial-gradient(65%_55%_at_50%_35%,transparent_0%,color-mix(in_oklab,var(--paper)_88%,transparent)_100%)]" />
 
-
         <div className="relative px-[clamp(1.25rem,4vw,3.5rem)] pt-[clamp(5rem,12vw,9rem)]">
           <div className="mx-auto max-w-[760px] text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-foreground/15 bg-foreground/5 px-4 py-1.5 backdrop-blur-md">

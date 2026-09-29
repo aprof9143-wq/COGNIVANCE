@@ -388,3 +388,80 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ------------------------------------------------------------------------
+ * Research imaging workstation (/research). Scoped under .ws so nothing here
+ * reaches the marketing pages. Neutral surfaces; colour is for data.
+ * --------------------------------------------------------------------- */
+.ws .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #334055;
+  background: #161d28;
+  color: #e8eef8;
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 13px;
+  line-height: 1.2;
+}
+.ws .btn:hover:not(:disabled) {
+  background: #1d2634;
+  border-color: #46566e;
+}
+.ws .btn:disabled {
+  opacity: 0.45;
+}
+.ws .chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #334055;
+  background: #141a24;
+  color: #c9d2de;
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  font-size: 12px;
+}
+.ws .chip:hover {
+  border-color: #46566e;
+  color: #ffffff;
+}
+.ws .chip-on {
+  border-color: #c9a227;
+  background: #2a230c;
+  color: #ffe59a;
+}
+.ws .tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid transparent;
+  color: #c9d2de;
+  border-radius: 5px;
+  padding: 0.3rem 0.55rem;
+  font-size: 12.5px;
+}
+.ws .tool:hover {
+  background: #161d28;
+  color: #ffffff;
+}
+.ws .tool-on {
+  border-color: #c9a227;
+  background: #2a230c;
+  color: #ffe59a;
+}
+.ws .field {
+  border: 1px solid #334055;
+  background: #0d1118;
+  color: #e8eef8;
+  border-radius: 5px;
+  padding: 0.3rem 0.45rem;
+  font-size: 13px;
+}
+.ws input[type="range"] {
+  accent-color: #c9a227;
+}
+.ws :focus-visible {
+  outline: 2px solid #ffc400;
+  outline-offset: 1px;
+}
