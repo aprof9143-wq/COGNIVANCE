@@ -637,6 +637,9 @@ export function ResearchConsole() {
             <Link to="/neurodegeneration" className={NAV_BUTTON}>
               <Microscope className="h-3.5 w-3.5" /> Neurodegeneration
             </Link>
+            <Link to="/simulation" className={NAV_BUTTON}>
+              <Box className="h-3.5 w-3.5" /> Simulation
+            </Link>
             <button
               type="button"
               onClick={signOut}

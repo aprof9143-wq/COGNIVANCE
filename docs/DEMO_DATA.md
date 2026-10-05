@@ -202,6 +202,58 @@ Every value on that page is simulated in the browser, and it says so.
 
 ---
 
+## CIRCUIT Simulation Window — `/simulation` (signed in)
+
+The Simulation Window is the "Proteus for neurotechnology" view from the design
+document. It needs no download: the anatomy ships in `public/sim/anatomy.bin.gz`
+(licence notes are in `public/sim/NOTICE.md`).
+
+**Walkthrough (about two minutes)**
+
+1. Open it. The eight CIRCUIT parts fly in and auto-assemble on the cortex
+   above the target. The auto-connector wires 14 typed nets, and the netlist
+   fills in as each pair of pins lands. Design-rule check: ERC passes, the write
+   path is gated by PRISM, and there is one power-budget warning (the array
+   duty-cycles to 78 %).
+2. The loop starts in slow motion: NIMBLE sense → Synapse Atlas predict →
+   PRISM verify → ECHO write-back → measure. The green halo is a verified gate;
+   the beam fires only after it.
+3. **Untick PRISM** in the component library. The DRC raises SAFETY-GATE and
+   the simulation refuses to run. This is the safety claim, enforced
+   structurally.
+4. Pick **Parkinson's**. At the spec's 15 MHz the subthalamic nucleus is out of
+   reach: brain absorbs about 9 dB/cm, off-target pressure is above half the
+   focus, PRISM halts, and a red barrier stays at the array. Press
+   **Auto-design**. It moves the array to 7.5 MHz, and the loop runs with every
+   write-back verified.
+5. **C · Benchmark → RUN ALL** (10 patients, about 45 s). Each virtual patient
+   runs closed loop (PRISM enforced) and open loop (fixed protocol) with the
+   same noise.
+
+**What the numbers are, and are not**
+
+- **SPEC** values are design targets from the design document, not measurements
+  of built hardware. **ASSUMED** values are literature-typical and cite their
+  source. Prediction latency is measured in the viewer's browser. Write latency
+  is acoustic time of flight.
+- Clinical outcomes (CDR-SB, SRS-2, acuity, speech) are **not predicted**. The
+  benchmark shows the cited clinical reference and the NIMBLE target beside
+  the model's own biomarker endpoint, and scores only that endpoint,
+  verification, halts, safety breaches and latency.
+- What the model reports today, with 10 patients and auto-design on:
+  - Autism, Parkinson's, vision and hearing **pass**.
+  - Alzheimer's **fails**: at safe intensity the closed loop closes about 27 %
+    of the gap. The open loop reaches about 44 %, but with 1,200 safety-limit
+    breaches.
+  - Paralysis is **not assessed**: its endpoint is a read-out (BCI) problem.
+  - Loop latency is about 16–20 ms (p50), above the 15 ms target. The spec
+    budgets alone already use the 15 ms.
+
+The design document's §8 table of pre-written PASS results is deliberately not
+reproduced. Every result on this page is computed when you press Run.
+
+---
+
 ## What to say if asked "does it diagnose Alzheimer's?"
 
 **No — and say so plainly.** Every number on screen is a measurement computed

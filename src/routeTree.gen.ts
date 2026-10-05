@@ -16,6 +16,7 @@ import { Route as BenchmarksRouteImport } from './routes/benchmarks'
 import { Route as NeurodegenerationRouteImport } from './routes/neurodegeneration'
 import { Route as NimbleRouteImport } from './routes/nimble'
 import { Route as ResearchRouteImport } from './routes/research'
+import { Route as SimulationRouteImport } from './routes/simulation'
 import { Route as ViewerRouteImport } from './routes/viewer'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const ResearchRoute = ResearchRouteImport.update({
   path: '/research',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SimulationRoute = SimulationRouteImport.update({
+  id: '/simulation',
+  path: '/simulation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ViewerRoute = ViewerRouteImport.update({
   id: '/viewer',
   path: '/viewer',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
+  '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
+  '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
+  '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/neurodegeneration'
     | '/nimble'
     | '/research'
+    | '/simulation'
     | '/viewer'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/neurodegeneration'
     | '/nimble'
     | '/research'
+    | '/simulation'
     | '/viewer'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/neurodegeneration'
     | '/nimble'
     | '/research'
+    | '/simulation'
     | '/viewer'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   NeurodegenerationRoute: typeof NeurodegenerationRoute
   NimbleRoute: typeof NimbleRoute
   ResearchRoute: typeof ResearchRoute
+  SimulationRoute: typeof SimulationRoute
   ViewerRoute: typeof ViewerRoute
 }
 
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/simulation': {
+      id: '/simulation'
+      path: '/simulation'
+      fullPath: '/simulation'
+      preLoaderRoute: typeof SimulationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/viewer': {
       id: '/viewer'
       path: '/viewer'
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   NeurodegenerationRoute: NeurodegenerationRoute,
   NimbleRoute: NimbleRoute,
   ResearchRoute: ResearchRoute,
+  SimulationRoute: SimulationRoute,
   ViewerRoute: ViewerRoute,
 }
 export const routeTree = rootRouteImport
