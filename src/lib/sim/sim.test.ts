@@ -1,0 +1,371 @@
+import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
+import {
+  alphaNpM,
+  beamField,
+  DEFAULT_ARRAY,
+  heatStep,
+  wavelengthM,
+  type ArrayDesign,
+  type Vec3,
+} from "./acoustics";
+import { parseAnatomy, placeArray, targetPoint, type Placement } from "./anatomy";
+import { autoConnect, FULL_TOPOLOGY } from "./autoconnect";
+import { runCohort, virtualPatient } from "./benchmark";
+import { addressableFoci, evaluateDesign, designSpace, pickBest } from "./design";
+import { diseaseByKey, patientParams } from "./diseases";
+import { CircuitSim, computeBeams } from "./loop";
+import { createNetwork, healthyParams, Recorder, REGION_INDEX as R, REGIONS, step } from "./neural";
+import { verify, type GateInputs } from "./prism";
+import { COMPONENTS, SAFETY_LIMITS, thermalNoiseUv } from "./specs";
+
+/** A placement `depth` mm straight down from the origin. */
+const straight = (depth: number): Placement => ({
+  centre: [0, 0, 0],
+  normal: [0, 0, -1],
+  target: [0, 0, -depth],
+  depthMm: depth,
+});
+
+describe("component library and auto-connection", () => {
+  it("wires the full implant with no design-rule errors", () => {
+    const c = autoConnect(FULL_TOPOLOGY);
+    expect(c.drc.filter((d) => d.severity === "error")).toEqual([]);
+    expect(c.ok).toBe(true);
+    // Every required input is driven.
+    for (const comp of c.components)
+      for (const p of comp.ports.filter((x) => x.dir === "in" && x.required))
+        expect(c.nets.some((n) => n.to.component === comp.id && n.to.port === p.id)).toBe(true);
+    // Signal path order: sense before verify before stimulate.
+    const o = c.assemblyOrder;
+    expect(o.indexOf("asic")).toBeLessThan(o.indexOf("prism"));
+    expect(o.indexOf("prism")).toBeLessThan(o.indexOf("array"));
+  });
+
+  it("refuses a tissue-write path without PRISM — the closed-loop guarantee, structurally", () => {
+    const c = autoConnect({
+      components: COMPONENTS.map((x) => x.id).filter((id) => id !== "prism"),
+    });
+    expect(c.ok).toBe(false);
+    expect(c.drc.map((d) => d.rule)).toContain("SAFETY-GATE");
+  });
+
+  it("flags a missing power source and an over-budget design", () => {
+    expect(autoConnect({ components: ["mesh", "asic"] }).drc.map((d) => d.rule)).toContain(
+      "PWR-SOURCE",
+    );
+    const full = autoConnect(FULL_TOPOLOGY);
+    expect(full.power.drawMw).toBeGreaterThan(full.power.harvestMw);
+    expect(full.drc.map((d) => d.rule)).toContain("PWR-BUDGET");
+    expect(full.power.dutyLimit).toBeCloseTo(full.power.harvestMw / full.power.drawMw, 6);
+  });
+
+  it("computes contact thermal noise from first principles (√4kTRB)", () => {
+    // 10 kΩ, 7.5 kHz, 310 K → 1.13 µV rms.
+    expect(thermalNoiseUv()).toBeCloseTo(1.13, 2);
+  });
+});
+
+describe("acoustics", () => {
+  const design: ArrayDesign = { ...DEFAULT_ARRAY, frequencyHz: 5e6, pitchM: 2 * wavelengthM(5e6) };
+
+  it("puts the focus where it was asked, with a diffraction-limited width", () => {
+    const { metrics } = beamField(design, [0, 0, 0], [0, 0, -1], [0, 0, -0.012]);
+    expect(metrics.focalErrorMm).toBeLessThan(metrics.axialFwhmMm);
+    // Lateral FWHM ≈ λ·F# for a square aperture (within a factor of 1.5).
+    const fnum = 12 / metrics.apertureMm;
+    expect(metrics.lateralFwhmMm).toBeGreaterThan(0.5 * metrics.wavelengthMm * fnum);
+    expect(metrics.lateralFwhmMm).toBeLessThan(1.5 * metrics.wavelengthMm * fnum);
+  });
+
+  it("attenuates at 0.6 dB/cm/MHz: 15 MHz loses 9 dB per cm", () => {
+    expect((alphaNpM(15e6) * 0.01 * 8.686).toFixed(2)).toBe("9.00");
+    const { metrics } = beamField(DEFAULT_ARRAY, [0, 0, 0], [0, 0, -1], [0, 0, -0.02]);
+    expect(metrics.pathLossDb).toBeCloseTo(18, 5);
+  });
+
+  it("reports MI = p/√f and I_SPPA = p²/2ρc consistently", () => {
+    const { metrics } = beamField(design, [0, 0, 0], [0, 0, -1], [0, 0, -0.01]);
+    expect(metrics.mechanicalIndex).toBeCloseTo(metrics.peakMpa / Math.sqrt(5), 6);
+    expect(metrics.isppaWcm2).toBeCloseTo(
+      (metrics.focusMpa * 1e6) ** 2 / (2 * 1040 * 1540) / 1e4,
+      6,
+    );
+  });
+
+  it("heats toward 2αIτ/(ρC) and cools back", () => {
+    let t = 0;
+    for (let i = 0; i < 2000; i++) t = heatStep(t, 1, 5e6, 1, 0.01);
+    const kappa = 1.4e-7;
+    const tau = 1e-3 ** 2 / (4 * kappa);
+    const steady = ((2 * alphaNpM(5e6) * 1e4) / (1040 * 3600)) * tau;
+    expect(t).toBeCloseTo(steady, 4);
+    expect(heatStep(t, 0, 5e6, 1, 100)).toBeLessThan(1e-6);
+  });
+
+  it("shows the 15 MHz spec cannot focus deep: off-target pressure exceeds −6 dB at 18 mm", () => {
+    const [b] = computeBeams(DEFAULT_ARRAY, [{ region: "hippocampus", placement: straight(18) }]);
+    expect(b!.metrics.offTargetFraction).toBeGreaterThan(SAFETY_LIMITS.offTargetFraction);
+  });
+});
+
+describe("neural model", () => {
+  const run = (
+    p: ReturnType<typeof healthyParams>,
+    stim: { region: number; u: number; sign: 1 | -1 }[] = [],
+  ) => {
+    const net = createNetwork(p, 5);
+    const rec = new Recorder(REGIONS.length, 4096);
+    step(net, 500);
+    step(net, 3000, stim, undefined, rec.push);
+    return rec;
+  };
+
+  it("reproduces each disease's biomarker direction and lets stimulation move it back", () => {
+    const h = run(healthyParams());
+    const pd = patientParams(diseaseByKey("parkinsons"), 1);
+    const off = run(pd);
+    const on = run(pd, [{ region: R.stn, u: 0.7, sign: -1 }]);
+    expect(off.power(R.stn, 3000)).toBeGreaterThan(2 * h.power(R.stn, 3000));
+    expect(on.power(R.stn, 3000)).toBeLessThan(0.7 * off.power(R.stn, 3000));
+
+    const vis = patientParams(diseaseByKey("vision"), 1);
+    expect(run(vis).power(R.v1, 3000)).toBeLessThan(0.8 * h.power(R.v1, 3000));
+    expect(run(vis, [{ region: R.v1, u: 0.7, sign: 1 }]).power(R.v1, 3000)).toBeGreaterThan(
+      run(vis).power(R.v1, 3000),
+    );
+
+    const ad = patientParams(diseaseByKey("alzheimers"), 1);
+    expect(run(ad).coherence(R.hippocampus, R.vmpfc, 3000)).toBeLessThan(
+      h.coherence(R.hippocampus, R.vmpfc, 3000),
+    );
+  });
+
+  it("is stable: the same parameters give similar biomarkers across noise seeds", () => {
+    const p = healthyParams();
+    const vals = [1, 2, 3].map((seed) => {
+      const net = createNetwork(p, seed);
+      const rec = new Recorder(REGIONS.length, 8192);
+      step(net, 500);
+      step(net, 6000, [], undefined, rec.push);
+      return rec.power(R.stn, 6000);
+    });
+    const mean = vals.reduce((a, b) => a + b) / vals.length;
+    for (const v of vals) expect(Math.abs(v - mean) / mean).toBeLessThan(0.35);
+  });
+});
+
+describe("PRISM gate", () => {
+  const ok: GateInputs = {
+    intent: {
+      regions: [{ region: "stn", gain: 0.6, u: 0.3 }],
+      sign: -1,
+      predictedBenefit: 5,
+      confidence: 0.2,
+      predictedPlasticity: 1.1,
+    },
+    allowedRegions: ["stn"],
+    perRegion: [
+      {
+        region: "stn",
+        mechanicalIndex: 0.3,
+        isptaMwCm2: 300,
+        predictedTempC: 0.2,
+        offTargetFraction: 0.3,
+        doseS: 1,
+        focalGainOk: true,
+      },
+    ],
+    aggregateDoseS: 1,
+    minConfidence: 0.02,
+  };
+
+  it("verifies an intent that satisfies every rule", () => {
+    const v = verify(ok);
+    expect(v.verified).toBe(true);
+    expect(v.rules.every((r) => r.pass)).toBe(true);
+  });
+
+  it.each([
+    ["P1", { intent: { ...ok.intent, regions: [{ region: "v1" as const, gain: 1, u: 1 }] } }],
+    ["P2", { intent: { ...ok.intent, confidence: 0 } }],
+    ["P3", { intent: { ...ok.intent, predictedBenefit: -1 } }],
+    ["S1", { perRegion: [{ ...ok.perRegion[0]!, mechanicalIndex: 2 }] }],
+    ["S2", { perRegion: [{ ...ok.perRegion[0]!, isptaMwCm2: 800 }] }],
+    ["S3", { perRegion: [{ ...ok.perRegion[0]!, predictedTempC: 2.5 }] }],
+    ["S4", { perRegion: [{ ...ok.perRegion[0]!, offTargetFraction: 0.9 }] }],
+    ["S5", { perRegion: [{ ...ok.perRegion[0]!, doseS: 121 }] }],
+    ["S6", { aggregateDoseS: 241 }],
+    ["S7", { intent: { ...ok.intent, predictedPlasticity: 1.7 } }],
+  ] as const)("halts on %s", (id, patch) => {
+    const v = verify({ ...ok, ...patch } as GateInputs);
+    expect(v.verified).toBe(false);
+    expect(v.reason).toMatch(new RegExp(`^${id} `));
+  });
+});
+
+describe("CIRCUIT loop", () => {
+  const pd = diseaseByKey("parkinsons");
+  const good: ArrayDesign = {
+    ...DEFAULT_ARRAY,
+    frequencyHz: 7.5e6,
+    pitchM: 2 * wavelengthM(7.5e6),
+  };
+
+  it("never delivers a write-back PRISM did not verify", () => {
+    for (const design of [DEFAULT_ARRAY, good]) {
+      const beams = computeBeams(design, [{ region: "stn", placement: straight(14) }]);
+      const sim = new CircuitSim({
+        disease: pd,
+        severity: 1,
+        beams,
+        seed: 3,
+        dutyLimit: 0.78,
+        gated: true,
+        design,
+      });
+      for (let i = 0; i < 40; i++) {
+        const ev = sim.iterate();
+        if (ev.delivered.length) expect(ev.verification?.verified).toBe(true);
+        if (ev.halted) {
+          expect(ev.delivered).toEqual([]);
+          expect(ev.verification?.reason).toBeTruthy();
+        }
+      }
+    }
+  });
+
+  it("halts at the 15 MHz spec for a 14 mm target and delivers with a redesigned array", () => {
+    const spec = new CircuitSim({
+      disease: pd,
+      severity: 1,
+      beams: computeBeams(DEFAULT_ARRAY, [{ region: "stn", placement: straight(14) }]),
+      seed: 3,
+      dutyLimit: 0.78,
+      gated: true,
+    });
+    const evs = Array.from({ length: 20 }, () => spec.iterate());
+    expect(evs.every((e) => e.halted)).toBe(true);
+    expect(evs.some((e) => e.verification?.reason?.startsWith("S4"))).toBe(true);
+
+    const fixed = new CircuitSim({
+      disease: pd,
+      severity: 1,
+      beams: computeBeams(good, [{ region: "stn", placement: straight(14) }]),
+      seed: 3,
+      dutyLimit: 0.78,
+      gated: true,
+      design: good,
+    });
+    const delivered = Array.from({ length: 20 }, () => fixed.iterate()).filter(
+      (e) => e.delivered.length,
+    );
+    expect(delivered.length).toBeGreaterThan(10);
+  });
+
+  it("reports latency with provenance: spec budgets plus measured compute", () => {
+    const sim = new CircuitSim({
+      disease: pd,
+      severity: 1,
+      beams: computeBeams(good, [{ region: "stn", placement: straight(14) }]),
+      seed: 3,
+      dutyLimit: 0.78,
+      gated: true,
+      design: good,
+    });
+    const ev = sim.iterate();
+    expect(ev.stages.find((s) => s.stage === "SENSE")).toMatchObject({ ms: 10, source: "spec" });
+    expect(ev.stages.find((s) => s.stage === "VERIFY")!.ms).toBeGreaterThanOrEqual(5);
+    expect(ev.stages.find((s) => s.stage === "PREDICT")!.source).toBe("measured");
+    expect(ev.latencyMs).toBeGreaterThanOrEqual(15);
+  });
+});
+
+describe("design search and benchmark", () => {
+  it("auto-design finds a mm-scale design that reaches a 14 mm target", () => {
+    const placements = [{ region: "stn" as const, placement: straight(14) }];
+    const best = pickBest(designSpace().map((d) => evaluateDesign(d, placements)));
+    expect(best).not.toBeNull();
+    expect(best!.ok).toBe(true);
+    expect(best!.beams[0]!.metrics.lateralFwhmMm).toBeLessThanOrEqual(1.5);
+  });
+
+  it("steerable foci follow the grating-lobe limit: none beyond a λ pitch", () => {
+    const sparse: ArrayDesign = {
+      ...DEFAULT_ARRAY,
+      frequencyHz: 5e6,
+      pitchM: 2 * wavelengthM(5e6),
+    };
+    expect(addressableFoci(sparse, 15, 0.7)).toBe(0);
+    const dense: ArrayDesign = {
+      ...DEFAULT_ARRAY,
+      frequencyHz: 5e6,
+      pitchM: 0.5 * wavelengthM(5e6),
+    };
+    expect(addressableFoci(dense, 15, 0.7)).toBeGreaterThan(0);
+  });
+
+  it("is reproducible and never counts an unverified write-back in the closed arm", async () => {
+    const d = diseaseByKey("parkinsons");
+    const design: ArrayDesign = {
+      ...DEFAULT_ARRAY,
+      frequencyHz: 7.5e6,
+      pitchM: 2 * wavelengthM(7.5e6),
+    };
+    const beams = computeBeams(design, [{ region: "stn", placement: straight(14) }]);
+    const a = await runCohort({
+      disease: d,
+      design,
+      beams,
+      dutyLimit: 0.78,
+      patients: 3,
+      loops: 30,
+    });
+    const b = await runCohort({
+      disease: d,
+      design,
+      beams,
+      dutyLimit: 0.78,
+      patients: 3,
+      loops: 30,
+    });
+    expect(a.closed.endpoint.mean).toBe(b.closed.endpoint.mean);
+    expect(a.closed.unverifiedDeliveries).toBe(0);
+    expect(a.closed.safetyBreaches).toBe(0);
+    expect(a.verificationRate).toBe(1);
+    expect(virtualPatient(d, 1).severity).toBe(virtualPatient(d, 1).severity);
+  });
+
+  it("marks paralysis as not assessable by this model", async () => {
+    const d = diseaseByKey("paralysis");
+    const beams = computeBeams(DEFAULT_ARRAY, [{ region: "motor", placement: straight(10) }]);
+    const r = await runCohort({
+      disease: d,
+      design: DEFAULT_ARRAY,
+      beams,
+      dutyLimit: 0.78,
+      patients: 1,
+      loops: 5,
+    });
+    expect(r.verdict).toBe("not-assessed");
+  });
+});
+
+describe("anatomy asset", () => {
+  it("parses the shipped atlas meshes in MNI space and places arrays on the outer surface", () => {
+    const buf = gunzipSync(readFileSync("public/sim/anatomy.bin.gz"));
+    const an = parseAnatomy(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+    for (const k of ["cortex", "outer", "hippocampus", "amygdala", "stn", "v1", "motor"])
+      expect(an.meshes.has(k)).toBe(true);
+    const hip = an.meshes.get("hippocampus")!;
+    const left: Vec3 = targetPoint(hip, "left");
+    expect(left[0]).toBeLessThan(0); // RAS: left is negative x
+    expect(hip.volumeMm3!).toBeGreaterThan(3000);
+    const pl = placeArray(an.meshes.get("outer")!, left);
+    expect(pl.depthMm).toBeGreaterThan(5);
+    expect(pl.depthMm).toBeLessThan(30);
+    const n = Math.hypot(...pl.normal);
+    expect(n).toBeCloseTo(1, 6);
+  });
+});
