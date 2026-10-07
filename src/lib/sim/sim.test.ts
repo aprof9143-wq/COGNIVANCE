@@ -469,6 +469,20 @@ describe("gated regions and depth", () => {
     expect(scalp.label).toBeUndefined();
   });
 
+  it("covers the whole head, so deep targets measure to the side of the head", () => {
+    const an = shippedAnatomy();
+    const scalp = an.meshes.get("scalp")!;
+    let minZ = Infinity;
+    for (let i = 2; i < scalp.positions.length; i += 3) minZ = Math.min(minZ, scalp.positions[i]!);
+    // Down to the bottom of the image, not just the top of the head.
+    expect(minZ).toBeLessThan(-60);
+    // The amygdala's nearest skin is lateral (temple), not the airway or the cut.
+    const amy = targetPoint(an.meshes.get("amygdala")!, "left");
+    const near = nearestVertex(scalp, amy).point;
+    expect(near[0]).toBeLessThan(-60);
+    expect(Math.abs(near[2] - amy[2])).toBeLessThan(15);
+  });
+
   it("gates exactly the subcortical targets", () => {
     const an = shippedAnatomy();
     expect([...GATED_REGIONS].sort()).toEqual(["amygdala", "hippocampus", "stn", "thalamus"]);

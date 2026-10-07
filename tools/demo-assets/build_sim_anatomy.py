@@ -7,8 +7,8 @@ sim_regions.json, next to this script.
 Inputs (TemplateFlow, tpl-MNI152NLin2009cAsym, res-01; licences in
 public/templates/NOTICE.md and public/sim/NOTICE.md)
   _T1w.nii.gz                         cortical surface (T1 isosurface in the brain mask)
+                                      and the scalp (head above the background)
   _desc-brain_mask.nii.gz             brain mask
-  _desc-head_mask.nii.gz              head mask: the skin surface, for depth below the scalp
   _seg-aseg_dseg.nii.gz               FreeSurfer aseg: hippocampus, amygdala, thalamus
   _atlas-MASSP20_dseg.nii.gz          MASSP (Alkemade et al. 2022): subthalamic nucleus
   _atlas-Schaefer2018_desc-400Parcels17Networks_dseg.nii.gz (+ .tsv)
@@ -50,7 +50,6 @@ from pathlib import Path
 
 import nibabel as nib
 import numpy as np
-from nibabel.processing import resample_from_to
 from scipy import ndimage
 from skimage import measure
 
@@ -120,6 +119,74 @@ def gz(data):
     return buf.getvalue()
 
 
+SIX = ndimage.generate_binary_structure(3, 1)
+
+
+def head_threshold(T):
+    """Background median + 5 robust SD (1.4826 x MAD), sampled on the six faces.
+
+    Same definition as headThreshold() in src/lib/sim/subject.ts, including
+    its median (the upper middle value) and each face voxel counted once.
+    """
+    face = np.ones(T.shape, bool)
+    face[1:-1, 1:-1, 1:-1] = False
+    v = T[face].astype(np.float64)
+    med = lambda x: np.sort(x)[len(x) // 2]
+    m = med(v)
+    return m + 5 * 1.4826 * med(np.abs(v - m))
+
+
+def downsample2(mask, affine):
+    """2x coarser: a voxel is set when half or more of its 2x2x2 block is."""
+    p = [(0, s % 2) for s in mask.shape]
+    m = np.pad(mask.astype(np.float32), p)
+    n = np.pad(np.ones(mask.shape, np.float32), p)
+    blocks = lambda a: a.reshape(a.shape[0] // 2, 2, a.shape[1] // 2, 2, a.shape[2] // 2, 2).sum((1, 3, 5))
+    coarse = 2 * blocks(m) >= blocks(n)
+    a = affine.copy()
+    a[:3, :3] = 2 * affine[:3, :3]
+    a[:3, 3] = affine[:3, 3] + 0.5 * affine[:3, :3].sum(1)
+    return coarse, a
+
+
+def scalp_points(T, affine):
+    """Skin surface of a head T1 as points, the field-of-view edge dropped.
+
+    Mirrors analyseSubject() in src/lib/sim/subject.ts step for step.
+    """
+    coarse, a = downsample2(T > head_threshold(T), affine)
+    # Closing that leaves the field-of-view edge alone (erosion border = set).
+    closed = ndimage.binary_erosion(
+        ndimage.binary_dilation(coarse, SIX, iterations=2), SIX, iterations=2, border_value=1
+    )
+    # Fill every axial slice: seals the airway, which opens where the image
+    # cuts through the neck.
+    z = int(np.argmax(np.abs(a[2, :3])))
+    closed = np.moveaxis(closed, z, 0).copy()
+    for w in range(closed.shape[0]):
+        closed[w] = ndimage.binary_fill_holes(closed[w])
+    closed = np.moveaxis(closed, 0, z)
+    # Fill: everything not reachable from the border through empty voxels.
+    bg, _ = ndimage.label(~closed, SIX)
+    border = np.unique(np.concatenate([bg[0].ravel(), bg[-1].ravel(), bg[:, 0].ravel(),
+                                       bg[:, -1].ravel(), bg[:, :, 0].ravel(), bg[:, :, -1].ravel()]))
+    solid = ~np.isin(bg, border[border > 0])
+    lab, n = ndimage.label(solid, SIX)
+    head = lab == (np.bincount(lab.ravel())[1:].argmax() + 1)
+    pts = []
+    inner = np.zeros_like(head)
+    inner[1:-1, 1:-1, 1:-1] = head[1:-1, 1:-1, 1:-1]
+    for axis in range(3):
+        for step in (-1, 1):
+            nb = np.roll(head, -step, axis=axis)
+            idx = np.argwhere(inner & ~nb)
+            mid = idx.astype(np.float64)
+            mid[:, axis] += step / 2
+            pts.append(mid)
+    ijk = np.concatenate(pts)
+    return (np.c_[ijk, np.ones(len(ijk))] @ a.T)[:, :3].astype(np.float32)
+
+
 def main(atlas_dir, out_dir):
     d = Path(atlas_dir)
     out = Path(out_dir)
@@ -160,16 +227,11 @@ def main(atlas_dir, out_dir):
     meshes.append(("outer", "Brain surface", "#5d7aa8", outer_v, outer_f, None))
     print(f"outer: {len(outer_v)} verts")
 
-    # Scalp: the skin surface of the head mask, resampled onto the 1 mm grid.
-    # Where the head leaves the field of view (neck, cut planes) the surface
-    # is the box edge, not skin, so those points are dropped.
-    head = resample_from_to(nib.load(d / f"{P}desc-head_mask.nii.gz"), t1, order=1)
-    head = np.asarray(head.dataobj) > 0.5
-    v = ndimage.gaussian_filter(np.pad(head, 2).astype(np.float32), 1.0)
-    sv, _, _, _ = measure.marching_cubes(v, level=0.5, step_size=2)
-    sv -= 2
-    sv = sv[np.all((sv >= 1) & (sv <= np.array(head.shape) - 2), axis=1)]
-    scalp = (np.c_[sv, np.ones(len(sv))] @ affine.T)[:, :3].astype(np.float32)
+    # Scalp: the skin surface of the T1, found exactly as the page finds a
+    # subject's (src/lib/sim/subject.ts), so template and subject depths are
+    # measured the same way. (TemplateFlow's head mask is not used: below
+    # z ≈ 0 it fills the whole field of view, so it has no skin surface there.)
+    scalp = scalp_points(T, affine)
     meshes.append(("scalp", "Scalp", "#c8a27a", scalp, np.zeros((0, 3), np.uint32), None))
     print(f"scalp: {len(scalp)} points")
 

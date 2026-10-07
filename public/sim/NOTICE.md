@@ -21,7 +21,7 @@ They describe a population-average template, not a person.
 | Region                                                     | Source                                                                                                                                    |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Cortex, outer surface                                      | TemplateFlow `tpl-MNI152NLin2009cAsym_res-01_T1w` and `_desc-brain_mask` — MNI/McGill permissive notice, see `public/templates/NOTICE.md` |
-| Scalp (points)                                             | TemplateFlow `_desc-head_mask`, resampled to 1 mm; points at the field-of-view edge are dropped — same notice                             |
+| Scalp (points)                                             | Skin surface of the TemplateFlow `_T1w` (head above the background; axial slices filled; field-of-view edge dropped) — same notice        |
 | Hippocampus, amygdala, thalamus                            | TemplateFlow `_seg-aseg_dseg` (FreeSurfer convention) — same notice                                                                       |
 | Subthalamic nucleus                                        | MASSP atlas (Alkemade et al., _Science Advances_ 2022), TemplateFlow `_atlas-MASSP20_dseg`                                                |
 | V1, dlPFC, vmPFC, insula, auditory and sensorimotor cortex | Schaefer 2018, 400 parcels, 17 networks — TemplateFlow `_atlas-Schaefer2018_desc-400Parcels17Networks_dseg`, parcel names from CBIG       |
