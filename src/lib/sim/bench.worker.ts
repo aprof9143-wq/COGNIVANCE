@@ -13,6 +13,8 @@ import type { RegionKey } from "./neural";
 
 export type BenchRequest = {
   disease: DiseaseKey;
+  /** Target regions that replace the programme's own (a subject's config.json). */
+  targets?: RegionKey[];
   design: ArrayDesign;
   placements: { region: RegionKey; placement: Placement }[];
   dutyLimit: number;
@@ -25,7 +27,8 @@ const ctx = self as unknown as DedicatedWorkerGlobalScope;
 ctx.onmessage = async (e: MessageEvent<BenchRequest>) => {
   const r = e.data;
   try {
-    const disease = diseaseByKey(r.disease);
+    const base = diseaseByKey(r.disease);
+    const disease = r.targets ? { ...base, targets: r.targets } : base;
     const beams = computeBeams(r.design, r.placements);
     const result = await runCohort(
       {

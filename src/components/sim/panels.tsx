@@ -266,6 +266,7 @@ export function DesignPanel({
   onAuto,
   autoProgress,
   autoNote,
+  source,
 }: {
   design: ArrayDesign;
   beams: TargetBeam[];
@@ -273,13 +274,18 @@ export function DesignPanel({
   onAuto: () => void;
   autoProgress: number | null;
   autoNote: string | null;
+  /** Where a non-spec design came from, when not auto-design (e.g. a subject's config.json). */
+  source?: string | undefined;
 }) {
   const fMhz = design.frequencyHz / 1e6;
   const lam = wavelengthM(design.frequencyHz);
   const pitchLam = design.pitchM / lam;
   const isSpec = fMhz === 15;
   return (
-    <SimPanel title="ECHO array design" meta={isSpec ? "doc spec · 15 MHz" : "auto-designed"}>
+    <SimPanel
+      title="ECHO array design"
+      meta={isSpec ? "doc spec · 15 MHz" : (source ?? "auto-designed")}
+    >
       <div className="grid grid-cols-2 gap-2">
         <label className="flex flex-col gap-1 text-[0.6rem] uppercase tracking-[0.12em] text-[#8095bf]">
           Frequency
@@ -587,7 +593,24 @@ const Cite = ({ refs }: { refs: Reference[] }) => (
 );
 
 /** Why a deep target is gated, with this region's own measured depths. */
-function GatedExplanation({ d, name }: { d: RegionDepth; name: string }) {
+/** Which anatomy the depths were measured on, when a subject is loaded. */
+export type DepthSubject = { label: string; scalp: boolean; brain: boolean } | null;
+
+function GatedExplanation({
+  d,
+  name,
+  subject,
+}: {
+  d: RegionDepth;
+  name: string;
+  subject: DepthSubject;
+}) {
+  const scalp = !subject
+    ? "the scalp of this template"
+    : subject.scalp
+      ? "this subject's scalp"
+      : "the template's scalp (the subject's T1 is skull-stripped)";
+  const brain = !subject || subject.brain ? "the brain surface" : "the template's brain surface";
   const sources: Reference[] = [
     REFS.rushDriscoll1968,
     REFS.oostendorp2000,
@@ -599,20 +622,20 @@ function GatedExplanation({ d, name }: { d: RegionDepth; name: string }) {
   return (
     <div className="mt-2 border-t border-[#0e2247] pt-2 text-[0.6rem] leading-relaxed text-[#c4d2ee]">
       <p>
-        {name} sits {fmt(d.belowScalpMm, 1)} mm below the scalp of this template and{" "}
-        {fmt(d.belowBrainMm, 1)} mm below the brain surface, both measured here on MNI152. The skull
-        conducts far less than brain — a brain-to-skull conductivity ratio of about 80 in early tank
-        measurements and about 15 measured in vivo{" "}
-        <Cite refs={[REFS.rushDriscoll1968, REFS.oostendorp2000]} /> — so it smears and attenuates
-        what reaches scalp electrodes. Source imaging projects scalp potentials back into the brain
-        through a head model; eLORETA&apos;s weighting localises a single test source without bias
-        in principle, at low spatial resolution <Cite refs={[REFS.pascualMarqui2007]} />. In
-        practice the error grows with depth: 12.8 ± 6.2 mm for inferior against 9.2 ± 4.4 mm for
-        superior sources implanted in patients <Cite refs={[REFS.cuffin2001]} />, and about 20 mm at
-        the most basal locations even with individual four-layer head models, where a wrong skull
-        conductivity alone gave errors up to 31 mm <Cite refs={[REFS.akalinAcar2013]} />. A
-        scalp-EEG estimate here needs cross-validation against fMRI or intracranial EEG before
-        clinical use; this simulation senses with a cortical-surface mesh, not scalp EEG.
+        {name} sits {fmt(d.belowScalpMm, 1)} mm below {scalp} and {fmt(d.belowBrainMm, 1)} mm below{" "}
+        {brain}, measured here from its centroid in MNI152 space. The skull conducts far less than
+        brain — a brain-to-skull conductivity ratio of about 80 in early tank measurements and about
+        15 measured in vivo <Cite refs={[REFS.rushDriscoll1968, REFS.oostendorp2000]} /> — so it
+        smears and attenuates what reaches scalp electrodes. Source imaging projects scalp
+        potentials back into the brain through a head model; eLORETA&apos;s weighting localises a
+        single test source without bias in principle, at low spatial resolution{" "}
+        <Cite refs={[REFS.pascualMarqui2007]} />. In practice the error grows with depth: 12.8 ± 6.2
+        mm for inferior against 9.2 ± 4.4 mm for superior sources implanted in patients{" "}
+        <Cite refs={[REFS.cuffin2001]} />, and about 20 mm at the most basal locations even with
+        individual four-layer head models, where a wrong skull conductivity alone gave errors up to
+        31 mm <Cite refs={[REFS.akalinAcar2013]} />. A scalp-EEG estimate here needs
+        cross-validation against fMRI or intracranial EEG before clinical use; this simulation
+        senses with a cortical-surface mesh, not scalp EEG.
       </p>
       <ol className="mt-1.5 list-decimal pl-4 text-[0.56rem] text-[#8095bf]">
         {sources.map((r) => (
@@ -641,10 +664,12 @@ export function DepthPanel({
   depths,
   name,
   targets,
+  subject = null,
 }: {
   depths: RegionDepth[];
   name: (k: RegionKey) => string;
   targets: RegionKey[];
+  subject?: DepthSubject;
 }) {
   const [open, setOpen] = useState<RegionKey | null>(null);
   const mni = (v: [number, number, number]) => v.map((x) => x.toFixed(0)).join(", ");
@@ -717,14 +742,17 @@ export function DepthPanel({
                     className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
                   />
                 </button>
-                {isOpen ? <GatedExplanation d={d} name={name(d.region)} /> : null}
+                {isOpen ? <GatedExplanation d={d} name={name(d.region)} subject={subject} /> : null}
               </div>
             );
           })}
           <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
-            Gated: deep targets that scalp EEG cannot localise precisely. Depths are measured on the
-            MNI152 template from each region&apos;s centroid; they describe the template, not a
-            patient.
+            Gated: deep targets that scalp EEG cannot localise precisely.{" "}
+            {subject
+              ? `Depths are measured on ${subject.label} from each region's centroid${
+                  subject.scalp ? "" : "; the scalp is the template's (skull-stripped T1)"
+                }${subject.brain ? "" : "; the brain surface is the template's (no aseg or mask)"}.`
+              : "Depths are measured on the MNI152 template from each region's centroid; they describe the template, not a patient."}
           </p>
         </div>
       ) : (

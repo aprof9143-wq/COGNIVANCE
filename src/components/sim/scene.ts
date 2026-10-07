@@ -379,7 +379,9 @@ export class SimScene {
 
   /* -------------------------------------------------------------- anatomy */
 
+  /** Show an anatomy, replacing the one on screen (the template or a loaded subject). */
   setAnatomy(an: Anatomy) {
+    this.clearAnatomy();
     const toGeom = (positions: Float32Array, indices: Uint32Array) => {
       const p = new Float32Array(positions.length);
       for (let i = 0; i < positions.length; i += 3) {
@@ -471,6 +473,20 @@ export class SimScene {
       const label = this.makeLabel(mesh.name, "region");
       this.regions.set(key, { mesh: m, mat, points, pmat, colour, label });
     }
+    this.setTargets([...this.targets]);
+  }
+
+  /** Remove the anatomy's meshes, particles and labels, freeing their GPU memory. */
+  private clearAnatomy() {
+    for (const o of [...this.brain.children]) {
+      this.brain.remove(o);
+      const m = o as THREE.Mesh | THREE.Points;
+      m.geometry.dispose();
+      (m.material as THREE.Material).dispose();
+    }
+    for (const r of this.regions.values()) r.label.remove();
+    this.regions.clear();
+    this.cortexMat = null;
   }
 
   setTargets(keys: string[]) {
