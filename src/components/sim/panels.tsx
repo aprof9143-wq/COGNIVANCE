@@ -12,7 +12,12 @@ import { NOT_MODELLED, type TargetPlan } from "@/lib/sim/plan";
 import {
   AMYGDALA_SCALP_RANGE_MM,
   DEEP_SOURCE_ERROR,
+  isGated,
+  isSimulated,
+  NOT_INCLUDED,
   REFS,
+  STANDS_FOR,
+  type AnyRegionKey,
   type Reference,
   type RegionDepth,
 } from "@/lib/sim/regions";
@@ -634,10 +639,10 @@ const Cite = ({ refs }: { refs: Reference[] }) => (
   <span className="text-[#8095bf]">({refs.map((r) => r.cite).join("; ")})</span>
 );
 
-/** Why a deep target is gated, with this region's own measured depths. */
 /** Which anatomy the depths were measured on, when a subject is loaded. */
 export type DepthSubject = { label: string; scalp: boolean; brain: boolean } | null;
 
+/** Why a deep target is gated, with this region's own measured depths. */
 function GatedExplanation({
   d,
   name,
@@ -704,16 +709,20 @@ function GatedExplanation({
 
 export function DepthPanel({
   depths,
+  all = [],
   name,
   targets,
   subject = null,
 }: {
   depths: RegionDepth[];
-  name: (k: RegionKey) => string;
+  /** Every region of the anatomy, for the "All regions" table. */
+  all?: RegionDepth[];
+  name: (k: AnyRegionKey) => string;
   targets: RegionKey[];
   subject?: DepthSubject;
 }) {
-  const [open, setOpen] = useState<RegionKey | null>(null);
+  const [open, setOpen] = useState<AnyRegionKey | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const mni = (v: [number, number, number]) => v.map((x) => x.toFixed(0)).join(", ");
   return (
     <SimPanel title="Depth & localisation" meta="MNI152 · computed">
@@ -744,7 +753,7 @@ export function DepthPanel({
                 <div className="mb-1 flex items-center justify-between gap-2 text-[0.7rem]">
                   <span className="truncate text-[#e6efff]">{name(d.region)}</span>
                   <span className="flex shrink-0 items-center gap-1">
-                    {targets.includes(d.region) ? (
+                    {isSimulated(d.region) && targets.includes(d.region) ? (
                       <span className="rounded border border-[#3d8bf5]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#9cc7ff]">
                         TARGET
                       </span>
@@ -788,8 +797,93 @@ export function DepthPanel({
               </div>
             );
           })}
+          {all.length ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowAll(!showAll)}
+                aria-expanded={showAll}
+                className="flex items-center gap-1 text-[0.6rem] text-[#7fd8ff] hover:text-[#e6efff]"
+              >
+                All regions · {all.length}
+                <ChevronDown
+                  className={`h-3 w-3 transition-transform ${showAll ? "rotate-180" : ""}`}
+                />
+              </button>
+              {showAll ? (
+                <div className="mt-1.5 flex flex-col gap-2">
+                  <table className="w-full border-collapse text-[0.6rem]">
+                    <thead>
+                      <tr className="text-[#5e719a]">
+                        <th className="py-0.5 text-left font-normal">Region</th>
+                        <th className="py-0.5 pl-1 text-right font-normal">Scalp</th>
+                        <th className="py-0.5 pl-1 text-right font-normal">Brain</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {all.map((d) => {
+                        const stands = STANDS_FOR[d.region];
+                        return (
+                          <tr
+                            key={d.region}
+                            className="border-t border-[#0e2247]"
+                            title={`MNI ${mni(d.mni)} (${d.side === "left" ? "L" : "R"} centroid)${
+                              stands ? ` · stands in for ${stands}` : ""
+                            }`}
+                          >
+                            <td className="py-1 text-[#c4d2ee]">
+                              <span className="flex flex-wrap items-center gap-1">
+                                <span className="text-[#e6efff]">{name(d.region)}</span>
+                                {isGated(d.region) ? (
+                                  <span className="rounded border border-[#d9a441]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#f0d08a]">
+                                    GATED
+                                  </span>
+                                ) : null}
+                                {isSimulated(d.region) ? null : (
+                                  <span className="rounded border border-[#16305e] px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#8095bf]">
+                                    NOT SIMULATED
+                                  </span>
+                                )}
+                              </span>
+                              {stands ? (
+                                <span className="block text-[0.56rem] text-[#8095bf]">
+                                  for {stands}
+                                </span>
+                              ) : null}
+                            </td>
+                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[#e6efff]">
+                              {fmt(d.belowScalpMm, 1)}
+                            </td>
+                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[#e6efff]">
+                              {fmt(d.belowBrainMm, 1)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div className="rounded-md border border-dashed border-[#16305e] p-2 text-[0.6rem]">
+                    <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#5e719a]">
+                      Not included
+                    </p>
+                    {NOT_INCLUDED.map((n) => (
+                      <p key={n.name} className="text-[#8095bf]">
+                        <span className="text-[#c4d2ee]">{n.name}</span> — {n.reason}
+                      </p>
+                    ))}
+                  </div>
+                  <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+                    Depth in mm below the scalp and below the brain surface, from each region&apos;s
+                    left centroid. Not simulated: shown and measured, but not part of the network
+                    model (it has no coupling data for them), so not a target. &quot;For&quot; names
+                    the area a broader atlas region stands in for.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
-            Gated: deep targets that scalp EEG cannot localise precisely.{" "}
+            Gated: deep regions that scalp EEG cannot localise precisely.{" "}
             {subject
               ? `Depths are measured on ${subject.label} from each region's centroid${
                   subject.scalp ? "" : "; the scalp is the template's (skull-stripped T1)"

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { writeNifti } from "../imaging/testing/fixtures";
 import { attachRegionMeasures, parseAnatomy, parseRegionLabels, targetPoint } from "./anatomy";
-import { regionDepth } from "./regions";
+import { regionDepth, type AnyRegionKey } from "./regions";
 import {
   analyseSubject,
   composeSubject,
@@ -66,7 +66,7 @@ describe("subject config", () => {
         subject_id: "sub-01",
         age: 71,
         sex: "F",
-        target_regions: ["amygdala", "vmpfc", "cerebellum"],
+        target_regions: ["amygdala", "vmpfc", "cerebellum", "putamen"],
         array: { frequency_mhz: 7.5, pitch_mm: 5 },
         site: "x",
       }),
@@ -80,7 +80,8 @@ describe("subject config", () => {
       array: { frequency_mhz: 7.5 },
     });
     expect(notes.join(" ")).toMatch(/"site" is not used/);
-    expect(notes.join(" ")).toMatch(/cerebellum/);
+    expect(notes.join(" ")).toMatch(/unknown target regions ignored \(cerebellum\)/);
+    expect(notes.join(" ")).toMatch(/putamen is shown but not simulated/);
     expect(notes.join(" ")).toMatch(/pitch_mm/);
     expect(() => parseConfig("{", [])).toThrow(/not valid JSON/);
   });
@@ -98,15 +99,15 @@ describe("subject anatomy", () => {
       subjectRef(tpl),
     );
     const s = composeSubject(tpl, parts);
-    for (const k of ["outer", "cortex", "hippocampus", "amygdala", "thalamus"])
-      expect(s.sources[k]).toBe("subject");
-    for (const k of ["stn", "v1", "dlpfc", "vmpfc", "insula", "auditory", "motor"])
+    const fromAseg = ["hippocampus", "amygdala", "thalamus", "caudate", "putamen", "accumbens"];
+    for (const k of ["outer", "cortex", ...fromAseg]) expect(s.sources[k]).toBe("subject");
+    for (const k of ["stn", "lgn", "v1", "dlpfc", "vmpfc", "insula", "auditory", "motor", "ifg"])
       expect(s.sources[k]).toBe("template");
     // This T1 is cropped to the brain: no scalp, so the template's is kept.
     expect(s.sources["scalp"]).toBe("template");
     expect(s.notes.join(" ")).toMatch(/skull-stripped/);
     // Same template space, so the subject's deep regions land where the atlas's do.
-    for (const k of ["hippocampus", "amygdala", "thalamus"] as const) {
+    for (const k of fromAseg as AnyRegionKey[]) {
       const a = targetPoint(tpl.meshes.get(k)!, "left");
       const b = targetPoint(s.anatomy.meshes.get(k)!, "left");
       expect(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])).toBeLessThan(3);

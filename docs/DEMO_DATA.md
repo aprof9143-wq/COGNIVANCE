@@ -242,10 +242,11 @@ the loader keeps the T1, aseg and brain mask, and skips the rest with a note.
 - **From the T1:** the scalp. A skull-stripped T1 keeps the template's scalp.
 - **From the brain mask, or the aseg if there is no mask:** the brain surface
   the array sits on.
-- **From the aseg:** the cortex view, and the hippocampus, amygdala and
-  thalamus (meshes, centroids, volumes).
-- **From the MNI152 atlases:** the cortical regions and the subthalamic
-  nucleus. They apply directly to a subject in MNI space.
+- **From the aseg:** the cortex view, and the hippocampus, amygdala,
+  thalamus, caudate, putamen and nucleus accumbens (meshes, centroids,
+  volumes).
+- **From the MNI152 atlases:** the cortical regions and the subthalamic and
+  lateral geniculate nuclei. They apply directly to a subject in MNI space.
 
 Every depth, placement, beam and plan margin is then recomputed on the
 subject. The subject chip's tooltip lists what came from the subject.
@@ -263,7 +264,9 @@ optional):
 ```
 
 `target_regions` replaces every programme's targets while the subject is
-loaded. `array` sets the starting design; elements stay 16 × 16.
+loaded. Only the ten simulated regions can be targets; the eight regions the
+Depth & localisation panel marks NOT SIMULATED are shown and measured only.
+`array` sets the starting design; elements stay 16 × 16.
 
 **What the numbers are, and are not**
 

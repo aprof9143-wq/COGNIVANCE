@@ -36,7 +36,13 @@ import { CircuitSim, computeBeams, deliverable, type LoopEvent, type Stage } fro
 import { plasticityIndex, REGION_INDEX, REGIONS, type RegionKey } from "@/lib/sim/neural";
 import { RollingWindow, type Percentiles } from "@/lib/rolling";
 import { planTarget } from "@/lib/sim/plan";
-import { GATED_REGIONS, regionDepth, type RegionDepth } from "@/lib/sim/regions";
+import {
+  allRegionDepths,
+  GATED_REGIONS,
+  isSimulated,
+  regionDepth,
+  type RegionDepth,
+} from "@/lib/sim/regions";
 import {
   composeSubject,
   subjectRef,
@@ -223,15 +229,17 @@ export function SimulationWindow() {
   );
   const unreachable = beams.filter((b) => !deliverable(b));
   const regionName = (k: string) => anatomy?.meshes.get(k)?.name ?? k;
+  // Cards for the network's gated targets; every region goes in the table.
   const gatedDepths = useMemo(
     () =>
       anatomy
-        ? GATED_REGIONS.map((k) => regionDepth(anatomy, k)).filter(
-            (d): d is RegionDepth => d !== null,
-          )
+        ? GATED_REGIONS.filter(isSimulated)
+            .map((k) => regionDepth(anatomy, k))
+            .filter((d): d is RegionDepth => d !== null)
         : [],
     [anatomy],
   );
+  const allDepths = useMemo(() => (anatomy ? allRegionDepths(anatomy) : []), [anatomy]);
 
   /* ------------------------------------------------------- lifecycle */
 
@@ -992,6 +1000,7 @@ export function SimulationWindow() {
           <BeamPanel beams={beams} ev={ev} />
           <DepthPanel
             depths={gatedDepths}
+            all={allDepths}
             name={regionName}
             targets={disease.targets}
             subject={

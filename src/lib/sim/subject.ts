@@ -9,14 +9,16 @@
  * Nothing here registers images. The files must already be in MNI152 space
  * (for example fMRIPrep's space-MNI152NLin2009cAsym outputs); the page checks
  * that they line up with the template and refuses them otherwise. Because the
- * subject is in MNI space, the template's cortical (Schaefer) and subthalamic
- * (MASSP) atlases apply to it directly. Everything that can be measured on
- * the subject's own images is measured there:
+ * subject is in MNI space, the template's cortical (Schaefer) and MASSP
+ * (subthalamic and lateral geniculate nuclei) atlases apply to it directly.
+ * Everything that can be measured on the subject's own images is measured
+ * there:
  *
  *   from the T1          the scalp (unless the T1 is skull-stripped)
  *   from the brain mask  the brain surface (else from the aseg, closed)
- *   from the aseg        the cortex, and hippocampus, amygdala and thalamus
- *                        (meshes, centroids and volumes)
+ *   from the aseg        the cortex, and hippocampus, amygdala, thalamus,
+ *                        caudate, putamen and nucleus accumbens (meshes,
+ *                        centroids and volumes)
  *
  * analyseSubject() does the heavy work and runs in a worker
  * (subject.worker.ts); composeSubject() merges its result into the template.
@@ -27,6 +29,7 @@ import { parseNiftiImage, parseNiftiSegmentation } from "../imaging/nifti";
 import type { Vec3 } from "./acoustics";
 import { gunzip, regionMeasures, type Anatomy, type RegionMeasures } from "./anatomy";
 import { REGIONS, type RegionKey } from "./neural";
+import { ANATOMY_ONLY, type AnyRegionKey } from "./regions";
 import {
   bbox,
   boundaryPoints,
@@ -59,7 +62,7 @@ export type SubjectRef = {
   scalpBox: Box;
   brainBox: Box;
   /** Label value of each aseg-derived region in the template's label map. */
-  deepLabels: Partial<Record<RegionKey, number>>;
+  deepLabels: Partial<Record<AnyRegionKey, number>>;
 };
 
 type MeshData = { positions: Float32Array; indices: Uint32Array };
@@ -71,7 +74,7 @@ export type SubjectParts = {
   scalp: Float32Array | null;
   outer: Float32Array | null;
   cortex: MeshData | null;
-  deep: Partial<Record<RegionKey, MeshData & { measures: RegionMeasures }>>;
+  deep: Partial<Record<AnyRegionKey, MeshData & { measures: RegionMeasures }>>;
 };
 
 export type Source = "subject" | "template";
@@ -88,17 +91,21 @@ export type Subject = {
 };
 
 /** aseg labels of the regions taken from a subject's aseg (as in tools/demo-assets/sim_regions.json). */
-export const ASEG_REGIONS: Partial<Record<RegionKey, number[]>> = {
+export const ASEG_REGIONS: Partial<Record<AnyRegionKey, number[]>> = {
   hippocampus: [17, 53],
   amygdala: [18, 54],
   thalamus: [10, 49],
+  caudate: [11, 50],
+  putamen: [12, 51],
+  accumbens: [26, 58],
 };
 
 /**
  * Closing radius (voxels) that turns an aseg into a filled brain: it bridges
  * the Sylvian and interhemispheric fissures, which an aseg leaves unlabelled.
  * On the MNI152 template, radius 6 reproduces the depths measured against the
- * template's own brain mask to within 2.2 mm for all ten regions.
+ * template's own brain mask to within 2.2 mm for the ten network regions
+ * and 2.6 mm for all eighteen.
  */
 const ASEG_CLOSING = 6;
 
@@ -130,7 +137,13 @@ export function parseConfig(text: string, notes: string[]): SubjectConfig {
     const keys = new Set<string>(REGIONS.map((x) => x.key));
     const list: unknown[] = Array.isArray(r["target_regions"]) ? r["target_regions"] : [];
     const ok = list.filter((x): x is RegionKey => typeof x === "string" && keys.has(x));
-    const bad = list.filter((x) => !(typeof x === "string" && keys.has(x)));
+    const shown = new Set<string>(ANATOMY_ONLY);
+    const notSimulated = list.filter((x) => typeof x === "string" && shown.has(x));
+    const bad = list.filter((x) => !(typeof x === "string" && (keys.has(x) || shown.has(x))));
+    if (notSimulated.length)
+      notes.push(
+        `config.json: ${notSimulated.join(", ")} ${notSimulated.length > 1 ? "are" : "is"} shown but not simulated, so not a target.`,
+      );
     if (bad.length)
       notes.push(`config.json: unknown target regions ignored (${bad.map(String).join(", ")}).`);
     if (ok.length) c.target_regions = [...new Set(ok)];
@@ -547,8 +560,8 @@ export async function analyseSubject(
 
     await step("Building deep regions");
     const regionLabels = new Uint8Array(lab.length);
-    const masks = new Map<RegionKey, Uint8Array>();
-    for (const [key, ids] of Object.entries(ASEG_REGIONS) as [RegionKey, number[]][]) {
+    const masks = new Map<AnyRegionKey, Uint8Array>();
+    for (const [key, ids] of Object.entries(ASEG_REGIONS) as [AnyRegionKey, number[]][]) {
       const value = ref.deepLabels[key];
       if (value === undefined) continue;
       const m = new Uint8Array(lab.length);
@@ -572,8 +585,7 @@ export async function analyseSubject(
     }
   }
   if (!aseg && !mask) notes.push("No aseg or brain mask: the brain surface uses the template.");
-  if (!aseg)
-    notes.push("No aseg: the cortex view and hippocampus, amygdala and thalamus use the template.");
+  if (!aseg) notes.push("No aseg: the cortex view and the aseg's deep regions use the template.");
   return { config, notes, scalp, outer, cortex, deep };
 }
 
@@ -584,7 +596,7 @@ export function subjectRef(template: Anatomy): SubjectRef {
   const brainBox = pointsBox(template.meshes.get("outer")?.positions ?? new Float32Array());
   if (!scalpBox || !brainBox) throw new Error("Template anatomy is incomplete.");
   const deepLabels: SubjectRef["deepLabels"] = {};
-  for (const key of Object.keys(ASEG_REGIONS) as RegionKey[]) {
+  for (const key of Object.keys(ASEG_REGIONS) as AnyRegionKey[]) {
     const label = template.meshes.get(key)?.label;
     if (label !== undefined) deepLabels[key] = label;
   }

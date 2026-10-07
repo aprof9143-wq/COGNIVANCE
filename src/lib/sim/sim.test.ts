@@ -24,12 +24,22 @@ import {
 import { autoConnect, FULL_TOPOLOGY } from "./autoconnect";
 import { runCohort, virtualPatient } from "./benchmark";
 import { addressableFoci, evaluateDesign, designSpace, pickBest } from "./design";
-import { diseaseByKey, patientParams } from "./diseases";
+import { DISEASES, diseaseByKey, patientParams } from "./diseases";
 import { CircuitSim, computeBeams, deliverable } from "./loop";
 import { createNetwork, healthyParams, Recorder, REGION_INDEX as R, REGIONS, step } from "./neural";
 import { NOT_MODELLED, planTarget } from "./plan";
 import { verify, type GateInputs } from "./prism";
-import { AMYGDALA_SCALP_RANGE_MM, GATED_REGIONS, isGated, regionDepth } from "./regions";
+import {
+  allRegionDepths,
+  AMYGDALA_SCALP_RANGE_MM,
+  ANATOMY_ONLY,
+  GATED_REGIONS,
+  isGated,
+  isSimulated,
+  regionDepth,
+  STANDS_FOR,
+  type AnyRegionKey,
+} from "./regions";
 import { COMPONENTS, SAFETY_LIMITS, thermalNoiseUv } from "./specs";
 
 /** A placement `depth` mm straight down from the origin. */
@@ -400,28 +410,47 @@ describe("region measures", () => {
 });
 
 describe("anatomy asset", () => {
-  it("defines exactly the network model's regions, none from Harvard-Oxford", () => {
+  it("defines the network model's regions and the anatomy-only ones, none from Harvard-Oxford", () => {
     const spec = JSON.parse(readFileSync("tools/demo-assets/sim_regions.json", "utf8")) as {
-      regions: { key: string; atlas: string }[];
+      regions: { key: string; atlas: string; simulated?: boolean }[];
     };
-    expect(spec.regions.map((r) => r.key).sort()).toEqual(REGIONS.map((r) => r.key).sort());
+    const simulated = spec.regions.filter((r) => r.simulated !== false).map((r) => r.key);
+    const shown = spec.regions.filter((r) => r.simulated === false).map((r) => r.key);
+    expect(simulated.sort()).toEqual(REGIONS.map((r) => r.key).sort());
+    expect(shown.sort()).toEqual([...ANATOMY_ONLY].sort());
     const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
     const labels = new Set<number>();
-    for (const r of spec.regions) {
+    for (const [i, r] of spec.regions.entries()) {
       const mesh = an.meshes.get(r.key)!;
       expect(mesh.source).toBe(r.atlas);
       expect(["aseg", "massp", "schaefer2018"]).toContain(mesh.source);
+      // Label values follow the list, so adding regions never renumbers one.
+      expect(mesh.label).toBe(i + 1);
       labels.add(mesh.label!);
       // Nothing positional is stored in the asset: it is computed at load.
       expect(mesh.centroid).toBeUndefined();
     }
     expect(labels.size).toBe(spec.regions.length);
+    expect(spec.regions.length).toBe(18);
   });
 
-  it("computes every target region's centroids from the label map", () => {
+  it("keeps anatomy-only regions out of the network and out of every programme", () => {
+    for (const k of ANATOMY_ONLY) {
+      expect(isSimulated(k)).toBe(false);
+      expect((R as Record<string, number>)[k]).toBeUndefined();
+    }
+    for (const d of DISEASES) for (const t of d.targets) expect(isSimulated(t)).toBe(true);
+    // Every broader stand-in region is anatomy-only and cortical.
+    for (const k of Object.keys(STANDS_FOR) as AnyRegionKey[]) {
+      expect(isSimulated(k)).toBe(false);
+      expect(isGated(k)).toBe(false);
+    }
+  });
+
+  it("computes every region's centroids from the label map", () => {
     const an = shippedAnatomy();
-    for (const r of REGIONS) {
-      const mesh = an.meshes.get(r.key)!;
+    for (const key of [...REGIONS.map((r) => r.key), ...ANATOMY_ONLY]) {
+      const mesh = an.meshes.get(key)!;
       expect(mesh.volumeMm3!).toBeGreaterThan(100);
       expect(mesh.sides!.left![0]).toBeLessThan(0);
       expect(mesh.sides!.right![0]).toBeGreaterThan(0);
@@ -430,6 +459,14 @@ describe("anatomy asset", () => {
     const v1 = targetPoint(an.meshes.get("v1")!, "left");
     expect(v1[0]).toBeGreaterThan(-20);
     expect(v1[1]).toBeLessThan(-70);
+    // The extrastriate regions sit above and below it.
+    expect(targetPoint(an.meshes.get("vis_dorsal")!, "left")[2]).toBeGreaterThan(v1[2] + 10);
+    expect(targetPoint(an.meshes.get("vis_ventral")!, "left")[2]).toBeLessThan(v1[2]);
+    // The LGN lies lateral to and below the thalamus centroid.
+    const lgn = targetPoint(an.meshes.get("lgn")!, "left");
+    const th = targetPoint(an.meshes.get("thalamus")!, "left");
+    expect(lgn[0]).toBeLessThan(th[0]);
+    expect(lgn[2]).toBeLessThan(th[2]);
   });
 
   it("parses the shipped atlas meshes in MNI space and places arrays on the outer surface", () => {
@@ -483,18 +520,32 @@ describe("gated regions and depth", () => {
     expect(Math.abs(near[2] - amy[2])).toBeLessThan(15);
   });
 
-  it("gates exactly the subcortical targets", () => {
+  it("gates exactly the subcortical regions", () => {
     const an = shippedAnatomy();
-    expect([...GATED_REGIONS].sort()).toEqual(["amygdala", "hippocampus", "stn", "thalamus"]);
-    for (const r of REGIONS) {
-      const deep = an.meshes.get(r.key)!.source !== "schaefer2018";
-      expect(isGated(r.key)).toBe(deep);
+    expect(GATED_REGIONS.filter(isSimulated).sort()).toEqual([
+      "amygdala",
+      "hippocampus",
+      "stn",
+      "thalamus",
+    ]);
+    let n = 0;
+    for (const mesh of an.meshes.values()) {
+      if (mesh.label === undefined) continue;
+      n++;
+      expect(isGated(mesh.key as AnyRegionKey)).toBe(mesh.source !== "schaefer2018");
     }
+    expect(n).toBe(18);
   });
 
   it("measures depth below the scalp and below the brain surface on the template", () => {
     const an = shippedAnatomy();
-    const depths = REGIONS.map((r) => regionDepth(an, r.key)!);
+    const depths = allRegionDepths(an);
+    expect(depths.map((d) => d.region)).toEqual([
+      ...REGIONS.map((r) => r.key).sort(
+        (a, b) => an.meshes.get(a)!.label! - an.meshes.get(b)!.label!,
+      ),
+      ...ANATOMY_ONLY,
+    ]);
     for (const d of depths) {
       expect(d.mni).toEqual(targetPoint(an.meshes.get(d.region)!, "left"));
       expect(d.belowBrainMm).toBeGreaterThan(0);
@@ -504,10 +555,16 @@ describe("gated regions and depth", () => {
     const amy = depths.find((d) => d.region === "amygdala")!;
     expect(amy.belowScalpMm).toBeGreaterThanOrEqual(AMYGDALA_SCALP_RANGE_MM[0]);
     expect(amy.belowScalpMm).toBeLessThanOrEqual(AMYGDALA_SCALP_RANGE_MM[1]);
-    // Every gated region lies deeper below the scalp than every cortical one.
-    const gated = depths.filter((d) => isGated(d.region)).map((d) => d.belowScalpMm);
-    const cortical = depths.filter((d) => !isGated(d.region)).map((d) => d.belowScalpMm);
+    // Among the network's regions, every gated one lies deeper below the
+    // scalp than every cortical one.
+    const net = depths.filter((d) => isSimulated(d.region));
+    const gated = net.filter((d) => isGated(d.region)).map((d) => d.belowScalpMm);
+    const cortical = net.filter((d) => !isGated(d.region)).map((d) => d.belowScalpMm);
     expect(Math.min(...gated)).toBeGreaterThan(Math.max(...cortical));
+    // Not so for all cortex: the ventral visual region is on the basal surface,
+    // above the cerebellum, and sits about as deep as the putamen.
+    const at = (k: AnyRegionKey) => depths.find((d) => d.region === k)!.belowScalpMm;
+    expect(at("vis_ventral")).toBeGreaterThan(at("smg") + 20);
   });
 
   it("returns nothing until the anatomy has region measures", () => {

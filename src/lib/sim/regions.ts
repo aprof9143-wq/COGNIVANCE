@@ -1,6 +1,6 @@
 /**
- * Gated regions and their depth, for the Simulation Window's "Depth &
- * localisation" panel.
+ * Regions of the anatomy, gated regions and their depth, for the Simulation
+ * Window's "Depth & localisation" panel.
  *
  * The deep (subcortical) targets are gated: scalp EEG cannot localise activity
  * there to anything like the precision of a cortical source, so an estimate
@@ -15,15 +15,75 @@
 
 import type { Vec3 } from "./acoustics";
 import { nearestVertex, placeArray, targetPoint, type Anatomy } from "./anatomy";
-import type { RegionKey } from "./neural";
+import { REGION_INDEX, type RegionKey } from "./neural";
 
-/** Deep targets: subcortical, out of reach of scalp-EEG localisation. */
-export const GATED_REGIONS: RegionKey[] = ["amygdala", "hippocampus", "thalamus", "stn"];
+/**
+ * Regions shown and measured on the anatomy but not simulated: the oscillator
+ * network (neural.ts) has no coupling data for them, so they are not nodes of
+ * it and cannot be stimulation targets.
+ */
+export const ANATOMY_ONLY = [
+  "caudate",
+  "putamen",
+  "accumbens",
+  "lgn",
+  "vis_dorsal",
+  "vis_ventral",
+  "ifg",
+  "smg",
+] as const;
 
-export const isGated = (k: RegionKey) => GATED_REGIONS.includes(k);
+export type AnatomyOnlyKey = (typeof ANATOMY_ONLY)[number];
+/** Any region of the anatomy: a network region or an anatomy-only one. */
+export type AnyRegionKey = RegionKey | AnatomyOnlyKey;
+
+export const isSimulated = (k: string): k is RegionKey => k in REGION_INDEX;
+
+/**
+ * Deep regions: subcortical, out of reach of scalp-EEG localisation. The
+ * network's deep targets first, then the anatomy-only ones.
+ */
+export const GATED_REGIONS: AnyRegionKey[] = [
+  "amygdala",
+  "hippocampus",
+  "thalamus",
+  "stn",
+  "caudate",
+  "putamen",
+  "accumbens",
+  "lgn",
+];
+
+export const isGated = (k: AnyRegionKey) => GATED_REGIONS.includes(k);
+
+/**
+ * The spec's Julich-Brain areas that a broader Schaefer region stands in for.
+ * Schaefer's network parcels do not follow these borders (see
+ * tools/demo-assets/sim_regions.json for each region's make-up).
+ */
+export const STANDS_FOR: Partial<Record<AnyRegionKey, string>> = {
+  vis_dorsal: "V3d (hOc3d)",
+  vis_ventral: "V4v (hOc4v)",
+  ifg: "Areas 44 and 45",
+  smg: "PFt",
+};
+
+/** Regions the spec lists that are not in the anatomy, and why. */
+export const NOT_INCLUDED: { name: string; reason: string }[] = [
+  {
+    name: "Hypothalamus",
+    reason:
+      "no permissively licensed MNI152 label. The aseg only has the ventral diencephalon, which lumps it with other nuclei; MASSP has none.",
+  },
+  {
+    name: "Area TE 1.0",
+    reason:
+      "primary auditory cortex has no parcel of its own in Schaefer; it lies inside Auditory cortex.",
+  },
+];
 
 export type RegionDepth = {
-  region: RegionKey;
+  region: AnyRegionKey;
   side: "left" | "right";
   /** Hemisphere centroid of the region, MNI152 RAS mm, from the label map. */
   mni: Vec3;
@@ -36,7 +96,7 @@ export type RegionDepth = {
 /** Depths of a region's hemisphere centroid, measured on the loaded anatomy. */
 export function regionDepth(
   an: Anatomy,
-  region: RegionKey,
+  region: AnyRegionKey,
   side: "left" | "right" = "left",
 ): RegionDepth | null {
   const mesh = an.meshes.get(region);
@@ -51,6 +111,17 @@ export function regionDepth(
     belowBrainMm: placeArray(outer, mni).depthMm,
     belowScalpMm: nearestVertex(scalp, mni).distMm,
   };
+}
+
+/** Depths of every region in the anatomy (left hemisphere), in the anatomy's order. */
+export function allRegionDepths(an: Anatomy): RegionDepth[] {
+  const out: RegionDepth[] = [];
+  for (const mesh of an.meshes.values()) {
+    if (mesh.label === undefined) continue;
+    const d = regionDepth(an, mesh.key as AnyRegionKey);
+    if (d) out.push(d);
+  }
+  return out;
 }
 
 /** `url` only where the link itself was checked. */

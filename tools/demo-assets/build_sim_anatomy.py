@@ -9,8 +9,10 @@ public/templates/NOTICE.md and public/sim/NOTICE.md)
   _T1w.nii.gz                         cortical surface (T1 isosurface in the brain mask)
                                       and the scalp (head above the background)
   _desc-brain_mask.nii.gz             brain mask
-  _seg-aseg_dseg.nii.gz               FreeSurfer aseg: hippocampus, amygdala, thalamus
-  _atlas-MASSP20_dseg.nii.gz          MASSP (Alkemade et al. 2022): subthalamic nucleus
+  _seg-aseg_dseg.nii.gz               FreeSurfer aseg: hippocampus, amygdala, thalamus,
+                                      caudate, putamen, nucleus accumbens
+  _atlas-MASSP20_dseg.nii.gz          MASSP (Alkemade et al. 2022): subthalamic nucleus,
+                                      lateral geniculate nucleus
   _atlas-Schaefer2018_desc-400Parcels17Networks_dseg.nii.gz (+ .tsv)
                                       Schaefer 2018 cortical parcels
 and, from CBIG (MIT), the current parcel names, which tag parcels anatomically
@@ -31,7 +33,7 @@ Outputs (in OUT_DIR)
                    (mm * 50, MNI RAS) and uint32 triangle indices at the
                    offsets the header lists. gzip-compressed. "scalp" is a
                    point set (no triangles): it is measured against, not drawn.
-  regions.nii.gz   uint8 label map of the target regions (value = the mesh's
+  regions.nii.gz   uint8 label map of the regions (value = the mesh's
                    "label" in the header), cropped to the regions. The page
                    computes region centroids and volumes from it at load time,
                    so no coordinate is stored or typed in anywhere.
@@ -235,7 +237,9 @@ def main(atlas_dir, out_dir):
     meshes.append(("scalp", "Scalp", "#c8a27a", scalp, np.zeros((0, 3), np.uint32), None))
     print(f"scalp: {len(scalp)} points")
 
-    # Target regions: one label each in the label map, one mesh each.
+    # Regions: one label each in the label map, one mesh each. Regions must
+    # not share voxels; one marked "overlap": "yield" leaves the shared voxels
+    # to the regions listed before it.
     labelmap = np.zeros(t1.shape, np.uint8)
     for value, r in enumerate(spec["regions"], start=1):
         src = r["atlas"]
@@ -243,10 +247,14 @@ def main(atlas_dir, out_dir):
         if not ids:
             raise SystemExit(f"{r['key']}: no atlas labels matched.")
         m = np.isin(atlases[src], ids)
-        clash = labelmap[m]
+        clash = m & (labelmap > 0)
         if clash.any():
-            other = spec["regions"][int(clash[clash > 0][0]) - 1]["key"]
-            raise SystemExit(f"{r['key']} overlaps {other}; regions must not share voxels.")
+            if r.get("overlap") != "yield":
+                other = spec["regions"][int(labelmap[clash][0]) - 1]["key"]
+                raise SystemExit(f"{r['key']} overlaps {other}; regions must not share voxels.")
+            kept = sorted({spec["regions"][int(v) - 1]["key"] for v in labelmap[clash]})
+            print(f"{r['key']}: {int(clash.sum())} shared voxels left to {', '.join(kept)}")
+            m &= ~clash
         labelmap[m] = value
         # Large cortical parcels need no 1 mm sampling; small nuclei do.
         step = 2 if src == "schaefer2018" else 1

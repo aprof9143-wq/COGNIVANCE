@@ -19,6 +19,7 @@ import type { ArrayDesign, FieldPlane, Vec3 } from "@/lib/sim/acoustics";
 import type { Anatomy, Placement } from "@/lib/sim/anatomy";
 import type { Net } from "@/lib/sim/autoconnect";
 import type { Stage } from "@/lib/sim/loop";
+import { isSimulated } from "@/lib/sim/regions";
 import type { PortType } from "@/lib/sim/specs";
 
 export type View = "cinematic" | "implant" | "explode" | "section" | "beam";
@@ -229,6 +230,8 @@ export class SimScene {
       pmat: THREE.ShaderMaterial;
       colour: THREE.Color;
       label: HTMLDivElement;
+      /** A node of the network model; anatomy-only regions show no activity. */
+      simulated: boolean;
     }
   >();
   private targets = new Set<string>();
@@ -471,7 +474,15 @@ export class SimScene {
       points.renderOrder = 6;
       this.brain.add(points);
       const label = this.makeLabel(mesh.name, "region");
-      this.regions.set(key, { mesh: m, mat, points, pmat, colour, label });
+      this.regions.set(key, {
+        mesh: m,
+        mat,
+        points,
+        pmat,
+        colour,
+        label,
+        simulated: isSimulated(key),
+      });
     }
     this.setTargets([...this.targets]);
   }
@@ -494,7 +505,7 @@ export class SimScene {
     for (const [k, r] of this.regions) {
       const on = this.targets.has(k);
       r.mat.opacity = on ? 0.85 : 0.22;
-      r.points.visible = true;
+      r.points.visible = r.simulated;
       r.label.dataset["kind"] = on ? "target" : "region";
     }
   }
