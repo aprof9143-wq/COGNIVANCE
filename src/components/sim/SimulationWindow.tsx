@@ -33,10 +33,12 @@ import { autoDesign } from "@/lib/sim/design";
 import { DISEASES, diseaseByKey, type DiseaseKey } from "@/lib/sim/diseases";
 import { CircuitSim, computeBeams, deliverable, type LoopEvent, type Stage } from "@/lib/sim/loop";
 import { plasticityIndex, REGION_INDEX, REGIONS, type RegionKey } from "@/lib/sim/neural";
+import { GATED_REGIONS, regionDepth, type RegionDepth } from "@/lib/sim/regions";
 import { COMPONENTS } from "@/lib/sim/specs";
 import {
   BeamPanel,
   BenchmarkPanel,
+  DepthPanel,
   DesignPanel,
   LatencyPanel,
   LibraryPanel,
@@ -179,6 +181,15 @@ export function SimulationWindow() {
   const blocked = circuit.drc.filter((d) => d.severity === "error");
   const unreachable = beams.filter((b) => !deliverable(b));
   const regionName = (k: string) => anatomy?.meshes.get(k)?.name ?? k;
+  const gatedDepths = useMemo(
+    () =>
+      anatomy
+        ? GATED_REGIONS.map((k) => regionDepth(anatomy, k)).filter(
+            (d): d is RegionDepth => d !== null,
+          )
+        : [],
+    [anatomy],
+  );
 
   /* ------------------------------------------------------- lifecycle */
 
@@ -798,6 +809,7 @@ export function SimulationWindow() {
             autoNote={autoNote}
           />
           <BeamPanel beams={beams} ev={ev} />
+          <DepthPanel depths={gatedDepths} name={regionName} targets={disease.targets} />
         </div>
       </div>
 

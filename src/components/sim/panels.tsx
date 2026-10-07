@@ -1,12 +1,19 @@
-import { useEffect, useRef } from "react";
-import { Check, Cpu, ShieldAlert, ShieldCheck, Sparkles, X, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, ChevronDown, Cpu, ShieldAlert, ShieldCheck, Sparkles, X, Zap } from "lucide-react";
 import { wavelengthM, type ArrayDesign } from "@/lib/sim/acoustics";
 import type { Circuit, Net } from "@/lib/sim/autoconnect";
 import type { CohortResult } from "@/lib/sim/benchmark";
 import type { Disease } from "@/lib/sim/diseases";
 import { FREQUENCIES_MHZ, PITCH_WAVELENGTHS } from "@/lib/sim/design";
 import { deliverable, type LoopEvent, type TargetBeam } from "@/lib/sim/loop";
-import { REGION_INDEX, type Recorder } from "@/lib/sim/neural";
+import { REGION_INDEX, type Recorder, type RegionKey } from "@/lib/sim/neural";
+import {
+  AMYGDALA_SCALP_RANGE_MM,
+  DEEP_SOURCE_ERROR,
+  REFS,
+  type Reference,
+  type RegionDepth,
+} from "@/lib/sim/regions";
 import { COMPONENTS, LAYER_LABEL, LAYER_ORDER, SAFETY_LIMITS } from "@/lib/sim/specs";
 
 /* ------------------------------------------------------------------ shell */
@@ -570,6 +577,158 @@ export function BeamPanel({ beams, ev }: { beams: TargetBeam[]; ev: LoopEvent | 
           );
         })}
       </div>
+    </SimPanel>
+  );
+}
+
+const Cite = ({ refs }: { refs: Reference[] }) => (
+  <span className="text-[#8095bf]">({refs.map((r) => r.cite).join("; ")})</span>
+);
+
+/** Why a deep target is gated, with this region's own measured depths. */
+function GatedExplanation({ d, name }: { d: RegionDepth; name: string }) {
+  const sources: Reference[] = [
+    REFS.rushDriscoll1968,
+    REFS.oostendorp2000,
+    REFS.pascualMarqui2007,
+    REFS.cuffin2001,
+    REFS.akalinAcar2013,
+    ...(d.region === "amygdala" ? [REFS.neurosity] : []),
+  ];
+  return (
+    <div className="mt-2 border-t border-[#0e2247] pt-2 text-[0.6rem] leading-relaxed text-[#c4d2ee]">
+      <p>
+        {name} sits {fmt(d.belowScalpMm, 1)} mm below the scalp of this template and{" "}
+        {fmt(d.belowBrainMm, 1)} mm below the brain surface, both measured here on MNI152. The skull
+        conducts far less than brain — a brain-to-skull conductivity ratio of about 80 in early tank
+        measurements and about 15 measured in vivo{" "}
+        <Cite refs={[REFS.rushDriscoll1968, REFS.oostendorp2000]} /> — so it smears and attenuates
+        what reaches scalp electrodes. Source imaging projects scalp potentials back into the brain
+        through a head model; eLORETA&apos;s weighting localises a single test source without bias
+        in principle, at low spatial resolution <Cite refs={[REFS.pascualMarqui2007]} />. In
+        practice the error grows with depth: 12.8 ± 6.2 mm for inferior against 9.2 ± 4.4 mm for
+        superior sources implanted in patients <Cite refs={[REFS.cuffin2001]} />, and about 20 mm at
+        the most basal locations even with individual four-layer head models, where a wrong skull
+        conductivity alone gave errors up to 31 mm <Cite refs={[REFS.akalinAcar2013]} />. A
+        scalp-EEG estimate here needs cross-validation against fMRI or intracranial EEG before
+        clinical use; this simulation senses with a cortical-surface mesh, not scalp EEG.
+      </p>
+      <ol className="mt-1.5 list-decimal pl-4 text-[0.56rem] text-[#8095bf]">
+        {sources.map((r) => (
+          <li key={r.cite}>
+            {r.url ? (
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#9cc7ff] hover:text-[#e6efff]"
+              >
+                {r.cite}
+              </a>
+            ) : (
+              <span className="text-[#c4d2ee]">{r.cite}</span>
+            )}{" "}
+            — {r.title}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+export function DepthPanel({
+  depths,
+  name,
+  targets,
+}: {
+  depths: RegionDepth[];
+  name: (k: RegionKey) => string;
+  targets: RegionKey[];
+}) {
+  const [open, setOpen] = useState<RegionKey | null>(null);
+  const mni = (v: [number, number, number]) => v.map((x) => x.toFixed(0)).join(", ");
+  return (
+    <SimPanel title="Depth & localisation" meta="MNI152 · computed">
+      {depths.length ? (
+        <div className="flex flex-col gap-2">
+          {depths.map((d) => {
+            const rows: [string, string][] = [
+              [`MNI (${d.side === "left" ? "L" : "R"} centroid)`, mni(d.mni)],
+              ["Below scalp", `${fmt(d.belowScalpMm, 1)} mm`],
+              ...(d.region === "amygdala"
+                ? ([
+                    [
+                      "Published (scalp)",
+                      `${AMYGDALA_SCALP_RANGE_MM[0]}–${AMYGDALA_SCALP_RANGE_MM[1]} mm`,
+                    ],
+                  ] as [string, string][])
+                : []),
+              ["Below brain surface", `${fmt(d.belowBrainMm, 1)} mm`],
+              ["Scalp-EEG reach", "No · deep source"],
+              ["Scalp-EEG error", "≈ 13–20 mm"],
+            ];
+            const isOpen = open === d.region;
+            return (
+              <div
+                key={d.region}
+                className="rounded-md border border-[#0e2247] bg-[#030b20]/70 p-2"
+              >
+                <div className="mb-1 flex items-center justify-between gap-2 text-[0.7rem]">
+                  <span className="truncate text-[#e6efff]">{name(d.region)}</span>
+                  <span className="flex shrink-0 items-center gap-1">
+                    {targets.includes(d.region) ? (
+                      <span className="rounded border border-[#3d8bf5]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#9cc7ff]">
+                        TARGET
+                      </span>
+                    ) : null}
+                    <span className="rounded border border-[#d9a441]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#f0d08a]">
+                      GATED
+                    </span>
+                  </span>
+                </div>
+                <dl className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[0.6rem]">
+                  {rows.map(([k, v]) => (
+                    <div key={k} className="contents">
+                      <dt className="text-[#8095bf]">{k}</dt>
+                      <dd
+                        className="text-right font-mono text-[#e6efff]"
+                        title={
+                          k === "Scalp-EEG error"
+                            ? `${DEEP_SOURCE_ERROR.value} — ${DEEP_SOURCE_ERROR.refs.map((r) => r.cite).join("; ")}`
+                            : k === "Published (scalp)"
+                              ? REFS.neurosity.cite
+                              : undefined
+                        }
+                      >
+                        {v}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : d.region)}
+                  aria-expanded={isOpen}
+                  className="mt-1.5 flex items-center gap-1 text-[0.6rem] text-[#7fd8ff] hover:text-[#e6efff]"
+                >
+                  Why gated
+                  <ChevronDown
+                    className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {isOpen ? <GatedExplanation d={d} name={name(d.region)} /> : null}
+              </div>
+            );
+          })}
+          <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+            Gated: deep targets that scalp EEG cannot localise precisely. Depths are measured on the
+            MNI152 template from each region&apos;s centroid; they describe the template, not a
+            patient.
+          </p>
+        </div>
+      ) : (
+        <p className="text-[0.66rem] text-[#8095bf]">Waiting for the anatomy…</p>
+      )}
     </SimPanel>
   );
 }
