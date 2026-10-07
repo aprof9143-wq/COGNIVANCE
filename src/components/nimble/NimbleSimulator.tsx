@@ -17,10 +17,12 @@ import {
   NO_FAULTS,
   PLANTED,
   PROFILES,
-  SimStream,
+  StreamView,
+  TICK_MS,
   type Faults,
   type SourceKind,
 } from "@/lib/nimbleSim";
+import type { SimRequest, SimTick } from "@/lib/nimbleSim.worker";
 import { analyseChannel, BANDS, type ChannelSpectrum } from "@/lib/signal";
 import { CoreView } from "./CoreView";
 
@@ -43,7 +45,9 @@ export function NimbleSimulator() {
   const [running, setRunning] = useState(true);
   const [tick, setTick] = useState(0);
 
-  const stream = useRef<SimStream | null>(null);
+  const stream = useRef<StreamView | null>(null);
+  const worker = useRef<Worker | null>(null);
+  const session = useRef(0);
   const faultsRef = useRef<Faults>(faults);
   faultsRef.current = faults;
   const selectedRef = useRef(selected);
@@ -51,21 +55,48 @@ export function NimbleSimulator() {
   const runningRef = useRef(running);
   runningRef.current = running;
 
+  const post = (m: SimRequest) => worker.current?.postMessage(m);
+
+  // The source runs in a worker, one tick every TICK_MS; the page plays the
+  // ticks out (StreamView) and reports back how full its buffer is.
+  useEffect(() => {
+    const w = new Worker(new URL("../../lib/nimbleSim.worker.ts", import.meta.url), {
+      type: "module",
+    });
+    worker.current = w;
+    w.onmessage = (e: MessageEvent<SimTick>) => {
+      const s = stream.current;
+      if (!s || e.data.session !== session.current) return;
+      s.receive(e.data, performance.now());
+      w.postMessage({ type: "fill", value: s.health().bufferFill } satisfies SimRequest);
+    };
+    return () => {
+      w.terminate();
+      worker.current = null;
+    };
+  }, []);
+
   // A new source is a new connection: fresh stream, fresh counters.
   useEffect(() => {
-    stream.current = new SimStream(PROFILES[kind]);
+    session.current++;
+    stream.current = new StreamView(PROFILES[kind]);
+    post({ type: "start", kind, session: session.current });
   }, [kind]);
+  useEffect(() => void post({ type: "faults", faults }), [faults]);
+  useEffect(() => void post({ type: "run", running }), [running]);
 
-  // Acquisition clock, independent of rendering. Advances the stream in real
-  // time and nudges React ~6×/s for the numeric read-outs.
+  // Display clock, independent of the source. Plays received samples out at
+  // the sample rate and nudges React ~6×/s for the numeric read-outs.
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
     let sinceUi = 0;
     const step = (now: number) => {
-      const dt = Math.min(0.1, (now - last) / 1000);
+      // Slow frames still play out the wall time that passed; a stall beyond
+      // the playout buffer drops the oldest samples instead of lagging.
+      const dt = Math.min(1, (now - last) / 1000);
       last = now;
-      if (runningRef.current) stream.current?.advance(dt, faultsRef.current);
+      if (runningRef.current) stream.current?.play(dt);
       sinceUi += dt;
       if (sinceUi > 0.16) {
         sinceUi = 0;
@@ -81,10 +112,11 @@ export function NimbleSimulator() {
   const profile = PROFILES[kind];
   const health = s?.health();
   const lossPct = s && s.packets ? (100 * s.lostPackets) / s.packets : 0;
+  const degraded = s?.degraded(performance.now()) ?? false;
 
   // Spectrum of the selected channel, recomputed at the read-out rate.
   const spectrum = useMemo<ChannelSpectrum | null>(() => {
-    if (!s || !profile.available || s.written < profile.sampleRate * 2) return null;
+    if (!s || !profile.available || s.played < profile.sampleRate * 2) return null;
     return analyseChannel(s.labels[selected]!, s.recent(selected, 4), profile.sampleRate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick, selected, kind]);
@@ -120,10 +152,23 @@ export function NimbleSimulator() {
             One acquisition contract, every signal origin
           </p>
         </div>
-        <span className="rounded border border-[#ffb547]/60 bg-[#ffb547]/10 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] text-[#ffcf7a] shadow-[0_0_18px_rgba(255,181,71,0.25)]">
-          SIMULATION · NO HARDWARE CONNECTED
-        </span>
+        {degraded ? (
+          <span
+            title={`A source tick overran its ${TICK_MS} ms cadence in the last few seconds.`}
+            className="rounded border border-[#ff4860]/60 bg-[#ff4860]/10 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] text-[#ff8a98] shadow-[0_0_18px_rgba(255,72,96,0.25)]"
+          >
+            SIMULATION · DEGRADED
+          </span>
+        ) : (
+          <span className="rounded border border-[#ffb547]/60 bg-[#ffb547]/10 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] text-[#ffcf7a] shadow-[0_0_18px_rgba(255,181,71,0.25)]">
+            SIMULATION · NO HARDWARE CONNECTED
+          </span>
+        )}
         <div className="ml-auto flex items-center gap-3 font-mono text-[0.66rem] text-[#8095bf]">
+          <span className="hidden text-[#5e719a] md:inline">
+            Wall-clock synchronized — {TICK_MS} ms display cadence
+            {profile.available ? `, ${profile.sampleRate} Hz sample rate` : ""}
+          </span>
           <span>
             T+{s ? s.clock.toFixed(1) : "0.0"} s · {s?.written.toLocaleString() ?? 0} samples/ch
           </span>
@@ -514,7 +559,7 @@ function ContractLog({
   stream,
   tick,
 }: {
-  stream: React.RefObject<SimStream | null>;
+  stream: React.RefObject<StreamView | null>;
   tick: number;
 }) {
   const lines = stream.current?.log.slice(-4) ?? [];
@@ -573,7 +618,7 @@ function Traces({
   faults,
   selected,
 }: {
-  stream: React.RefObject<SimStream | null>;
+  stream: React.RefObject<StreamView | null>;
   faults: React.RefObject<Faults>;
   selected: React.RefObject<number>;
 }) {
@@ -628,7 +673,7 @@ function LatencyHistogram({
   stream,
   tick,
 }: {
-  stream: React.RefObject<SimStream | null>;
+  stream: React.RefObject<StreamView | null>;
   tick: number;
 }) {
   const ref = useCanvas(

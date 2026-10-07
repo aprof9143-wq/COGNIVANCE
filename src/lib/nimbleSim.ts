@@ -13,6 +13,11 @@
  * rhythms, the same construction as core's `SimulatedSource`, and the link
  * model (packetisation, latency, loss) is a parameterised model, not a
  * measurement of any device.
+ *
+ * The stream runs in a Web Worker (nimbleSim.worker.ts). Every TICK_MS a
+ * `TickProducer` advances it by the wall time that passed and posts what is
+ * new; on the main thread a `StreamView` plays those samples out at the
+ * sample rate, so the display stays smooth while the source keeps wall time.
  */
 
 import { MONTAGE_1020 } from "./montage";
@@ -125,7 +130,15 @@ export class SimStream {
   lostPackets = 0;
   readonly latencies: number[] = [];
   readonly log: LogLine[] = [];
+  /** Totals ever pushed to `latencies` and `log`, which keep only the newest. */
+  latencyCount = 0;
+  logCount = 0;
   clock = 0;
+  /**
+   * Consumer buffer occupancy, 0–1, as last reported by whoever drains this
+   * stream (StreamView measures it). The source cannot see it by itself.
+   */
+  bufferFill = 0;
 
   private seed: number;
   private pink: Float64Array; // Paul Kellet pink-noise filter state, 7 per channel
@@ -175,6 +188,7 @@ export class SimStream {
 
   private push(t: number, text: string, tone: LogLine["tone"]) {
     this.log.push({ t, text, tone });
+    this.logCount++;
     if (this.log.length > 60) this.log.shift();
   }
 
@@ -198,6 +212,7 @@ export class SimStream {
         if (packetLost) this.lostPackets++;
         else {
           this.latencies.push(Math.max(0.05, p.latencyMs + p.jitterMs * this.gauss()));
+          this.latencyCount++;
           if (this.latencies.length > 240) this.latencies.shift();
         }
       }
@@ -273,14 +288,11 @@ export class SimStream {
   }
 
   health() {
-    const lat = [...this.latencies].sort((a, b) => a - b);
-    const median = lat.length ? lat[Math.floor(lat.length / 2)]! : 0;
-    // Buffer fill: a consumer draining every frame keeps it low; jitter spikes it.
-    const fill = Math.min(
-      1,
-      0.12 + (this.profile.jitterMs / 40) * (0.5 + 0.5 * Math.sin(this.clock * 1.7)),
-    );
-    return { dropped: this.dropped, latencyMs: median, bufferFill: fill };
+    return {
+      dropped: this.dropped,
+      latencyMs: median(this.latencies),
+      bufferFill: this.bufferFill,
+    };
   }
 
   /** Modelled electrode impedance in kΩ. */
@@ -294,23 +306,282 @@ export class SimStream {
    * packets) linearly bridged so spectral estimates are not poisoned by NaN.
    */
   recent(c: number, seconds: number): Float32Array {
-    const n = Math.min(this.written, this.capacity, Math.round(seconds * this.profile.sampleRate));
-    const out = new Float32Array(n);
-    const buf = this.buffers[c]!;
-    for (let i = 0; i < n; i++) out[i] = buf[(this.head - n + i + this.capacity) % this.capacity]!;
-    let last = 0;
-    for (let i = 0; i < n; i++) {
-      if (Number.isNaN(out[i]!)) out[i] = last;
-      else last = out[i]!;
-    }
-    return out;
+    return ringRecent(this, c, this.written, seconds);
   }
 
   /** RMS of the last `seconds`, µV. */
   rms(c: number, seconds = 0.5): number {
-    const x = this.recent(c, seconds);
-    let s = 0;
-    for (let i = 0; i < x.length; i++) s += x[i]! * x[i]!;
-    return x.length ? Math.sqrt(s / x.length) : 0;
+    return rmsOf(this.recent(c, seconds));
+  }
+}
+
+const median = (xs: number[]) => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s.length ? s[Math.floor(s.length / 2)]! : 0;
+};
+
+/** The newest `seconds` of a ring buffer, oldest first, lost-packet gaps bridged. */
+function ringRecent(
+  r: { buffers: Float32Array[]; head: number; capacity: number; profile: SourceProfile },
+  c: number,
+  available: number,
+  seconds: number,
+): Float32Array {
+  const n = Math.min(available, r.capacity, Math.round(seconds * r.profile.sampleRate));
+  const out = new Float32Array(n);
+  const buf = r.buffers[c]!;
+  for (let i = 0; i < n; i++) out[i] = buf[(r.head - n + i + r.capacity) % r.capacity]!;
+  let last = 0;
+  for (let i = 0; i < n; i++) {
+    if (Number.isNaN(out[i]!)) out[i] = last;
+    else last = out[i]!;
+  }
+  return out;
+}
+
+function rmsOf(x: Float32Array): number {
+  let s = 0;
+  for (let i = 0; i < x.length; i++) s += x[i]! * x[i]!;
+  return x.length ? Math.sqrt(s / x.length) : 0;
+}
+
+/* ------------------------------------------------------------ worker ticks */
+
+/** Display cadence: the worker delivers one chunk of samples per tick. */
+export const TICK_MS = 250;
+/** How long the DEGRADED state stays up after a tick overruns, ms. */
+export const DEGRADED_HOLD_MS = 2000;
+
+export type Tick = {
+  /** Source clock after this tick, s. Advances with wall time while running. */
+  clock: number;
+  /** Samples per channel the source has produced in total. */
+  written: number;
+  /** Global sample index of the first sample in `chunk`. */
+  start: number;
+  /** New samples per channel, oldest first, µV. NaN marks a lost packet. */
+  chunk: Float32Array[];
+  /** New modelled per-packet link latencies, ms. */
+  latencies: number[];
+  /** New contract-log lines. */
+  log: LogLine[];
+  /** Modelled electrode impedance per channel now, kΩ. */
+  impedance: Float32Array;
+  /** Wall time since the previous tick, ms. */
+  intervalMs: number;
+  /** Time spent producing this tick, ms. */
+  workMs: number;
+  /** The tick started a full cadence late, or took longer than one. */
+  overran: boolean;
+};
+
+/** Owns a SimStream in the worker and turns it into ticks. */
+export class TickProducer {
+  readonly stream: SimStream;
+  private sent = 0;
+  private latenciesSent = 0;
+  private logSent = 0;
+  private lastAt: number | null = null;
+
+  constructor(profile: SourceProfile, seed?: number) {
+    this.stream = new SimStream(profile, seed);
+  }
+
+  /** Advance by the wall time since the previous tick and package what is new. */
+  tick(now: () => number, running: boolean, faults: Faults): Tick {
+    const s = this.stream;
+    const t0 = now();
+    const intervalMs = this.lastAt === null ? TICK_MS : t0 - this.lastAt;
+    this.lastAt = t0;
+    // Wall-clock synchronised: generate exactly the time that passed, up to
+    // what the ring can hold. Paused time is not generated.
+    if (running) s.advance(Math.min(intervalMs / 1000, s.seconds), faults);
+
+    const n = Math.min(s.written - this.sent, s.capacity);
+    const chunk = s.buffers.map((buf) => {
+      const out = new Float32Array(n);
+      for (let i = 0; i < n; i++) out[i] = buf[(s.head - n + i + s.capacity) % s.capacity]!;
+      return out;
+    });
+    this.sent = s.written;
+    const nLat = Math.min(s.latencyCount - this.latenciesSent, s.latencies.length);
+    const nLog = Math.min(s.logCount - this.logSent, s.log.length);
+    this.latenciesSent = s.latencyCount;
+    this.logSent = s.logCount;
+    const impedance = Float32Array.from(s.labels, (_, c) => s.impedance(c, faults));
+    const workMs = now() - t0;
+    return {
+      clock: s.clock,
+      written: s.written,
+      start: s.written - n,
+      chunk,
+      latencies: nLat ? s.latencies.slice(-nLat) : [],
+      log: nLog ? s.log.slice(-nLog) : [],
+      impedance,
+      intervalMs,
+      workMs,
+      overran: running && (workMs > TICK_MS || intervalMs > 2 * TICK_MS),
+    };
+  }
+}
+
+/**
+ * The main thread's view of a stream produced in the worker.
+ *
+ * Ticks arrive every TICK_MS. Their samples go into a playout buffer of two
+ * ticks and are released at the sample rate, so the traces scroll smoothly.
+ * Playback starts half a cadence after a full tick is queued, so the buffer
+ * holds between half a tick and a tick and a half: a tick can arrive up to
+ * half a cadence early or late without overflowing or stalling. Everything drawn
+ * (traces, RMS, packets) reads the played-out state. `clock` and `written` are
+ * the source's own counters from the latest tick. Buffer fill is the measured
+ * occupancy of the playout buffer, averaged over about a second.
+ */
+export class StreamView {
+  readonly profile: SourceProfile;
+  readonly labels = MONTAGE_1020.map((e) => e.label);
+  readonly seconds = 8;
+  /** Played-out samples, µV, as a ring; NaN where a packet was lost. */
+  readonly buffers: Float32Array[];
+  readonly capacity: number;
+  head = 0;
+  /** Samples per channel the source reports producing. */
+  written = 0;
+  /** Samples per channel played out to the display. */
+  played = 0;
+  dropped = 0;
+  packets = 0;
+  lostPackets = 0;
+  clock = 0;
+  readonly latencies: number[] = [];
+  readonly log: LogLine[] = [];
+  /** Playout buffer size, samples per channel (two ticks). */
+  readonly queueCapacity: number;
+  /** Samples the source produced that overflowed the playout buffer. */
+  overflowed = 0;
+
+  private queue: Float32Array[];
+  private qRead = 0;
+  private qLen = 0;
+  /** Global sample index of the next sample to enqueue. */
+  private nextIndex = 0;
+  private acc = 0;
+  private primed = false;
+  /** Seconds a full tick has been waiting while not primed. */
+  private waited = 0;
+  private fill = 0;
+  private impedances: Float32Array;
+  private overrunAt: number | null = null;
+
+  constructor(profile: SourceProfile) {
+    this.profile = profile;
+    this.capacity = Math.round(profile.sampleRate * this.seconds);
+    this.buffers = this.labels.map(() => new Float32Array(this.capacity).fill(Number.NaN));
+    this.queueCapacity = Math.max(1, Math.round((profile.sampleRate * 2 * TICK_MS) / 1000));
+    this.queue = this.labels.map(() => new Float32Array(this.queueCapacity));
+    this.impedances = new Float32Array(this.labels.length);
+  }
+
+  /** Samples per channel waiting in the playout buffer. */
+  get queued(): number {
+    return this.qLen;
+  }
+
+  receive(t: Tick, nowMs: number) {
+    this.clock = t.clock;
+    this.written = t.written;
+    this.impedances = t.impedance;
+    for (const l of t.latencies) this.latencies.push(l);
+    if (this.latencies.length > 240) this.latencies.splice(0, this.latencies.length - 240);
+    for (const l of t.log) this.log.push(l);
+    if (this.log.length > 60) this.log.splice(0, this.log.length - 60);
+    if (t.overran) this.overrunAt = nowMs;
+
+    // A gap in sample indices means the source dropped samples it could not
+    // hold; start the playout again from the new chunk.
+    if (t.start !== this.nextIndex) {
+      this.qLen = 0;
+      this.primed = false;
+      this.nextIndex = t.start;
+    }
+    const n = t.chunk[0]?.length ?? 0;
+    for (let i = 0; i < n; i++) {
+      if (this.qLen === this.queueCapacity) {
+        // Full: drop the oldest queued sample.
+        this.qRead = (this.qRead + 1) % this.queueCapacity;
+        this.qLen--;
+        this.overflowed++;
+      }
+      const w = (this.qRead + this.qLen) % this.queueCapacity;
+      for (let c = 0; c < this.queue.length; c++) this.queue[c]![w] = t.chunk[c]![i]!;
+      this.qLen++;
+    }
+    this.nextIndex = t.start + n;
+  }
+
+  /** Release `dt` seconds of samples to the display. */
+  play(dt: number) {
+    const p = this.profile;
+    const tickSamples = Math.floor((p.sampleRate * TICK_MS) / 1000);
+    if (!this.primed) {
+      this.waited = this.qLen >= tickSamples ? this.waited + dt : 0;
+      if (this.waited >= TICK_MS / 2000) {
+        this.primed = true;
+        this.waited = 0;
+      }
+    }
+    if (this.primed) {
+      this.acc += dt * p.sampleRate;
+      let n = Math.floor(this.acc);
+      this.acc -= n;
+      if (n >= this.qLen) {
+        // Underrun: play what there is and wait for the buffer to refill.
+        n = this.qLen;
+        this.acc = 0;
+        this.primed = false;
+      }
+      for (let i = 0; i < n; i++) {
+        const index = this.nextIndex - this.qLen;
+        const r = this.qRead;
+        const lost = Number.isNaN(this.queue[0]![r]!);
+        if (index % p.packet === 0) {
+          this.packets++;
+          if (lost) this.lostPackets++;
+        }
+        if (lost) this.dropped++;
+        for (let c = 0; c < this.buffers.length; c++)
+          this.buffers[c]![this.head] = this.queue[c]![r]!;
+        this.head = (this.head + 1) % this.capacity;
+        this.played++;
+        this.qRead = (this.qRead + 1) % this.queueCapacity;
+        this.qLen--;
+      }
+    }
+    // Occupancy averaged with a 1 s time constant: the raw value is a 4 Hz
+    // sawtooth (filled per tick, drained per frame).
+    const k = 1 - Math.exp(-Math.max(0, dt));
+    this.fill += (this.qLen / this.queueCapacity - this.fill) * k;
+  }
+
+  health() {
+    return { dropped: this.dropped, latencyMs: median(this.latencies), bufferFill: this.fill };
+  }
+
+  /** Modelled electrode impedance in kΩ, as of the latest tick. */
+  impedance(c: number, _faults?: Faults): number {
+    return this.impedances[c] ?? 0;
+  }
+
+  /** A tick overran within the last DEGRADED_HOLD_MS. */
+  degraded(nowMs: number): boolean {
+    return this.overrunAt !== null && nowMs - this.overrunAt < DEGRADED_HOLD_MS;
+  }
+
+  recent(c: number, seconds: number): Float32Array {
+    return ringRecent(this, c, this.played, seconds);
+  }
+
+  rms(c: number, seconds = 0.5): number {
+    return rmsOf(this.recent(c, seconds));
   }
 }
