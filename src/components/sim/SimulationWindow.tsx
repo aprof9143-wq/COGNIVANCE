@@ -52,6 +52,7 @@ import {
 } from "@/lib/sim/subject";
 import type { SubjectReply, SubjectRequest } from "@/lib/sim/subject.worker";
 import { COMPONENTS } from "@/lib/sim/specs";
+import { endSession } from "@/lib/session";
 import {
   BeamPanel,
   BenchmarkPanel,
@@ -193,7 +194,7 @@ export function SimulationWindow() {
   const design = designs[diseaseKey] ?? baseDesign;
 
   const signOut = () => {
-    localStorage.removeItem("cognivance_session");
+    endSession();
     navigate({ to: "/auth" });
   };
 

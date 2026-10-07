@@ -157,7 +157,9 @@ that needs a trained model.
 2. **Plug in the laptop.** Raymarching is GPU work; battery-saver modes throttle
    it and the rotation stutters.
 3. **Load both files once beforehand** to confirm they render on this machine.
-4. **Sign in first** — `/research` redirects to `/auth` without a session.
+4. **Enter the demo first** — `/research` redirects to `/auth` without a
+   session. **Enter Demo** there opens a read-only session for this tab: no
+   account, nothing saved, and it ends when the tab closes.
 
 ---
 

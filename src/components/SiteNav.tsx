@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { LogOut, UserRound } from "lucide-react";
+import { endSession, hasSession } from "@/lib/session";
 
 type NavLink = { label: string; to: string; hash?: string };
 
@@ -13,8 +14,6 @@ const links: NavLink[] = [
   { label: "Frontiers", to: "/", hash: "frontiers" },
   { label: "About", to: "/about" },
 ];
-
-const SESSION_KEY = "cognivance_session";
 
 export function SiteNav() {
   const navigate = useNavigate();
@@ -31,14 +30,14 @@ export function SiteNav() {
   }, []);
 
   useEffect(() => {
-    setSignedIn(Boolean(localStorage.getItem(SESSION_KEY)));
+    setSignedIn(hasSession());
   }, [pathname]);
 
   const isActive = (l: NavLink) =>
     l.hash ? false : l.to === "/" ? pathname === "/" : pathname.startsWith(l.to);
 
   const signOut = () => {
-    localStorage.removeItem(SESSION_KEY);
+    endSession();
     setSignedIn(false);
     setOpen(false);
     navigate({ to: "/" });
@@ -128,7 +127,7 @@ export function SiteNav() {
                 className="flex items-center gap-2 text-[0.84rem] font-medium text-ash transition-colors hover:text-foreground"
               >
                 <LogOut className="h-[1.05rem] w-[1.05rem] rotate-180" strokeWidth={1.6} />
-                Sign in
+                Enter demo
               </Link>
             )}
           </div>
@@ -191,7 +190,7 @@ export function SiteNav() {
                 onClick={() => setOpen(false)}
                 className="mb-3 block rounded-full border border-foreground/15 px-5 py-3 text-center text-[0.9rem] font-semibold text-foreground"
               >
-                Sign in / Create account
+                Enter demo
               </Link>
             )}
           </li>

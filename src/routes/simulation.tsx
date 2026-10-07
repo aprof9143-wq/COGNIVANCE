@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { hasSession } from "@/lib/session";
 import { SimulationWindow } from "@/components/sim/SimulationWindow";
 
 export const Route = createFileRoute("/simulation")({
@@ -21,7 +22,7 @@ function Simulation() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem("cognivance_session")) navigate({ to: "/auth" });
+    if (!hasSession()) navigate({ to: "/auth" });
     else setReady(true);
   }, [navigate]);
 
