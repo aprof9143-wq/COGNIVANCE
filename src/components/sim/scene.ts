@@ -418,7 +418,8 @@ export class SimScene {
       this.brain.add(m);
     }
     for (const [key, mesh] of an.meshes) {
-      if (key === "cortex" || key === "outer") continue;
+      // Surfaces, not target regions; the scalp is only measured against.
+      if (key === "cortex" || key === "outer" || key === "scalp") continue;
       const colour = new THREE.Color(mesh.colour);
       const mat = new THREE.MeshStandardMaterial({
         color: colour,

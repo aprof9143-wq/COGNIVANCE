@@ -3,7 +3,9 @@
 Anatomy for the CIRCUIT Simulation Window (`/simulation`):
 
 - `anatomy.bin.gz` holds surface meshes: the cortex, the outer brain surface
-  used to place the array, and ten target regions.
+  used to place the array, and ten target regions. It also holds the scalp as
+  points, never drawn, so the page can measure each region's depth below
+  the scalp.
 - `regions.nii.gz` is the label map of those ten regions. The page computes
   every region centroid and volume from it when it loads; no coordinate is
   stored or typed in.
@@ -19,6 +21,7 @@ They describe a population-average template, not a person.
 | Region                                                     | Source                                                                                                                                    |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Cortex, outer surface                                      | TemplateFlow `tpl-MNI152NLin2009cAsym_res-01_T1w` and `_desc-brain_mask` — MNI/McGill permissive notice, see `public/templates/NOTICE.md` |
+| Scalp (points)                                             | TemplateFlow `_desc-head_mask`, resampled to 1 mm; points at the field-of-view edge are dropped — same notice                             |
 | Hippocampus, amygdala, thalamus                            | TemplateFlow `_seg-aseg_dseg` (FreeSurfer convention) — same notice                                                                       |
 | Subthalamic nucleus                                        | MASSP atlas (Alkemade et al., _Science Advances_ 2022), TemplateFlow `_atlas-MASSP20_dseg`                                                |
 | V1, dlPFC, vmPFC, insula, auditory and sensorimotor cortex | Schaefer 2018, 400 parcels, 17 networks — TemplateFlow `_atlas-Schaefer2018_desc-400Parcels17Networks_dseg`, parcel names from CBIG       |

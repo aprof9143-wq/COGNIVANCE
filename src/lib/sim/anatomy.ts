@@ -3,7 +3,7 @@
  * tools/demo-assets/build_sim_anatomy.py (regions defined in
  * tools/demo-assets/sim_regions.json):
  *
- *   public/sim/anatomy.bin.gz   surface meshes
+ *   public/sim/anatomy.bin.gz   surface meshes, and the scalp as a point set
  *   public/sim/regions.nii.gz   label map of the target regions
  *
  * Positions are MNI152 RAS millimetres. Region centroids and volumes are not
@@ -182,6 +182,21 @@ export async function loadAnatomy(
   return an;
 }
 
+/** The vertex of a mesh (or point set) nearest to `p`, and its distance in mm. */
+export function nearestVertex(mesh: AnatomyMesh, p: Vec3): { point: Vec3; distMm: number } {
+  const v = mesh.positions;
+  let best = 0;
+  let bestD = Infinity;
+  for (let i = 0; i < v.length; i += 3) {
+    const d = (v[i]! - p[0]) ** 2 + (v[i + 1]! - p[1]) ** 2 + (v[i + 2]! - p[2]) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return { point: [v[best]!, v[best + 1]!, v[best + 2]!], distMm: Math.sqrt(bestD) };
+}
+
 export type Placement = {
   /** Array centre on the outer brain surface, mm. */
   centre: Vec3;
@@ -198,19 +213,7 @@ export type Placement = {
  * strip electrodes. The outer surface excludes ventricle walls.
  */
 export function placeArray(outer: AnatomyMesh, target: Vec3): Placement {
-  const p = outer.positions;
-  let best = 0;
-  let bestD = Infinity;
-  for (let i = 0; i < p.length; i += 3) {
-    const d =
-      (p[i]! - target[0]) ** 2 + (p[i + 1]! - target[1]) ** 2 + (p[i + 2]! - target[2]) ** 2;
-    if (d < bestD) {
-      bestD = d;
-      best = i;
-    }
-  }
-  const centre: Vec3 = [p[best]!, p[best + 1]!, p[best + 2]!];
-  const dist = Math.sqrt(bestD);
+  const { point: centre, distMm: dist } = nearestVertex(outer, target);
   const normal: Vec3 = [
     (target[0] - centre[0]) / dist,
     (target[1] - centre[1]) / dist,

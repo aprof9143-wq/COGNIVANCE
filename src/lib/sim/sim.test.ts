@@ -12,11 +12,13 @@ import {
 } from "./acoustics";
 import {
   attachRegionMeasures,
+  nearestVertex,
   parseAnatomy,
   parseRegionLabels,
   placeArray,
   regionMeasures,
   targetPoint,
+  type AnatomyMesh,
   type Placement,
 } from "./anatomy";
 import { autoConnect, FULL_TOPOLOGY } from "./autoconnect";
@@ -26,6 +28,7 @@ import { diseaseByKey, patientParams } from "./diseases";
 import { CircuitSim, computeBeams } from "./loop";
 import { createNetwork, healthyParams, Recorder, REGION_INDEX as R, REGIONS, step } from "./neural";
 import { verify, type GateInputs } from "./prism";
+import { AMYGDALA_SCALP_RANGE_MM, GATED_REGIONS, isGated, regionDepth } from "./regions";
 import { COMPONENTS, SAFETY_LIMITS, thermalNoiseUv } from "./specs";
 
 /** A placement `depth` mm straight down from the origin. */
@@ -441,5 +444,59 @@ describe("anatomy asset", () => {
     expect(pl.depthMm).toBeLessThan(30);
     const n = Math.hypot(...pl.normal);
     expect(n).toBeCloseTo(1, 6);
+  });
+});
+
+describe("gated regions and depth", () => {
+  it("finds the nearest vertex of a point set", () => {
+    const pts: AnatomyMesh = {
+      key: "p",
+      name: "p",
+      colour: "#000",
+      positions: new Float32Array([0, 0, 0, 10, 0, 0, 0, 3, 4]),
+      indices: new Uint32Array(0),
+    };
+    const n = nearestVertex(pts, [0, 6, 8]);
+    expect(n.point).toEqual([0, 3, 4]);
+    expect(n.distMm).toBeCloseTo(5, 9);
+  });
+
+  it("ships the scalp as a point set that the scene does not draw as a region", () => {
+    const scalp = shippedAnatomy().meshes.get("scalp")!;
+    expect(scalp.positions.length / 3).toBeGreaterThan(10_000);
+    expect(scalp.indices.length).toBe(0);
+    expect(scalp.label).toBeUndefined();
+  });
+
+  it("gates exactly the subcortical targets", () => {
+    const an = shippedAnatomy();
+    expect([...GATED_REGIONS].sort()).toEqual(["amygdala", "hippocampus", "stn", "thalamus"]);
+    for (const r of REGIONS) {
+      const deep = an.meshes.get(r.key)!.source !== "schaefer2018";
+      expect(isGated(r.key)).toBe(deep);
+    }
+  });
+
+  it("measures depth below the scalp and below the brain surface on the template", () => {
+    const an = shippedAnatomy();
+    const depths = REGIONS.map((r) => regionDepth(an, r.key)!);
+    for (const d of depths) {
+      expect(d.mni).toEqual(targetPoint(an.meshes.get(d.region)!, "left"));
+      expect(d.belowBrainMm).toBeGreaterThan(0);
+      expect(d.belowScalpMm).toBeGreaterThan(d.belowBrainMm);
+    }
+    // The computed amygdala depth falls inside the published 5–7 cm range.
+    const amy = depths.find((d) => d.region === "amygdala")!;
+    expect(amy.belowScalpMm).toBeGreaterThanOrEqual(AMYGDALA_SCALP_RANGE_MM[0]);
+    expect(amy.belowScalpMm).toBeLessThanOrEqual(AMYGDALA_SCALP_RANGE_MM[1]);
+    // Every gated region lies deeper below the scalp than every cortical one.
+    const gated = depths.filter((d) => isGated(d.region)).map((d) => d.belowScalpMm);
+    const cortical = depths.filter((d) => !isGated(d.region)).map((d) => d.belowScalpMm);
+    expect(Math.min(...gated)).toBeGreaterThan(Math.max(...cortical));
+  });
+
+  it("returns nothing until the anatomy has region measures", () => {
+    const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+    expect(regionDepth(an, "amygdala")).toBeNull();
   });
 });

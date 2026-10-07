@@ -8,6 +8,7 @@ Inputs (TemplateFlow, tpl-MNI152NLin2009cAsym, res-01; licences in
 public/templates/NOTICE.md and public/sim/NOTICE.md)
   _T1w.nii.gz                         cortical surface (T1 isosurface in the brain mask)
   _desc-brain_mask.nii.gz             brain mask
+  _desc-head_mask.nii.gz              head mask: the skin surface, for depth below the scalp
   _seg-aseg_dseg.nii.gz               FreeSurfer aseg: hippocampus, amygdala, thalamus
   _atlas-MASSP20_dseg.nii.gz          MASSP (Alkemade et al. 2022): subthalamic nucleus
   _atlas-Schaefer2018_desc-400Parcels17Networks_dseg.nii.gz (+ .tsv)
@@ -28,7 +29,8 @@ Outputs (in OUT_DIR)
   anatomy.bin.gz   meshes. Little endian: magic "CVSA1\\0\\0\\0" | uint32 header
                    length | header JSON (utf-8), then per mesh int16 xyz
                    (mm * 50, MNI RAS) and uint32 triangle indices at the
-                   offsets the header lists. gzip-compressed.
+                   offsets the header lists. gzip-compressed. "scalp" is a
+                   point set (no triangles): it is measured against, not drawn.
   regions.nii.gz   uint8 label map of the target regions (value = the mesh's
                    "label" in the header), cropped to the regions. The page
                    computes region centroids and volumes from it at load time,
@@ -48,6 +50,7 @@ from pathlib import Path
 
 import nibabel as nib
 import numpy as np
+from nibabel.processing import resample_from_to
 from scipy import ndimage
 from skimage import measure
 
@@ -156,6 +159,19 @@ def main(atlas_dir, out_dir):
     outer_v, outer_f = surface(mask, 0.5, affine, step=3, sigma=1.5, passes=3)
     meshes.append(("outer", "Brain surface", "#5d7aa8", outer_v, outer_f, None))
     print(f"outer: {len(outer_v)} verts")
+
+    # Scalp: the skin surface of the head mask, resampled onto the 1 mm grid.
+    # Where the head leaves the field of view (neck, cut planes) the surface
+    # is the box edge, not skin, so those points are dropped.
+    head = resample_from_to(nib.load(d / f"{P}desc-head_mask.nii.gz"), t1, order=1)
+    head = np.asarray(head.dataobj) > 0.5
+    v = ndimage.gaussian_filter(np.pad(head, 2).astype(np.float32), 1.0)
+    sv, _, _, _ = measure.marching_cubes(v, level=0.5, step_size=2)
+    sv -= 2
+    sv = sv[np.all((sv >= 1) & (sv <= np.array(head.shape) - 2), axis=1)]
+    scalp = (np.c_[sv, np.ones(len(sv))] @ affine.T)[:, :3].astype(np.float32)
+    meshes.append(("scalp", "Scalp", "#c8a27a", scalp, np.zeros((0, 3), np.uint32), None))
+    print(f"scalp: {len(scalp)} points")
 
     # Target regions: one label each in the label map, one mesh each.
     labelmap = np.zeros(t1.shape, np.uint8)
