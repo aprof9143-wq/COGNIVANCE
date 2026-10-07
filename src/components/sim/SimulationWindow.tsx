@@ -33,6 +33,7 @@ import { autoDesign } from "@/lib/sim/design";
 import { DISEASES, diseaseByKey, type DiseaseKey } from "@/lib/sim/diseases";
 import { CircuitSim, computeBeams, deliverable, type LoopEvent, type Stage } from "@/lib/sim/loop";
 import { plasticityIndex, REGION_INDEX, REGIONS, type RegionKey } from "@/lib/sim/neural";
+import { planTarget } from "@/lib/sim/plan";
 import { GATED_REGIONS, regionDepth, type RegionDepth } from "@/lib/sim/regions";
 import { COMPONENTS } from "@/lib/sim/specs";
 import {
@@ -44,6 +45,7 @@ import {
   LibraryPanel,
   NetlistPanel,
   PipelineStrip,
+  PlanPanel,
   PrismPanel,
   ScopePanel,
 } from "./panels";
@@ -179,6 +181,10 @@ export function SimulationWindow() {
   const circuit = useMemo(() => autoConnect({ components: [...enabled] }), [enabled]);
   const fullCircuit = useMemo(() => autoConnect(FULL_TOPOLOGY), []);
   const blocked = circuit.drc.filter((d) => d.severity === "error");
+  const plans = useMemo(
+    () => beams.map((b) => planTarget(b, design, circuit.power.dutyLimit)),
+    [beams, design, circuit],
+  );
   const unreachable = beams.filter((b) => !deliverable(b));
   const regionName = (k: string) => anatomy?.meshes.get(k)?.name ?? k;
   const gatedDepths = useMemo(
@@ -609,6 +615,7 @@ export function SimulationWindow() {
         <div className="order-2 flex min-w-0 flex-col gap-3 xl:order-1">
           <LibraryPanel enabled={enabled} onToggle={toggle} locked={phase === "assembling"} />
           <NetlistPanel circuit={circuit} revealed={revealed} />
+          <PlanPanel plans={plans} name={regionName} />
         </div>
 
         {/* Viewport */}

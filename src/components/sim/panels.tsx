@@ -7,6 +7,7 @@ import type { Disease } from "@/lib/sim/diseases";
 import { FREQUENCIES_MHZ, PITCH_WAVELENGTHS } from "@/lib/sim/design";
 import { deliverable, type LoopEvent, type TargetBeam } from "@/lib/sim/loop";
 import { REGION_INDEX, type Recorder, type RegionKey } from "@/lib/sim/neural";
+import { NOT_MODELLED, type TargetPlan } from "@/lib/sim/plan";
 import {
   AMYGDALA_SCALP_RANGE_MM,
   DEEP_SOURCE_ERROR,
@@ -724,6 +725,108 @@ export function DepthPanel({
             Gated: deep targets that scalp EEG cannot localise precisely. Depths are measured on the
             MNI152 template from each region&apos;s centroid; they describe the template, not a
             patient.
+          </p>
+        </div>
+      ) : (
+        <p className="text-[0.66rem] text-[#8095bf]">Waiting for the anatomy…</p>
+      )}
+    </SimPanel>
+  );
+}
+
+/** Placement and safety margins of every target, at full drive, before the loop runs. */
+export function PlanPanel({
+  plans,
+  name,
+}: {
+  plans: TargetPlan[];
+  name: (k: RegionKey) => string;
+}) {
+  const failed = plans.filter((p) => !p.pass).length;
+  const v3 = (v: [number, number, number], d: number) => v.map((x) => x.toFixed(d)).join(", ");
+  return (
+    <SimPanel
+      title="Placement & plan"
+      meta={
+        plans.length ? (failed ? `${failed} target${failed > 1 ? "s" : ""} fail` : "all pass") : "—"
+      }
+      action={
+        plans.length ? (
+          failed ? (
+            <ShieldAlert className="h-4 w-4 text-[#ff4b5c]" />
+          ) : (
+            <ShieldCheck className="h-4 w-4 text-[#41e0a2]" />
+          )
+        ) : null
+      }
+    >
+      {plans.length ? (
+        <div className="flex flex-col gap-2">
+          {plans.map((p) => (
+            <div key={p.region} className="rounded-md border border-[#0e2247] bg-[#030b20]/70 p-2">
+              <p className="mb-1 flex items-center justify-between text-[0.7rem]">
+                <span className="text-[#e6efff]">{name(p.region)}</span>
+                <span
+                  className={`font-mono text-[0.56rem] ${p.pass ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                >
+                  {p.pass ? "PASS" : "FAIL"}
+                </span>
+              </p>
+              <dl className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[0.6rem]">
+                {(
+                  [
+                    ["Array centre (MNI)", v3(p.centre, 1)],
+                    ["Normal", v3(p.normal, 2)],
+                    ["Array → target", `${fmt(p.depthMm, 1)} mm`],
+                  ] as [string, string][]
+                ).map(([k, v]) => (
+                  <div key={k} className="contents">
+                    <dt className="text-[#8095bf]">{k}</dt>
+                    <dd className="text-right font-mono text-[#e6efff]">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <table className="mt-1.5 w-full border-collapse text-[0.6rem]">
+                <tbody>
+                  {p.margins.map((m) => (
+                    <tr key={m.key} className="border-t border-[#0e2247]" title={m.basis}>
+                      <td className="py-1 text-[#c4d2ee]">{m.label}</td>
+                      <td className="whitespace-nowrap py-1 pl-1 text-right font-mono text-[#e6efff]">
+                        {fmt(m.value, m.digits)} / {fmt(m.limit, m.digits)}
+                        {m.unit ? ` ${m.unit}` : ""}
+                      </td>
+                      <td
+                        className={`whitespace-nowrap py-1 pl-1 text-right font-mono ${m.pass ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                      >
+                        {m.pass ? `${Math.round(m.margin * 100)} %` : "over"}
+                      </td>
+                      <td className="py-1 pl-1 text-right">
+                        {m.pass ? (
+                          <Check className="ml-auto h-3 w-3 text-[#41e0a2]" />
+                        ) : (
+                          <X className="ml-auto h-3 w-3 text-[#ff4b5c]" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+          <div className="rounded-md border border-dashed border-[#16305e] p-2 text-[0.6rem]">
+            <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#5e719a]">
+              Not modelled
+            </p>
+            {NOT_MODELLED.map((n) => (
+              <p key={n.label} className="text-[#8095bf]">
+                <span className="text-[#c4d2ee]">{n.label}</span> — {n.reason}
+              </p>
+            ))}
+          </div>
+          <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+            Value / limit and headroom at full drive, from the same physics and limits PRISM
+            enforces. The plan is the worst case before the loop runs; PRISM still checks every
+            intent.
           </p>
         </div>
       ) : (

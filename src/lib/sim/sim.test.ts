@@ -25,8 +25,9 @@ import { autoConnect, FULL_TOPOLOGY } from "./autoconnect";
 import { runCohort, virtualPatient } from "./benchmark";
 import { addressableFoci, evaluateDesign, designSpace, pickBest } from "./design";
 import { diseaseByKey, patientParams } from "./diseases";
-import { CircuitSim, computeBeams } from "./loop";
+import { CircuitSim, computeBeams, deliverable } from "./loop";
 import { createNetwork, healthyParams, Recorder, REGION_INDEX as R, REGIONS, step } from "./neural";
+import { NOT_MODELLED, planTarget } from "./plan";
 import { verify, type GateInputs } from "./prism";
 import { AMYGDALA_SCALP_RANGE_MM, GATED_REGIONS, isGated, regionDepth } from "./regions";
 import { COMPONENTS, SAFETY_LIMITS, thermalNoiseUv } from "./specs";
@@ -498,5 +499,69 @@ describe("gated regions and depth", () => {
   it("returns nothing until the anatomy has region measures", () => {
     const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
     expect(regionDepth(an, "amygdala")).toBeNull();
+  });
+});
+
+describe("placement and plan", () => {
+  const pd = diseaseByKey("parkinsons");
+  const design: ArrayDesign = {
+    ...DEFAULT_ARRAY,
+    frequencyHz: 7.5e6,
+    pitchM: 2 * wavelengthM(7.5e6),
+  };
+
+  it("uses the same acoustic quantities the PRISM gate checks", () => {
+    const beams = computeBeams(design, [{ region: "stn", placement: straight(14) }]);
+    const plan = planTarget(beams[0]!, design, 0.78);
+    const sim = new CircuitSim({
+      disease: pd,
+      severity: 0.8,
+      design,
+      beams,
+      seed: 1,
+      dutyLimit: 0.78,
+      gated: true,
+    });
+    const gate = sim.acoustics([1])[0]!;
+    const by = (k: string) => plan.margins.find((m) => m.key === k)!;
+    expect(by("mi").value).toBeCloseTo(gate.mechanicalIndex, 12);
+    expect(by("ispta").value).toBeCloseTo(gate.isptaMwCm2, 9);
+    expect(by("offTarget").value).toBe(gate.offTargetFraction);
+    // ΔT is the steady state the gate's burst-by-burst heating converges to.
+    let t = 0;
+    for (let i = 0; i < 2000; i++)
+      t = heatStep(
+        t,
+        beams[0]!.metrics.isppaWcm2 * 0.1,
+        design.frequencyHz,
+        beams[0]!.metrics.lateralFwhmMm,
+        0.0156,
+      );
+    expect(by("deltaT").value).toBeCloseTo(t, 9);
+    expect(by("deltaT").value).toBeGreaterThanOrEqual(gate.predictedTempC);
+    expect(plan.centre).toEqual([0, 0, 0]);
+    expect(plan.depthMm).toBe(14);
+  });
+
+  it("passes a deliverable target and fails one the array cannot focus on", () => {
+    const ok = computeBeams(design, [{ region: "stn", placement: straight(14) }])[0]!;
+    expect(deliverable(ok)).toBe(true);
+    expect(planTarget(ok, design, 0.78).pass).toBe(true);
+    const deep = computeBeams(DEFAULT_ARRAY, [{ region: "stn", placement: straight(30) }])[0]!;
+    expect(deliverable(deep)).toBe(false);
+    const plan = planTarget(deep, DEFAULT_ARRAY, 0.78);
+    expect(plan.pass).toBe(false);
+    const failed = plan.margins.filter((m) => !m.pass).map((m) => m.key);
+    expect(failed.some((k) => k === "offTarget" || k === "focus")).toBe(true);
+    for (const m of plan.margins) expect(m.pass).toBe(m.value <= m.limit);
+  });
+
+  it("lists what it does not model without giving it a number", () => {
+    expect(NOT_MODELLED.map((n) => n.label)).toEqual([
+      "RF SAR",
+      "Stimulation charge density",
+      "Distance to major vessels",
+    ]);
+    for (const n of NOT_MODELLED) expect(n.reason).not.toMatch(/\d/);
   });
 });
