@@ -10,7 +10,15 @@ import {
   type ArrayDesign,
   type Vec3,
 } from "./acoustics";
-import { parseAnatomy, placeArray, targetPoint, type Placement } from "./anatomy";
+import {
+  attachRegionMeasures,
+  parseAnatomy,
+  parseRegionLabels,
+  placeArray,
+  regionMeasures,
+  targetPoint,
+  type Placement,
+} from "./anatomy";
 import { autoConnect, FULL_TOPOLOGY } from "./autoconnect";
 import { runCohort, virtualPatient } from "./benchmark";
 import { addressableFoci, evaluateDesign, designSpace, pickBest } from "./design";
@@ -352,10 +360,76 @@ describe("design search and benchmark", () => {
   });
 });
 
+const readGz = (path: string) => {
+  const buf = gunzipSync(readFileSync(path));
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+};
+
+/** The shipped anatomy, with region measures computed from the label map. */
+const shippedAnatomy = () => {
+  const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+  attachRegionMeasures(an, parseRegionLabels(readGz("public/sim/regions.nii.gz")));
+  return an;
+};
+
+describe("region measures", () => {
+  it("computes volume and per-hemisphere centroids from a label map", () => {
+    // 4 × 2 × 1 voxels of 2 mm, x = 2i − 3 (so columns 0–1 are left, 2–3 right).
+    const affine = new Float64Array([2, 0, 0, -3, 0, 2, 0, 10, 0, 0, 2, -4, 0, 0, 0, 1]);
+    const labels = new Uint8Array([1, 1, 1, 0, 2, 0, 0, 0]);
+    const m = regionMeasures(labels, [4, 2, 1], affine);
+    const one = m.get(1)!;
+    expect(one.voxels).toBe(3);
+    expect(one.volumeMm3).toBe(24);
+    expect(one.sides.left).toEqual([-2, 10, -4]); // voxels (0,0) and (1,0)
+    expect(one.sides.right).toEqual([1, 10, -4]); // voxel (2,0)
+    expect(one.centroid[0]).toBeCloseTo(-1, 9);
+    const two = m.get(2)!;
+    expect(two.sides.right).toBeUndefined();
+    expect(two.centroid).toEqual([-3, 12, -4]); // voxel (0,1)
+  });
+
+  it("refuses a mesh whose label has no voxels", () => {
+    const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+    expect(() => attachRegionMeasures(an, new Map())).toThrow(/no voxels/);
+  });
+});
+
 describe("anatomy asset", () => {
+  it("defines exactly the network model's regions, none from Harvard-Oxford", () => {
+    const spec = JSON.parse(readFileSync("tools/demo-assets/sim_regions.json", "utf8")) as {
+      regions: { key: string; atlas: string }[];
+    };
+    expect(spec.regions.map((r) => r.key).sort()).toEqual(REGIONS.map((r) => r.key).sort());
+    const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+    const labels = new Set<number>();
+    for (const r of spec.regions) {
+      const mesh = an.meshes.get(r.key)!;
+      expect(mesh.source).toBe(r.atlas);
+      expect(["aseg", "massp", "schaefer2018"]).toContain(mesh.source);
+      labels.add(mesh.label!);
+      // Nothing positional is stored in the asset: it is computed at load.
+      expect(mesh.centroid).toBeUndefined();
+    }
+    expect(labels.size).toBe(spec.regions.length);
+  });
+
+  it("computes every target region's centroids from the label map", () => {
+    const an = shippedAnatomy();
+    for (const r of REGIONS) {
+      const mesh = an.meshes.get(r.key)!;
+      expect(mesh.volumeMm3!).toBeGreaterThan(100);
+      expect(mesh.sides!.left![0]).toBeLessThan(0);
+      expect(mesh.sides!.right![0]).toBeGreaterThan(0);
+    }
+    // V1 is calcarine cortex: medial and occipital.
+    const v1 = targetPoint(an.meshes.get("v1")!, "left");
+    expect(v1[0]).toBeGreaterThan(-20);
+    expect(v1[1]).toBeLessThan(-70);
+  });
+
   it("parses the shipped atlas meshes in MNI space and places arrays on the outer surface", () => {
-    const buf = gunzipSync(readFileSync("public/sim/anatomy.bin.gz"));
-    const an = parseAnatomy(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+    const an = shippedAnatomy();
     for (const k of ["cortex", "outer", "hippocampus", "amygdala", "stn", "v1", "motor"])
       expect(an.meshes.has(k)).toBe(true);
     const hip = an.meshes.get("hippocampus")!;
