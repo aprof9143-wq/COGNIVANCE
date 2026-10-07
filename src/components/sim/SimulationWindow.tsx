@@ -34,6 +34,7 @@ import { autoDesign } from "@/lib/sim/design";
 import { DISEASES, diseaseByKey, type DiseaseKey } from "@/lib/sim/diseases";
 import { CircuitSim, computeBeams, deliverable, type LoopEvent, type Stage } from "@/lib/sim/loop";
 import { plasticityIndex, REGION_INDEX, REGIONS, type RegionKey } from "@/lib/sim/neural";
+import { RollingWindow, type Percentiles } from "@/lib/rolling";
 import { planTarget } from "@/lib/sim/plan";
 import { GATED_REGIONS, regionDepth, type RegionDepth } from "@/lib/sim/regions";
 import {
@@ -108,6 +109,8 @@ type Hud = {
   verified: number;
   halts: number;
   modelS: number;
+  /** Measured over the last 60 s of wall time. */
+  rolling: { predict: Percentiles | null; total: Percentiles | null } | null;
 };
 
 const EMPTY_HUD: Hud = {
@@ -118,6 +121,7 @@ const EMPTY_HUD: Hud = {
   verified: 0,
   halts: 0,
   modelS: 0,
+  rolling: null,
 };
 
 export function SimulationWindow() {
@@ -379,6 +383,10 @@ export function SimulationWindow() {
     let verified = 0;
     let halts = 0;
     let owner: CircuitSim | null = null;
+    // The browser measures the predict step; the total adds the spec budgets
+    // and acoustic time of flight (see LoopEvent.stages).
+    const predictWin = new RollingWindow(60_000);
+    const totalWin = new RollingWindow(60_000);
 
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
@@ -393,6 +401,8 @@ export function SimulationWindow() {
         t = 0;
         endpoints.length = 0;
         loops = verified = halts = 0;
+        predictWin.clear();
+        totalWin.clear();
       }
       if (!sim) {
         scene.setLoop({
@@ -415,6 +425,8 @@ export function SimulationWindow() {
           if (ev) t -= period;
           prev = ev;
           ev = sim.iterate();
+          predictWin.push(now, ev.stages.find((x) => x.stage === "PREDICT")?.ms ?? 0);
+          totalWin.push(now, ev.latencyMs);
           loops++;
           if (ev.halted) halts++;
           else if (ev.delivered.length) verified++;
@@ -458,6 +470,7 @@ export function SimulationWindow() {
           verified,
           halts,
           modelS: ev.tS,
+          rolling: { predict: predictWin.percentiles(now), total: totalWin.percentiles(now) },
         });
       }
     };
@@ -966,7 +979,7 @@ export function SimulationWindow() {
         {/* Right column */}
         <div className="order-3 flex min-w-0 flex-col gap-3">
           <PrismPanel ev={ev} />
-          <LatencyPanel ev={ev} />
+          <LatencyPanel ev={ev} rolling={hud.rolling} />
           <DesignPanel
             design={design}
             beams={beams}

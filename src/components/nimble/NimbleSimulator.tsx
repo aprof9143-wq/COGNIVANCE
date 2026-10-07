@@ -17,12 +17,14 @@ import {
   NO_FAULTS,
   PLANTED,
   PROFILES,
+  LATENCY_TARGETS,
   StreamView,
   TICK_MS,
   type Faults,
   type SourceKind,
 } from "@/lib/nimbleSim";
 import type { SimRequest, SimTick } from "@/lib/nimbleSim.worker";
+import type { Percentiles } from "@/lib/rolling";
 import { analyseChannel, BANDS, type ChannelSpectrum } from "@/lib/signal";
 import { CoreView } from "./CoreView";
 
@@ -67,7 +69,9 @@ export function NimbleSimulator() {
     w.onmessage = (e: MessageEvent<SimTick>) => {
       const s = stream.current;
       if (!s || e.data.session !== session.current) return;
-      s.receive(e.data, performance.now());
+      // The worker's clock has its own origin; both share the epoch.
+      const producedAt = e.data.producedAtEpoch - performance.timeOrigin;
+      s.receive({ ...e.data, producedAt }, performance.now());
       w.postMessage({ type: "fill", value: s.health().bufferFill } satisfies SimRequest);
     };
     return () => {
@@ -83,7 +87,10 @@ export function NimbleSimulator() {
     post({ type: "start", kind, session: session.current });
   }, [kind]);
   useEffect(() => void post({ type: "faults", faults }), [faults]);
-  useEffect(() => void post({ type: "run", running }), [running]);
+  useEffect(() => {
+    stream.current?.setRunning(running, performance.now());
+    post({ type: "run", running });
+  }, [running]);
 
   // Display clock, independent of the source. Plays received samples out at
   // the sample rate and nudges React ~6×/s for the numeric read-outs.
@@ -96,7 +103,7 @@ export function NimbleSimulator() {
       // the playout buffer drops the oldest samples instead of lagging.
       const dt = Math.min(1, (now - last) / 1000);
       last = now;
-      if (runningRef.current) stream.current?.play(dt);
+      if (runningRef.current) stream.current?.play(dt, now);
       sinceUi += dt;
       if (sinceUi > 0.16) {
         sinceUi = 0;
@@ -112,7 +119,9 @@ export function NimbleSimulator() {
   const profile = PROFILES[kind];
   const health = s?.health();
   const lossPct = s && s.packets ? (100 * s.lostPackets) / s.packets : 0;
-  const degraded = s?.degraded(performance.now()) ?? false;
+  const nowMs = typeof performance !== "undefined" ? performance.now() : 0;
+  const degraded = s?.degraded(nowMs) ?? false;
+  const loop = s && profile.available ? s.loopLatency(nowMs) : null;
 
   // Spectrum of the selected channel, recomputed at the read-out rate.
   const spectrum = useMemo<ChannelSpectrum | null>(() => {
@@ -363,6 +372,13 @@ export function NimbleSimulator() {
                 style={{ width: `${(profile.available ? (health?.bufferFill ?? 0) : 0) * 100}%` }}
               />
             </div>
+            <LoopLatency
+              rows={[
+                ["Tick work", loop?.work ?? null],
+                ["Sample → screen", loop?.delay ?? null],
+              ]}
+              dropped={loop ? loop.dropped : null}
+            />
           </Panel>
 
           <Panel title="Self-test" meta={`${MONTAGE_1020[selected]!.label} · planted vs measured`}>
@@ -503,6 +519,56 @@ function Stat({ label, value, warn }: { label: string; value: string; warn?: boo
       <p className={`mt-0.5 font-mono text-[0.9rem] ${warn ? "text-[#ff8a98]" : "text-white"}`}>
         {value}
       </p>
+    </div>
+  );
+}
+
+/**
+ * Measured loop latency over the last 60 s against the spec's targets. Tick
+ * work is the worker's time per tick; sample → screen is the delay from a
+ * sample being produced to it being drawn (the 250 ms cadence and the
+ * playout buffer make up most of it).
+ */
+function LoopLatency({
+  rows,
+  dropped,
+}: {
+  rows: [string, Percentiles | null][];
+  /** Samples a full playout buffer dropped in the window; null when nothing streams. */
+  dropped: number | null;
+}) {
+  const ms = (x: number) => (x < 10 ? x.toFixed(1) : x.toFixed(0));
+  const cell = (v: number | undefined, limit: number) =>
+    v === undefined ? (
+      <span className="text-right text-[#5e719a]">—</span>
+    ) : (
+      <span className={`text-right ${v > limit ? "text-[#ff8a98]" : "text-[#c8d6f0]"}`}>
+        {ms(v)} ms
+      </span>
+    );
+  return (
+    <div className="mt-3 border-t border-[#16305e] pt-2 font-mono text-[0.6rem]">
+      <p className="text-[#5e719a]">MEASURED LOOP LATENCY — 60 S ROLLING WINDOW</p>
+      <div className="mt-1 grid grid-cols-[minmax(0,1fr)_4rem_4rem] gap-x-2 gap-y-0.5">
+        <span />
+        <span className="text-right text-[#5e719a]">p50</span>
+        <span className="text-right text-[#5e719a]">p95</span>
+        {rows.map(([label, q]) => (
+          <div key={label} className="contents">
+            <span className="text-[#8095bf]">{label}</span>
+            {cell(q?.p50, LATENCY_TARGETS.p50Ms)}
+            {cell(q?.p95, LATENCY_TARGETS.p95Ms)}
+          </div>
+        ))}
+      </div>
+      <p className="mt-1 text-[#5e719a]">
+        Targets: p50 &lt; {LATENCY_TARGETS.p50Ms} ms · p95 &lt; {LATENCY_TARGETS.p95Ms} ms
+      </p>
+      {dropped !== null ? (
+        <p className={dropped ? "text-[#ff8a98]" : "text-[#5e719a]"}>
+          Dropped before display: {dropped.toLocaleString()} samples
+        </p>
+      ) : null}
     </div>
   );
 }

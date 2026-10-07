@@ -7,6 +7,7 @@ import type { Disease } from "@/lib/sim/diseases";
 import { FREQUENCIES_MHZ, PITCH_WAVELENGTHS } from "@/lib/sim/design";
 import { deliverable, type LoopEvent, type TargetBeam } from "@/lib/sim/loop";
 import { REGION_INDEX, type Recorder, type RegionKey } from "@/lib/sim/neural";
+import type { Percentiles } from "@/lib/rolling";
 import { NOT_MODELLED, type TargetPlan } from "@/lib/sim/plan";
 import {
   AMYGDALA_SCALP_RANGE_MM,
@@ -445,7 +446,14 @@ export function PipelineStrip({ stage, ev }: { stage: string | null; ev: LoopEve
 
 /* --------------------------------------------------------- instruments */
 
-export function LatencyPanel({ ev }: { ev: LoopEvent | null }) {
+export function LatencyPanel({
+  ev,
+  rolling = null,
+}: {
+  ev: LoopEvent | null;
+  /** Measured over the last 60 s of wall time. */
+  rolling?: { predict: Percentiles | null; total: Percentiles | null } | null;
+}) {
   const target = 15;
   const total = ev?.latencyMs ?? 0;
   return (
@@ -485,6 +493,40 @@ export function LatencyPanel({ ev }: { ev: LoopEvent | null }) {
             The spec budgets alone (ASIC &lt; 10 ms + PRISM &lt; 5 ms) already use the 15 ms target;
             prediction time is measured here, in this browser.
           </p>
+          {rolling?.total ? (
+            <div className="mt-2 border-t border-[#0e2247] pt-1.5 font-mono text-[0.6rem]">
+              <p className="text-[#5e719a]">
+                MEASURED · 60 S ROLLING WINDOW · {rolling.total.n} LOOPS
+              </p>
+              <div className="mt-1 grid grid-cols-[minmax(0,1fr)_4.2rem_4.2rem] gap-x-2 gap-y-0.5">
+                <span />
+                <span className="text-right text-[#5e719a]">p50</span>
+                <span className="text-right text-[#5e719a]">p95</span>
+                {(
+                  [
+                    ["Predict", rolling.predict, null],
+                    ["Sense → write-back", rolling.total, target],
+                  ] as [string, Percentiles | null, number | null][]
+                ).map(([label, q, limit]) => (
+                  <div key={label} className="contents">
+                    <span className="text-[#8095bf]">{label}</span>
+                    {[q?.p50, q?.p95].map((v, i) => (
+                      <span
+                        key={i}
+                        className={`text-right ${
+                          v !== undefined && limit !== null && v > limit
+                            ? "text-[#f0d08a]"
+                            : "text-[#e6efff]"
+                        }`}
+                      >
+                        {v === undefined ? "—" : `${v.toFixed(2)} ms`}
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </>
       ) : (
         <p className="text-[0.66rem] text-[#8095bf]">Waiting for the first loop…</p>

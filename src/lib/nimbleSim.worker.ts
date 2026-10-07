@@ -23,7 +23,11 @@ export type SimRequest =
   /** Playout-buffer occupancy measured on the page, for the health() log line. */
   | { type: "fill"; value: number };
 
-export type SimTick = Tick & { session: number };
+export type SimTick = Tick & {
+  session: number;
+  /** When the tick's samples became available: timeOrigin + now(), shared by both threads. */
+  producedAtEpoch: number;
+};
 
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
 const now = () => performance.now();
@@ -35,7 +39,8 @@ let running = true;
 
 setInterval(() => {
   if (!producer) return;
-  const t: SimTick = { ...producer.tick(now, running, faults), session };
+  const tick = producer.tick(now, running, faults);
+  const t: SimTick = { ...tick, session, producedAtEpoch: performance.timeOrigin + now() };
   ctx.postMessage(
     t,
     t.chunk.map((c) => c.buffer),

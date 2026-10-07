@@ -21,6 +21,7 @@
  */
 
 import { MONTAGE_1020 } from "./montage";
+import { RollingWindow, type Percentiles } from "./rolling";
 
 export type SourceKind = "simulated" | "mcu" | "implant";
 
@@ -373,7 +374,17 @@ export type Tick = {
   workMs: number;
   /** The tick started a full cadence late, or took longer than one. */
   overran: boolean;
+  /**
+   * When this tick's samples became available, on the receiver's
+   * performance.now() clock. Set by the page from the worker's timestamp.
+   */
+  producedAt?: number;
 };
+
+/** Spec targets for the measured loop latency. */
+export const LATENCY_TARGETS = { p50Ms: 250, p95Ms: 500 } as const;
+/** Window the loop latency is measured over. */
+export const LATENCY_WINDOW_MS = 60_000;
 
 /** Owns a SimStream in the worker and turns it into ticks. */
 export class TickProducer {
@@ -472,6 +483,16 @@ export class StreamView {
   private fill = 0;
   private impedances: Float32Array;
   private overrunAt: number | null = null;
+  /** When each queued sample was produced (performance.now ms), NaN if unknown. */
+  private queueAt: Float64Array;
+  private pausedAt: number | null = null;
+  /** Time the worker spent producing each tick, ms. */
+  private work = new RollingWindow(LATENCY_WINDOW_MS);
+  /** Production to screen, per drawn sample, ms. */
+  private delay = new RollingWindow(LATENCY_WINDOW_MS);
+  /** Samples dropped from a full playout buffer, per tick. */
+  private drops = new RollingWindow(LATENCY_WINDOW_MS);
+  private dropAt: number | null = null;
 
   constructor(profile: SourceProfile) {
     this.profile = profile;
@@ -479,6 +500,7 @@ export class StreamView {
     this.buffers = this.labels.map(() => new Float32Array(this.capacity).fill(Number.NaN));
     this.queueCapacity = Math.max(1, Math.round((profile.sampleRate * 2 * TICK_MS) / 1000));
     this.queue = this.labels.map(() => new Float32Array(this.queueCapacity));
+    this.queueAt = new Float64Array(this.queueCapacity).fill(Number.NaN);
     this.impedances = new Float32Array(this.labels.length);
   }
 
@@ -496,6 +518,8 @@ export class StreamView {
     for (const l of t.log) this.log.push(l);
     if (this.log.length > 60) this.log.splice(0, this.log.length - 60);
     if (t.overran) this.overrunAt = nowMs;
+    this.work.push(nowMs, t.workMs);
+    const at = t.producedAt ?? Number.NaN;
 
     // A gap in sample indices means the source dropped samples it could not
     // hold; start the playout again from the new chunk.
@@ -505,6 +529,7 @@ export class StreamView {
       this.nextIndex = t.start;
     }
     const n = t.chunk[0]?.length ?? 0;
+    const before = this.overflowed;
     for (let i = 0; i < n; i++) {
       if (this.qLen === this.queueCapacity) {
         // Full: drop the oldest queued sample.
@@ -514,13 +539,22 @@ export class StreamView {
       }
       const w = (this.qRead + this.qLen) % this.queueCapacity;
       for (let c = 0; c < this.queue.length; c++) this.queue[c]![w] = t.chunk[c]![i]!;
+      this.queueAt[w] = at;
       this.qLen++;
     }
     this.nextIndex = t.start + n;
+    if (this.overflowed > before) {
+      this.drops.push(nowMs, this.overflowed - before);
+      this.dropAt = nowMs;
+    }
   }
 
-  /** Release `dt` seconds of samples to the display. */
-  play(dt: number) {
+  /**
+   * Release `dt` seconds of samples to the display. With `nowMs` (the same
+   * clock as producedAt), each drawn sample's production-to-screen delay is
+   * recorded.
+   */
+  play(dt: number, nowMs?: number) {
     const p = this.profile;
     const tickSamples = Math.floor((p.sampleRate * TICK_MS) / 1000);
     if (!this.primed) {
@@ -544,6 +578,8 @@ export class StreamView {
         const index = this.nextIndex - this.qLen;
         const r = this.qRead;
         const lost = Number.isNaN(this.queue[0]![r]!);
+        if (nowMs !== undefined && !Number.isNaN(this.queueAt[r]!))
+          this.delay.push(nowMs, nowMs - this.queueAt[r]!);
         if (index % p.packet === 0) {
           this.packets++;
           if (lost) this.lostPackets++;
@@ -572,9 +608,50 @@ export class StreamView {
     return this.impedances[c] ?? 0;
   }
 
-  /** A tick overran within the last DEGRADED_HOLD_MS. */
+  /**
+   * Pausing holds the queued samples; on resume their production times move
+   * forward by the pause, so a pause is not counted as display latency.
+   */
+  setRunning(running: boolean, nowMs: number) {
+    if (!running) {
+      this.pausedAt ??= nowMs;
+      return;
+    }
+    if (this.pausedAt === null) return;
+    const shift = nowMs - this.pausedAt;
+    this.pausedAt = null;
+    for (let i = 0; i < this.queueAt.length; i++) this.queueAt[i]! += shift;
+  }
+
+  /**
+   * Measured loop latency over the last LATENCY_WINDOW_MS: the worker's time
+   * per tick, the delay from a sample being produced to it being drawn, and
+   * how many samples a full playout buffer dropped before they were drawn.
+   */
+  loopLatency(nowMs: number): {
+    work: Percentiles | null;
+    delay: Percentiles | null;
+    dropped: number;
+  } {
+    return {
+      work: this.work.percentiles(nowMs),
+      delay: this.delay.percentiles(nowMs),
+      dropped: this.drops.sum(nowMs),
+    };
+  }
+
+  /**
+   * Degraded when a tick overran, or the display could not keep up, within the
+   * last DEGRADED_HOLD_MS; or when production-to-screen p95 is above its target
+   * over the window (once a second of samples has been drawn). The playout
+   * buffer caps that delay at about two ticks by dropping its oldest samples,
+   * so a display that falls behind shows first as dropped samples.
+   */
   degraded(nowMs: number): boolean {
-    return this.overrunAt !== null && nowMs - this.overrunAt < DEGRADED_HOLD_MS;
+    if (this.overrunAt !== null && nowMs - this.overrunAt < DEGRADED_HOLD_MS) return true;
+    if (this.dropAt !== null && nowMs - this.dropAt < DEGRADED_HOLD_MS) return true;
+    const d = this.delay.percentiles(nowMs);
+    return d !== null && d.n >= this.profile.sampleRate && d.p95 > LATENCY_TARGETS.p95Ms;
   }
 
   recent(c: number, seconds: number): Float32Array {

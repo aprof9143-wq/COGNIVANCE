@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEGRADED_HOLD_MS,
+  LATENCY_TARGETS,
   NO_FAULTS,
   PROFILES,
   SimStream,
@@ -166,5 +167,63 @@ describe("source health", () => {
     s.advance(1, NO_FAULTS);
     expect(s.health().bufferFill).toBe(0.42);
     expect(s.log.some((l) => l.text.includes("buffer_fill=0.42"))).toBe(true);
+  });
+});
+
+describe("measured loop latency", () => {
+  /**
+   * Ticks every TICK_MS stamped with their production time; frames every
+   * frameMs. Messages are handled between frames, as on a busy main thread,
+   * so a tick is received at the first frame after it was produced.
+   */
+  function timed(seconds: number, frameMs: number, pauses: [number, number][] = []) {
+    const p = new TickProducer(PROFILES.simulated, 9);
+    const v = new StreamView(PROFILES.simulated);
+    let nextTick = TICK_MS;
+    let paused = false;
+    for (let t = frameMs; t <= seconds * 1000; t += frameMs) {
+      const pause = pauses.some(([a, b]) => t >= a && t < b);
+      if (pause !== paused) {
+        paused = pause;
+        v.setRunning(!pause, t);
+      }
+      while (t >= nextTick) {
+        const at = nextTick;
+        v.receive({ ...p.tick(() => at, !paused, NO_FAULTS), producedAt: at }, t);
+        nextTick += TICK_MS;
+      }
+      if (!paused) v.play(frameMs / 1000, t);
+    }
+    return v;
+  }
+
+  it("measures production to screen at about one cadence in steady state", () => {
+    const v = timed(20, 16);
+    const { work, delay } = v.loopLatency(20_000);
+    expect(work!.n).toBeGreaterThan(70);
+    // Half a cadence of wait plus the drain of a tick: centred on ~250 ms.
+    expect(delay!.p50).toBeGreaterThan(200);
+    expect(delay!.p50).toBeLessThan(300);
+    expect(delay!.p95).toBeLessThan(400);
+    expect(v.degraded(20_000)).toBe(false);
+  });
+
+  it("does not count a pause as display latency", () => {
+    const v = timed(20, 16, [[5_000, 9_000]]);
+    expect(v.loopLatency(20_000).delay!.p95).toBeLessThan(400);
+    expect(v.degraded(20_000)).toBe(false);
+  });
+
+  it("shows DEGRADED when the display falls behind", () => {
+    // A main thread busy for 700 ms at a time: three ticks arrive at once and
+    // the two-tick buffer drops the oldest. The delay stays capped by the
+    // buffer, so the drops are what flag it.
+    const v = timed(20, 700);
+    const { delay, dropped } = v.loopLatency(20_000);
+    expect(dropped).toBeGreaterThan(0);
+    expect(delay!.p95).toBeLessThanOrEqual(LATENCY_TARGETS.p95Ms + TICK_MS);
+    expect(v.degraded(20_000)).toBe(true);
+    // Once frames are regular again, it clears after the hold.
+    expect(timed(20, 16).loopLatency(20_000).dropped).toBe(0);
   });
 });
