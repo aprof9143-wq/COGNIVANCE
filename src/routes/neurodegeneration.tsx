@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { hasSession } from "@/lib/session";
 import { NeuroDashboard } from "@/components/neuro/NeuroDashboard";
 
 export const Route = createFileRoute("/neurodegeneration")({
@@ -20,7 +21,7 @@ function Neuro() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (!localStorage.getItem("cognivance_session")) navigate({ to: "/auth" });
+    if (!hasSession()) navigate({ to: "/auth" });
     else setReady(true);
   }, [navigate]);
   if (!ready) return <div className="min-h-screen bg-[#0a0d12]" />;

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { MONTAGE_1020 } from "@/lib/montage";
-import type { Faults, SimStream } from "@/lib/nimbleSim";
+import type { Faults, StreamView } from "@/lib/nimbleSim";
 
 /**
  * The acquisition core, drawn as an instrument: a lattice sphere carrying the
@@ -15,7 +15,7 @@ export function CoreView({
   faults,
   selected,
 }: {
-  stream: React.RefObject<SimStream | null>;
+  stream: React.RefObject<StreamView | null>;
   faults: React.RefObject<Faults>;
   selected: React.RefObject<number>;
 }) {

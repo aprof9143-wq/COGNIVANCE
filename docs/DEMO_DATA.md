@@ -157,7 +157,9 @@ that needs a trained model.
 2. **Plug in the laptop.** Raymarching is GPU work; battery-saver modes throttle
    it and the rotation stutters.
 3. **Load both files once beforehand** to confirm they render on this machine.
-4. **Sign in first** — `/research` redirects to `/auth` without a session.
+4. **Enter the demo first** — `/research` redirects to `/auth` without a
+   session. **Enter Demo** there opens a read-only session for this tab: no
+   account, nothing saved, and it ends when the tab closes.
 
 ---
 
@@ -229,6 +231,44 @@ document. It needs no download: the anatomy ships in `public/sim/anatomy.bin.gz`
 5. **C · Benchmark → RUN ALL** (10 patients, about 45 s). Each virtual patient
    runs closed loop (PRISM enforced) and open loop (fixed protocol) with the
    same noise.
+
+**Loading a subject (optional)**
+
+**Load subject** in the header takes a T1 that is already registered to
+MNI152, for example fMRIPrep's `space-MNI152NLin2009cAsym` T1 and brain mask.
+It can also take an aseg resampled into the same space, and a `config.json`.
+Nothing is registered in the browser. Files that do not line up with MNI152
+are refused, and the error says so. You can select a whole derivatives folder:
+the loader keeps the T1, aseg and brain mask, and skips the rest with a note.
+
+- **From the T1:** the scalp. A skull-stripped T1 keeps the template's scalp.
+- **From the brain mask, or the aseg if there is no mask:** the brain surface
+  the array sits on.
+- **From the aseg:** the cortex view, and the hippocampus, amygdala,
+  thalamus, caudate, putamen and nucleus accumbens (meshes, centroids,
+  volumes).
+- **From the MNI152 atlases:** the cortical regions and the subthalamic and
+  lateral geniculate nuclei. They apply directly to a subject in MNI space.
+
+Every depth, placement, beam and plan margin is then recomputed on the
+subject. The subject chip's tooltip lists what came from the subject.
+**Template** goes back to MNI152. An example `config.json` (every key is
+optional):
+
+```json
+{
+  "subject_id": "sub-01",
+  "age": 71,
+  "sex": "F",
+  "target_regions": ["amygdala", "vmpfc"],
+  "array": { "frequency_mhz": 7.5, "pitch_mm": 0.3 }
+}
+```
+
+`target_regions` replaces every programme's targets while the subject is
+loaded. Only the ten simulated regions can be targets; the eight regions the
+Depth & localisation panel marks NOT SIMULATED are shown and measured only.
+`array` sets the starting design; elements stay 16 × 16.
 
 **What the numbers are, and are not**
 

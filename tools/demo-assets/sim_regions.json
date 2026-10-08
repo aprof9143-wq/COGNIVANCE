@@ -1,0 +1,185 @@
+{
+  "description": "Regions of the Simulation Window (/simulation) and the atlas labels each one is built from. Read by build_sim_anatomy.py, which writes the meshes (public/sim/anatomy.bin.gz) and the label map (public/sim/regions.nii.gz). Region centroids, hemisphere centroids and volumes are not stored anywhere: the page computes them from the label map when it loads. Regions with \"simulated\": false are shown and measured (depth, placement) but are not nodes of the oscillator network in src/lib/sim/neural.ts, which has no coupling data for them, so they cannot be stimulation targets.",
+  "space": "MNI152NLin2009cAsym, 1 mm, RAS (TemplateFlow)",
+  "atlases": {
+    "aseg": {
+      "file": "tpl-MNI152NLin2009cAsym_res-01_seg-aseg_dseg.nii.gz",
+      "labels": "FreeSurfer colour-table IDs",
+      "licence": "MNI/McGill permissive notice (public/templates/NOTICE.md)"
+    },
+    "massp": {
+      "file": "tpl-MNI152NLin2009cAsym_res-01_atlas-MASSP20_dseg.nii.gz",
+      "labels": "MASSP label IDs",
+      "licence": "Not confirmed — see public/sim/NOTICE.md"
+    },
+    "schaefer2018": {
+      "file": "tpl-MNI152NLin2009cAsym_res-01_atlas-Schaefer2018_desc-400Parcels17Networks_dseg.nii.gz",
+      "labels": "Parcel names from CBIG's Schaefer2018_400Parcels_17Networks_order.txt, matched by network and anatomical tag (e.g. VisPeri_StriCal matches 17Networks_LH_VisPeri_StriCal_1)",
+      "licence": "MIT (Computational Brain Imaging Group) — see public/sim/NOTICE.md"
+    }
+  },
+  "regions": [
+    {
+      "key": "hippocampus",
+      "name": "Hippocampus",
+      "colour": "#f2b33d",
+      "atlas": "aseg",
+      "labels": [17, 53]
+    },
+    {
+      "key": "amygdala",
+      "name": "Amygdala",
+      "colour": "#e8608a",
+      "atlas": "aseg",
+      "labels": [18, 54]
+    },
+    {
+      "key": "thalamus",
+      "name": "Thalamus",
+      "colour": "#7fa7d9",
+      "atlas": "aseg",
+      "labels": [10, 49]
+    },
+    {
+      "key": "stn",
+      "name": "Subthalamic nucleus",
+      "colour": "#ff7f6b",
+      "atlas": "massp",
+      "labels": [3, 4]
+    },
+    {
+      "key": "v1",
+      "name": "Primary visual cortex (V1)",
+      "colour": "#7b4fe0",
+      "atlas": "schaefer2018",
+      "parcels": ["VisCent_Striate", "VisPeri_StriCal"],
+      "rationale": "The parcels Schaefer labels striate (calcarine) cortex, which is V1 by definition.",
+      "replaces": "Harvard-Oxford intracalcarine + supracalcarine cortex + occipital pole"
+    },
+    {
+      "key": "dlpfc",
+      "name": "Dorsolateral PFC",
+      "colour": "#3fb6ff",
+      "atlas": "schaefer2018",
+      "parcels": ["ContA_PFCl", "ContA_PFCd", "ContB_PFCld"],
+      "rationale": "Lateral and dorsal prefrontal parcels of the frontoparietal control networks; the closest overlap with the middle frontal gyrus of the parcel groups tried.",
+      "replaces": "Harvard-Oxford middle frontal gyrus"
+    },
+    {
+      "key": "vmpfc",
+      "name": "Ventromedial PFC",
+      "colour": "#41d3c2",
+      "atlas": "schaefer2018",
+      "parcels": ["LimbicB_OFC", "DefaultA_PFCm"],
+      "rationale": "Medial orbitofrontal (limbic B) and medial prefrontal (default A) parcels. Schaefer has no vmPFC parcel; together these cover medial OFC, subgenual and pregenual cortex, and also reach into dorsomedial PFC.",
+      "replaces": "Harvard-Oxford frontal medial cortex"
+    },
+    {
+      "key": "insula",
+      "name": "Insula",
+      "colour": "#c58cff",
+      "atlas": "schaefer2018",
+      "parcels": ["SalVentAttnA_Ins", "SalVentAttnB_Ins", "SomMotB_Ins"],
+      "rationale": "Every parcel Schaefer labels insular, across the three networks that reach the insula.",
+      "replaces": "Harvard-Oxford insular cortex"
+    },
+    {
+      "key": "auditory",
+      "name": "Auditory cortex",
+      "colour": "#2ec4b6",
+      "atlas": "schaefer2018",
+      "parcels": ["SomMotB_Aud"],
+      "rationale": "The parcels Schaefer labels auditory. They cover Heschl's gyrus and the surrounding superior temporal cortex, so the region is larger than primary auditory cortex.",
+      "replaces": "Harvard-Oxford Heschl's gyrus"
+    },
+    {
+      "key": "motor",
+      "name": "Sensorimotor cortex (M1/S1)",
+      "colour": "#8be15b",
+      "atlas": "schaefer2018",
+      "parcels": ["SomMotA", "SomMotB_Cent"],
+      "rationale": "Schaefer's somatomotor parcels around the central sulcus. Network parcels do not separate precentral (M1) from postcentral (S1) cortex, so the region is named for both.",
+      "replaces": "Harvard-Oxford precentral gyrus"
+    },
+    {
+      "key": "caudate",
+      "name": "Caudate nucleus",
+      "colour": "#c4975f",
+      "atlas": "aseg",
+      "labels": [11, 50],
+      "simulated": false
+    },
+    {
+      "key": "putamen",
+      "name": "Putamen",
+      "colour": "#d07ad0",
+      "atlas": "aseg",
+      "labels": [12, 51],
+      "simulated": false,
+      "overlap": "yield",
+      "rationale": "The aseg putamen labels. 14 of their voxels are also Schaefer insula; the insula keeps them."
+    },
+    {
+      "key": "accumbens",
+      "name": "Nucleus accumbens",
+      "colour": "#e9df74",
+      "atlas": "aseg",
+      "labels": [26, 58],
+      "simulated": false,
+      "overlap": "yield",
+      "rationale": "The aseg accumbens labels. 14 of their voxels are also Schaefer vmPFC; the vmPFC keeps them."
+    },
+    {
+      "key": "lgn",
+      "name": "Lateral geniculate nucleus",
+      "colour": "#f59a6b",
+      "atlas": "massp",
+      "labels": [60, 61],
+      "simulated": false,
+      "overlap": "yield",
+      "rationale": "MASSP's lateral geniculate labels. 15 of their voxels are also aseg hippocampus; the hippocampus keeps them.",
+      "stands_for": "Julich-Brain LGB (metathalamus)"
+    },
+    {
+      "key": "vis_dorsal",
+      "name": "Dorsal extrastriate visual cortex",
+      "colour": "#a487f2",
+      "atlas": "schaefer2018",
+      "parcels": ["VisPeri_ExStrSup"],
+      "simulated": false,
+      "rationale": "Schaefer's superior extrastriate parcels, above the calcarine sulcus: on Harvard-Oxford (used only to check), 38 % cuneus, 15 % superior lateral occipital, 13 % occipital pole, 10 % precuneus. Network parcels do not follow retinotopic borders, so V3d is inside this region but not separated from V2d and V3A.",
+      "stands_for": "Julich-Brain hOc3d (V3d)"
+    },
+    {
+      "key": "vis_ventral",
+      "name": "Ventral extrastriate visual cortex",
+      "colour": "#5b63d8",
+      "atlas": "schaefer2018",
+      "parcels": ["VisPeri_ExStrInf"],
+      "simulated": false,
+      "overlap": "yield",
+      "rationale": "Schaefer's inferior extrastriate parcels, below the calcarine sulcus: on Harvard-Oxford (used only to check), 80 % lingual gyrus, 11 % temporal-occipital fusiform. This is mostly ventral V2/V3 territory; hV4 on the posterior fusiform gyrus is only partly inside. 33 of its voxels are also aseg hippocampus; the hippocampus keeps them.",
+      "stands_for": "Julich-Brain hOc4v (V4v)"
+    },
+    {
+      "key": "ifg",
+      "name": "Inferior frontal gyrus (incl. Broca's area)",
+      "colour": "#f0a04a",
+      "atlas": "schaefer2018",
+      "parcels": ["SalVentAttnA_FrOper", "DefaultB_PFCv", "ContA_PFClv"],
+      "simulated": false,
+      "rationale": "The Schaefer parcel groups with the best overlap (Dice 0.45) with Harvard-Oxford's IFG pars triangularis + opercularis, of every combination of the ventrolateral frontal groups. On Harvard-Oxford (used only to check): 33 % pars triangularis + opercularis, 22 % frontal orbital (which holds pars orbitalis), 16 % frontal pole, 9 % central operculum. Areas 44 and 45 cannot be told apart in Schaefer, so they are one region.",
+      "stands_for": "Julich-Brain Area 44 and Area 45 (IFG)"
+    },
+    {
+      "key": "smg",
+      "name": "Anterior supramarginal gyrus",
+      "colour": "#4fd18b",
+      "atlas": "schaefer2018",
+      "parcels": ["SalVentAttnA_ParOper"],
+      "simulated": false,
+      "rationale": "The Schaefer parcel group with the best overlap (Dice 0.39) with Harvard-Oxford's anterior supramarginal gyrus, where PFt lies, of every combination of the inferior parietal groups. On Harvard-Oxford (used only to check): 37 % anterior and 14 % posterior supramarginal gyrus, 28 % parietal operculum.",
+      "stands_for": "Julich-Brain Area PFt (IPL)"
+    }
+  ]
+}

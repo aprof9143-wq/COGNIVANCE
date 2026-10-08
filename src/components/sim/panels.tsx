@@ -1,12 +1,26 @@
-import { useEffect, useRef } from "react";
-import { Check, Cpu, ShieldAlert, ShieldCheck, Sparkles, X, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, ChevronDown, Cpu, ShieldAlert, ShieldCheck, Sparkles, X, Zap } from "lucide-react";
 import { wavelengthM, type ArrayDesign } from "@/lib/sim/acoustics";
 import type { Circuit, Net } from "@/lib/sim/autoconnect";
 import type { CohortResult } from "@/lib/sim/benchmark";
 import type { Disease } from "@/lib/sim/diseases";
 import { FREQUENCIES_MHZ, PITCH_WAVELENGTHS } from "@/lib/sim/design";
 import { deliverable, type LoopEvent, type TargetBeam } from "@/lib/sim/loop";
-import { REGION_INDEX, type Recorder } from "@/lib/sim/neural";
+import { REGION_INDEX, type Recorder, type RegionKey } from "@/lib/sim/neural";
+import type { Percentiles } from "@/lib/rolling";
+import { NOT_MODELLED, type TargetPlan } from "@/lib/sim/plan";
+import {
+  AMYGDALA_SCALP_RANGE_MM,
+  DEEP_SOURCE_ERROR,
+  isGated,
+  isSimulated,
+  NOT_INCLUDED,
+  REFS,
+  STANDS_FOR,
+  type AnyRegionKey,
+  type Reference,
+  type RegionDepth,
+} from "@/lib/sim/regions";
 import { COMPONENTS, LAYER_LABEL, LAYER_ORDER, SAFETY_LIMITS } from "@/lib/sim/specs";
 
 /* ------------------------------------------------------------------ shell */
@@ -258,6 +272,7 @@ export function DesignPanel({
   onAuto,
   autoProgress,
   autoNote,
+  source,
 }: {
   design: ArrayDesign;
   beams: TargetBeam[];
@@ -265,13 +280,18 @@ export function DesignPanel({
   onAuto: () => void;
   autoProgress: number | null;
   autoNote: string | null;
+  /** Where a non-spec design came from, when not auto-design (e.g. a subject's config.json). */
+  source?: string | undefined;
 }) {
   const fMhz = design.frequencyHz / 1e6;
   const lam = wavelengthM(design.frequencyHz);
   const pitchLam = design.pitchM / lam;
   const isSpec = fMhz === 15;
   return (
-    <SimPanel title="ECHO array design" meta={isSpec ? "doc spec · 15 MHz" : "auto-designed"}>
+    <SimPanel
+      title="ECHO array design"
+      meta={isSpec ? "doc spec · 15 MHz" : (source ?? "auto-designed")}
+    >
       <div className="grid grid-cols-2 gap-2">
         <label className="flex flex-col gap-1 text-[0.6rem] uppercase tracking-[0.12em] text-[#8095bf]">
           Frequency
@@ -431,7 +451,14 @@ export function PipelineStrip({ stage, ev }: { stage: string | null; ev: LoopEve
 
 /* --------------------------------------------------------- instruments */
 
-export function LatencyPanel({ ev }: { ev: LoopEvent | null }) {
+export function LatencyPanel({
+  ev,
+  rolling = null,
+}: {
+  ev: LoopEvent | null;
+  /** Measured over the last 60 s of wall time. */
+  rolling?: { predict: Percentiles | null; total: Percentiles | null } | null;
+}) {
   const target = 15;
   const total = ev?.latencyMs ?? 0;
   return (
@@ -471,6 +498,40 @@ export function LatencyPanel({ ev }: { ev: LoopEvent | null }) {
             The spec budgets alone (ASIC &lt; 10 ms + PRISM &lt; 5 ms) already use the 15 ms target;
             prediction time is measured here, in this browser.
           </p>
+          {rolling?.total ? (
+            <div className="mt-2 border-t border-[#0e2247] pt-1.5 font-mono text-[0.6rem]">
+              <p className="text-[#5e719a]">
+                MEASURED · 60 S ROLLING WINDOW · {rolling.total.n} LOOPS
+              </p>
+              <div className="mt-1 grid grid-cols-[minmax(0,1fr)_4.2rem_4.2rem] gap-x-2 gap-y-0.5">
+                <span />
+                <span className="text-right text-[#5e719a]">p50</span>
+                <span className="text-right text-[#5e719a]">p95</span>
+                {(
+                  [
+                    ["Predict", rolling.predict, null],
+                    ["Sense → write-back", rolling.total, target],
+                  ] as [string, Percentiles | null, number | null][]
+                ).map(([label, q, limit]) => (
+                  <div key={label} className="contents">
+                    <span className="text-[#8095bf]">{label}</span>
+                    {[q?.p50, q?.p95].map((v, i) => (
+                      <span
+                        key={i}
+                        className={`text-right ${
+                          v !== undefined && limit !== null && v > limit
+                            ? "text-[#f0d08a]"
+                            : "text-[#e6efff]"
+                        }`}
+                      >
+                        {v === undefined ? "—" : `${v.toFixed(2)} ms`}
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </>
       ) : (
         <p className="text-[0.66rem] text-[#8095bf]">Waiting for the first loop…</p>
@@ -570,6 +631,371 @@ export function BeamPanel({ beams, ev }: { beams: TargetBeam[]; ev: LoopEvent | 
           );
         })}
       </div>
+    </SimPanel>
+  );
+}
+
+const Cite = ({ refs }: { refs: Reference[] }) => (
+  <span className="text-[#8095bf]">({refs.map((r) => r.cite).join("; ")})</span>
+);
+
+/** Which anatomy the depths were measured on, when a subject is loaded. */
+export type DepthSubject = { label: string; scalp: boolean; brain: boolean } | null;
+
+/** Why a deep target is gated, with this region's own measured depths. */
+function GatedExplanation({
+  d,
+  name,
+  subject,
+}: {
+  d: RegionDepth;
+  name: string;
+  subject: DepthSubject;
+}) {
+  const scalp = !subject
+    ? "the scalp of this template"
+    : subject.scalp
+      ? "this subject's scalp"
+      : "the template's scalp (the subject's T1 is skull-stripped)";
+  const brain = !subject || subject.brain ? "the brain surface" : "the template's brain surface";
+  const sources: Reference[] = [
+    REFS.rushDriscoll1968,
+    REFS.oostendorp2000,
+    REFS.pascualMarqui2007,
+    REFS.cuffin2001,
+    REFS.akalinAcar2013,
+    ...(d.region === "amygdala" ? [REFS.neurosity] : []),
+  ];
+  return (
+    <div className="mt-2 border-t border-[#0e2247] pt-2 text-[0.6rem] leading-relaxed text-[#c4d2ee]">
+      <p>
+        {name} sits {fmt(d.belowScalpMm, 1)} mm below {scalp} and {fmt(d.belowBrainMm, 1)} mm below{" "}
+        {brain}, measured here from its centroid in MNI152 space. The skull conducts far less than
+        brain — a brain-to-skull conductivity ratio of about 80 in early tank measurements and about
+        15 measured in vivo <Cite refs={[REFS.rushDriscoll1968, REFS.oostendorp2000]} /> — so it
+        smears and attenuates what reaches scalp electrodes. Source imaging projects scalp
+        potentials back into the brain through a head model; eLORETA&apos;s weighting localises a
+        single test source without bias in principle, at low spatial resolution{" "}
+        <Cite refs={[REFS.pascualMarqui2007]} />. In practice the error grows with depth: 12.8 ± 6.2
+        mm for inferior against 9.2 ± 4.4 mm for superior sources implanted in patients{" "}
+        <Cite refs={[REFS.cuffin2001]} />, and about 20 mm at the most basal locations even with
+        individual four-layer head models, where a wrong skull conductivity alone gave errors up to
+        31 mm <Cite refs={[REFS.akalinAcar2013]} />. A scalp-EEG estimate here needs
+        cross-validation against fMRI or intracranial EEG before clinical use; this simulation
+        senses with a cortical-surface mesh, not scalp EEG.
+      </p>
+      <ol className="mt-1.5 list-decimal pl-4 text-[0.56rem] text-[#8095bf]">
+        {sources.map((r) => (
+          <li key={r.cite}>
+            {r.url ? (
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#9cc7ff] hover:text-[#e6efff]"
+              >
+                {r.cite}
+              </a>
+            ) : (
+              <span className="text-[#c4d2ee]">{r.cite}</span>
+            )}{" "}
+            — {r.title}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+export function DepthPanel({
+  depths,
+  all = [],
+  name,
+  targets,
+  subject = null,
+}: {
+  depths: RegionDepth[];
+  /** Every region of the anatomy, for the "All regions" table. */
+  all?: RegionDepth[];
+  name: (k: AnyRegionKey) => string;
+  targets: RegionKey[];
+  subject?: DepthSubject;
+}) {
+  const [open, setOpen] = useState<AnyRegionKey | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const mni = (v: [number, number, number]) => v.map((x) => x.toFixed(0)).join(", ");
+  return (
+    <SimPanel title="Depth & localisation" meta="MNI152 · computed">
+      {depths.length ? (
+        <div className="flex flex-col gap-2">
+          {depths.map((d) => {
+            const rows: [string, string][] = [
+              [`MNI (${d.side === "left" ? "L" : "R"} centroid)`, mni(d.mni)],
+              ["Below scalp", `${fmt(d.belowScalpMm, 1)} mm`],
+              ...(d.region === "amygdala"
+                ? ([
+                    [
+                      "Published (scalp)",
+                      `${AMYGDALA_SCALP_RANGE_MM[0]}–${AMYGDALA_SCALP_RANGE_MM[1]} mm`,
+                    ],
+                  ] as [string, string][])
+                : []),
+              ["Below brain surface", `${fmt(d.belowBrainMm, 1)} mm`],
+              ["Scalp-EEG reach", "No · deep source"],
+              ["Scalp-EEG error", "≈ 13–20 mm"],
+            ];
+            const isOpen = open === d.region;
+            return (
+              <div
+                key={d.region}
+                className="rounded-md border border-[#0e2247] bg-[#030b20]/70 p-2"
+              >
+                <div className="mb-1 flex items-center justify-between gap-2 text-[0.7rem]">
+                  <span className="truncate text-[#e6efff]">{name(d.region)}</span>
+                  <span className="flex shrink-0 items-center gap-1">
+                    {isSimulated(d.region) && targets.includes(d.region) ? (
+                      <span className="rounded border border-[#3d8bf5]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#9cc7ff]">
+                        TARGET
+                      </span>
+                    ) : null}
+                    <span className="rounded border border-[#d9a441]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#f0d08a]">
+                      GATED
+                    </span>
+                  </span>
+                </div>
+                <dl className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[0.6rem]">
+                  {rows.map(([k, v]) => (
+                    <div key={k} className="contents">
+                      <dt className="text-[#8095bf]">{k}</dt>
+                      <dd
+                        className="text-right font-mono text-[#e6efff]"
+                        title={
+                          k === "Scalp-EEG error"
+                            ? `${DEEP_SOURCE_ERROR.value} — ${DEEP_SOURCE_ERROR.refs.map((r) => r.cite).join("; ")}`
+                            : k === "Published (scalp)"
+                              ? REFS.neurosity.cite
+                              : undefined
+                        }
+                      >
+                        {v}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : d.region)}
+                  aria-expanded={isOpen}
+                  className="mt-1.5 flex items-center gap-1 text-[0.6rem] text-[#7fd8ff] hover:text-[#e6efff]"
+                >
+                  Why gated
+                  <ChevronDown
+                    className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {isOpen ? <GatedExplanation d={d} name={name(d.region)} subject={subject} /> : null}
+              </div>
+            );
+          })}
+          {all.length ? (
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowAll(!showAll)}
+                aria-expanded={showAll}
+                className="flex items-center gap-1 text-[0.6rem] text-[#7fd8ff] hover:text-[#e6efff]"
+              >
+                All regions · {all.length}
+                <ChevronDown
+                  className={`h-3 w-3 transition-transform ${showAll ? "rotate-180" : ""}`}
+                />
+              </button>
+              {showAll ? (
+                <div className="mt-1.5 flex flex-col gap-2">
+                  <table className="w-full border-collapse text-[0.6rem]">
+                    <thead>
+                      <tr className="text-[#5e719a]">
+                        <th className="py-0.5 text-left font-normal">Region</th>
+                        <th className="py-0.5 pl-1 text-right font-normal">Scalp</th>
+                        <th className="py-0.5 pl-1 text-right font-normal">Brain</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {all.map((d) => {
+                        const stands = STANDS_FOR[d.region];
+                        return (
+                          <tr
+                            key={d.region}
+                            className="border-t border-[#0e2247]"
+                            title={`MNI ${mni(d.mni)} (${d.side === "left" ? "L" : "R"} centroid)${
+                              stands ? ` · stands in for ${stands}` : ""
+                            }`}
+                          >
+                            <td className="py-1 text-[#c4d2ee]">
+                              <span className="flex flex-wrap items-center gap-1">
+                                <span className="text-[#e6efff]">{name(d.region)}</span>
+                                {isGated(d.region) ? (
+                                  <span className="rounded border border-[#d9a441]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#f0d08a]">
+                                    GATED
+                                  </span>
+                                ) : null}
+                                {isSimulated(d.region) ? null : (
+                                  <span className="rounded border border-[#16305e] px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#8095bf]">
+                                    NOT SIMULATED
+                                  </span>
+                                )}
+                              </span>
+                              {stands ? (
+                                <span className="block text-[0.56rem] text-[#8095bf]">
+                                  for {stands}
+                                </span>
+                              ) : null}
+                            </td>
+                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[#e6efff]">
+                              {fmt(d.belowScalpMm, 1)}
+                            </td>
+                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[#e6efff]">
+                              {fmt(d.belowBrainMm, 1)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div className="rounded-md border border-dashed border-[#16305e] p-2 text-[0.6rem]">
+                    <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#5e719a]">
+                      Not included
+                    </p>
+                    {NOT_INCLUDED.map((n) => (
+                      <p key={n.name} className="text-[#8095bf]">
+                        <span className="text-[#c4d2ee]">{n.name}</span> — {n.reason}
+                      </p>
+                    ))}
+                  </div>
+                  <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+                    Depth in mm below the scalp and below the brain surface, from each region&apos;s
+                    left centroid. Not simulated: shown and measured, but not part of the network
+                    model (it has no coupling data for them), so not a target. &quot;For&quot; names
+                    the area a broader atlas region stands in for.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+            Gated: deep regions that scalp EEG cannot localise precisely.{" "}
+            {subject
+              ? `Depths are measured on ${subject.label} from each region's centroid${
+                  subject.scalp ? "" : "; the scalp is the template's (skull-stripped T1)"
+                }${subject.brain ? "" : "; the brain surface is the template's (no aseg or mask)"}.`
+              : "Depths are measured on the MNI152 template from each region's centroid; they describe the template, not a patient."}
+          </p>
+        </div>
+      ) : (
+        <p className="text-[0.66rem] text-[#8095bf]">Waiting for the anatomy…</p>
+      )}
+    </SimPanel>
+  );
+}
+
+/** Placement and safety margins of every target, at full drive, before the loop runs. */
+export function PlanPanel({
+  plans,
+  name,
+}: {
+  plans: TargetPlan[];
+  name: (k: RegionKey) => string;
+}) {
+  const failed = plans.filter((p) => !p.pass).length;
+  const v3 = (v: [number, number, number], d: number) => v.map((x) => x.toFixed(d)).join(", ");
+  return (
+    <SimPanel
+      title="Placement & plan"
+      meta={
+        plans.length ? (failed ? `${failed} target${failed > 1 ? "s" : ""} fail` : "all pass") : "—"
+      }
+      action={
+        plans.length ? (
+          failed ? (
+            <ShieldAlert className="h-4 w-4 text-[#ff4b5c]" />
+          ) : (
+            <ShieldCheck className="h-4 w-4 text-[#41e0a2]" />
+          )
+        ) : null
+      }
+    >
+      {plans.length ? (
+        <div className="flex flex-col gap-2">
+          {plans.map((p) => (
+            <div key={p.region} className="rounded-md border border-[#0e2247] bg-[#030b20]/70 p-2">
+              <p className="mb-1 flex items-center justify-between text-[0.7rem]">
+                <span className="text-[#e6efff]">{name(p.region)}</span>
+                <span
+                  className={`font-mono text-[0.56rem] ${p.pass ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                >
+                  {p.pass ? "PASS" : "FAIL"}
+                </span>
+              </p>
+              <dl className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[0.6rem]">
+                {(
+                  [
+                    ["Array centre (MNI)", v3(p.centre, 1)],
+                    ["Normal", v3(p.normal, 2)],
+                    ["Array → target", `${fmt(p.depthMm, 1)} mm`],
+                  ] as [string, string][]
+                ).map(([k, v]) => (
+                  <div key={k} className="contents">
+                    <dt className="text-[#8095bf]">{k}</dt>
+                    <dd className="text-right font-mono text-[#e6efff]">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <table className="mt-1.5 w-full border-collapse text-[0.6rem]">
+                <tbody>
+                  {p.margins.map((m) => (
+                    <tr key={m.key} className="border-t border-[#0e2247]" title={m.basis}>
+                      <td className="py-1 text-[#c4d2ee]">{m.label}</td>
+                      <td className="whitespace-nowrap py-1 pl-1 text-right font-mono text-[#e6efff]">
+                        {fmt(m.value, m.digits)} / {fmt(m.limit, m.digits)}
+                        {m.unit ? ` ${m.unit}` : ""}
+                      </td>
+                      <td
+                        className={`whitespace-nowrap py-1 pl-1 text-right font-mono ${m.pass ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                      >
+                        {m.pass ? `${Math.round(m.margin * 100)} %` : "over"}
+                      </td>
+                      <td className="py-1 pl-1 text-right">
+                        {m.pass ? (
+                          <Check className="ml-auto h-3 w-3 text-[#41e0a2]" />
+                        ) : (
+                          <X className="ml-auto h-3 w-3 text-[#ff4b5c]" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+          <div className="rounded-md border border-dashed border-[#16305e] p-2 text-[0.6rem]">
+            <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#5e719a]">
+              Not modelled
+            </p>
+            {NOT_MODELLED.map((n) => (
+              <p key={n.label} className="text-[#8095bf]">
+                <span className="text-[#c4d2ee]">{n.label}</span> — {n.reason}
+              </p>
+            ))}
+          </div>
+          <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+            Value / limit and headroom at full drive, from the same physics and limits PRISM
+            enforces. The plan is the worst case before the loop runs; PRISM still checks every
+            intent.
+          </p>
+        </div>
+      ) : (
+        <p className="text-[0.66rem] text-[#8095bf]">Waiting for the anatomy…</p>
+      )}
     </SimPanel>
   );
 }

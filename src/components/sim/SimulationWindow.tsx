@@ -16,6 +16,7 @@ import {
   ScanLine,
   ShieldAlert,
   Sparkles,
+  Upload,
   Waves,
 } from "lucide-react";
 import { DEFAULT_ARRAY, type ArrayDesign } from "@/lib/sim/acoustics";
@@ -33,15 +34,35 @@ import { autoDesign } from "@/lib/sim/design";
 import { DISEASES, diseaseByKey, type DiseaseKey } from "@/lib/sim/diseases";
 import { CircuitSim, computeBeams, deliverable, type LoopEvent, type Stage } from "@/lib/sim/loop";
 import { plasticityIndex, REGION_INDEX, REGIONS, type RegionKey } from "@/lib/sim/neural";
+import { RollingWindow, type Percentiles } from "@/lib/rolling";
+import { planTarget } from "@/lib/sim/plan";
+import {
+  allRegionDepths,
+  GATED_REGIONS,
+  isSimulated,
+  regionDepth,
+  type RegionDepth,
+} from "@/lib/sim/regions";
+import {
+  composeSubject,
+  subjectRef,
+  type Subject,
+  type SubjectFile,
+  type SubjectParts,
+} from "@/lib/sim/subject";
+import type { SubjectReply, SubjectRequest } from "@/lib/sim/subject.worker";
 import { COMPONENTS } from "@/lib/sim/specs";
+import { endSession } from "@/lib/session";
 import {
   BeamPanel,
   BenchmarkPanel,
+  DepthPanel,
   DesignPanel,
   LatencyPanel,
   LibraryPanel,
   NetlistPanel,
   PipelineStrip,
+  PlanPanel,
   PrismPanel,
   ScopePanel,
 } from "./panels";
@@ -95,6 +116,8 @@ type Hud = {
   verified: number;
   halts: number;
   modelS: number;
+  /** Measured over the last 60 s of wall time. */
+  rolling: { predict: Percentiles | null; total: Percentiles | null } | null;
 };
 
 const EMPTY_HUD: Hud = {
@@ -105,6 +128,7 @@ const EMPTY_HUD: Hud = {
   verified: 0,
   halts: 0,
   modelS: 0,
+  rolling: null,
 };
 
 export function SimulationWindow() {
@@ -117,6 +141,12 @@ export function SimulationWindow() {
   const built = useRef<{ circuit: Circuit; design: ArrayDesign } | null>(null);
 
   const [anatomy, setAnatomy] = useState<Anatomy | null>(null);
+  /** The MNI152 template, kept to go back to after a subject. */
+  const templateRef = useRef<Anatomy | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [subject, setSubject] = useState<Subject | null>(null);
+  const [subjectStep, setSubjectStep] = useState<string | null>(null);
+  const [subjectError, setSubjectError] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>("loading");
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("assemble");
@@ -143,11 +173,28 @@ export function SimulationWindow() {
   const [patients, setPatients] = useState(10);
   const [benchAuto, setBenchAuto] = useState(true);
 
-  const disease = diseaseByKey(diseaseKey);
-  const design = designs[diseaseKey] ?? DEFAULT_ARRAY;
+  // A subject's config.json can set the target regions and the array geometry.
+  const subjectTargets = subject?.config.target_regions;
+  const withTargets = useCallback(
+    (key: DiseaseKey) => {
+      const d = diseaseByKey(key);
+      return subjectTargets ? { ...d, targets: subjectTargets } : d;
+    },
+    [subjectTargets],
+  );
+  const disease = useMemo(() => withTargets(diseaseKey), [withTargets, diseaseKey]);
+  const baseDesign = useMemo<ArrayDesign>(() => {
+    const a = subject?.config.array;
+    return {
+      ...DEFAULT_ARRAY,
+      ...(a?.frequency_mhz ? { frequencyHz: a.frequency_mhz * 1e6 } : {}),
+      ...(a?.pitch_mm ? { pitchM: a.pitch_mm / 1000 } : {}),
+    };
+  }, [subject]);
+  const design = designs[diseaseKey] ?? baseDesign;
 
   const signOut = () => {
-    localStorage.removeItem("cognivance_session");
+    endSession();
     navigate({ to: "/auth" });
   };
 
@@ -177,8 +224,23 @@ export function SimulationWindow() {
   const circuit = useMemo(() => autoConnect({ components: [...enabled] }), [enabled]);
   const fullCircuit = useMemo(() => autoConnect(FULL_TOPOLOGY), []);
   const blocked = circuit.drc.filter((d) => d.severity === "error");
+  const plans = useMemo(
+    () => beams.map((b) => planTarget(b, design, circuit.power.dutyLimit)),
+    [beams, design, circuit],
+  );
   const unreachable = beams.filter((b) => !deliverable(b));
   const regionName = (k: string) => anatomy?.meshes.get(k)?.name ?? k;
+  // Cards for the network's gated targets; every region goes in the table.
+  const gatedDepths = useMemo(
+    () =>
+      anatomy
+        ? GATED_REGIONS.filter(isSimulated)
+            .map((k) => regionDepth(anatomy, k))
+            .filter((d): d is RegionDepth => d !== null)
+        : [],
+    [anatomy],
+  );
+  const allDepths = useMemo(() => (anatomy ? allRegionDepths(anatomy) : []), [anatomy]);
 
   /* ------------------------------------------------------- lifecycle */
 
@@ -199,7 +261,7 @@ export function SimulationWindow() {
     loadAnatomy()
       .then((an) => {
         if (cancelled) return;
-        scene.setAnatomy(an);
+        templateRef.current = an;
         setAnatomy(an);
       })
       .catch((e: unknown) => {
@@ -212,6 +274,11 @@ export function SimulationWindow() {
       sceneRef.current = null;
     };
   }, []);
+
+  // The scene shows whichever anatomy is current: the template or a subject.
+  useEffect(() => {
+    if (anatomy) sceneRef.current?.setAnatomy(anatomy);
+  }, [anatomy]);
 
   // Build and assemble the implant whenever the programme changes (or on request).
   useEffect(() => {
@@ -325,6 +392,10 @@ export function SimulationWindow() {
     let verified = 0;
     let halts = 0;
     let owner: CircuitSim | null = null;
+    // The browser measures the predict step; the total adds the spec budgets
+    // and acoustic time of flight (see LoopEvent.stages).
+    const predictWin = new RollingWindow(60_000);
+    const totalWin = new RollingWindow(60_000);
 
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
@@ -339,6 +410,8 @@ export function SimulationWindow() {
         t = 0;
         endpoints.length = 0;
         loops = verified = halts = 0;
+        predictWin.clear();
+        totalWin.clear();
       }
       if (!sim) {
         scene.setLoop({
@@ -361,6 +434,8 @@ export function SimulationWindow() {
           if (ev) t -= period;
           prev = ev;
           ev = sim.iterate();
+          predictWin.push(now, ev.stages.find((x) => x.stage === "PREDICT")?.ms ?? 0);
+          totalWin.push(now, ev.latencyMs);
           loops++;
           if (ev.halted) halts++;
           else if (ev.delivered.length) verified++;
@@ -404,6 +479,7 @@ export function SimulationWindow() {
           verified,
           halts,
           modelS: ev.tS,
+          rolling: { predict: predictWin.percentiles(now), total: totalWin.percentiles(now) },
         });
       }
     };
@@ -445,9 +521,9 @@ export function SimulationWindow() {
     setBenchRunning(true);
     try {
       for (const key of keys) {
-        const d = diseaseByKey(key as DiseaseKey);
+        const d = withTargets(key as DiseaseKey);
         const pl = placementsFor(d.targets);
-        let des = designs[d.key] ?? DEFAULT_ARRAY;
+        let des = designs[d.key] ?? baseDesign;
         if (benchAuto && !designs[d.key]) {
           setBenchProgress({ disease: `${d.name} · auto-design`, done: 0, total: 1 });
           const best = await autoDesign(pl);
@@ -478,6 +554,7 @@ export function SimulationWindow() {
           };
           const req: BenchRequest = {
             disease: d.key,
+            ...(subjectTargets ? { targets: subjectTargets } : {}),
             design: des,
             placements: pl,
             dutyLimit: fullCircuit.power.dutyLimit,
@@ -495,6 +572,80 @@ export function SimulationWindow() {
       setBenchProgress(null);
     }
   };
+
+  /** Build a subject from MNI-space files in a worker and show it in place of the template. */
+  const loadSubject = async (list: FileList | null) => {
+    const template = templateRef.current;
+    if (!list?.length || !template) return;
+    setSubjectError(null);
+    setSubjectStep("Reading files");
+    try {
+      const files: SubjectFile[] = await Promise.all(
+        [...list].map(async (f) => ({ name: f.name, buffer: await f.arrayBuffer() })),
+      );
+      const parts = await new Promise<SubjectParts>((resolve, reject) => {
+        const w = new Worker(new URL("../../lib/sim/subject.worker.ts", import.meta.url), {
+          type: "module",
+        });
+        w.onmessage = (e: MessageEvent<SubjectReply>) => {
+          const m = e.data;
+          if (m.type === "step") return setSubjectStep(m.step);
+          w.terminate();
+          if (m.type === "done") resolve(m.parts);
+          else reject(new Error(m.message));
+        };
+        w.onerror = (e) => {
+          w.terminate();
+          reject(new Error(e.message));
+        };
+        const req: SubjectRequest = { files, ref: subjectRef(template) };
+        w.postMessage(
+          req,
+          files.map((f) => f.buffer),
+        );
+      });
+      const s = composeSubject(template, parts);
+      // Designs chosen for another anatomy no longer apply.
+      setDesigns({});
+      setAutoNote(null);
+      setSubject(s);
+      setAnatomy(s.anatomy);
+    } catch (e) {
+      setSubjectError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSubjectStep(null);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const showTemplate = () => {
+    const template = templateRef.current;
+    if (!template) return;
+    setDesigns({});
+    setAutoNote(null);
+    setSubject(null);
+    setSubjectError(null);
+    setAnatomy(template);
+  };
+
+  const subjectSummary = subject
+    ? [
+        `From this subject: ${
+          Object.entries(subject.sources)
+            .filter(([, v]) => v === "subject")
+            .map(([k]) => (k === "outer" ? "brain surface" : k))
+            .join(", ") || "nothing (see notes)"
+        }.`,
+        "From the MNI152 atlases: every other region.",
+        subject.config.target_regions
+          ? `Targets from config.json: ${subject.config.target_regions.join(", ")}.`
+          : "",
+        subject.config.array ? "Array geometry from config.json." : "",
+        ...subject.notes,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : "";
 
   const recorder = useCallback(() => simRef.current?.rec ?? null, []);
 
@@ -559,6 +710,49 @@ export function SimulationWindow() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <input
+            ref={fileRef}
+            type="file"
+            multiple
+            accept=".nii,.nii.gz,.gz,.json"
+            className="hidden"
+            onChange={(e) => void loadSubject(e.target.files)}
+          />
+          {subjectError ? (
+            <span
+              title={subjectError}
+              className="max-w-[18rem] truncate text-[0.66rem] text-[#ffb3bc]"
+            >
+              {subjectError}
+            </span>
+          ) : null}
+          {subject ? (
+            <>
+              <span
+                title={subjectSummary}
+                className="max-w-[14rem] truncate rounded-md border border-[#7fd8ff]/40 bg-[#0b2a5c] px-2.5 py-1.5 font-mono text-[0.62rem] text-[#e6f7ff]"
+              >
+                {subject.label} · MNI152
+              </span>
+              <button
+                type="button"
+                onClick={showTemplate}
+                disabled={subjectStep !== null}
+                className="rounded-md border border-[#16305e] px-2.5 py-1.5 text-[0.72rem] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff] disabled:opacity-40"
+              >
+                Template
+              </button>
+            </>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={!anatomy || subjectStep !== null}
+            title="T1 registered to MNI152 (NIfTI), plus optional aseg, brain mask and config.json"
+            className="flex items-center gap-1.5 rounded-md border border-[#16305e] px-2.5 py-1.5 text-[0.72rem] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff] disabled:opacity-40"
+          >
+            <Upload className="h-3.5 w-3.5" /> {subjectStep ? `${subjectStep}…` : "Load subject"}
+          </button>
           <button
             type="button"
             onClick={signOut}
@@ -587,7 +781,7 @@ export function SimulationWindow() {
           >
             {d.name}
             <span className="ml-1.5 font-mono text-[0.56rem] text-[#5e719a]">
-              {d.targets.join("+")}
+              {(subjectTargets ?? d.targets).join("+")}
             </span>
           </button>
         ))}
@@ -598,6 +792,7 @@ export function SimulationWindow() {
         <div className="order-2 flex min-w-0 flex-col gap-3 xl:order-1">
           <LibraryPanel enabled={enabled} onToggle={toggle} locked={phase === "assembling"} />
           <NetlistPanel circuit={circuit} revealed={revealed} />
+          <PlanPanel plans={plans} name={regionName} />
         </div>
 
         {/* Viewport */}
@@ -611,6 +806,11 @@ export function SimulationWindow() {
               {phase === "ready" && mode !== "assemble" && circuit.ok ? (
                 <div className="origin-top scale-[0.66] sm:scale-90 lg:scale-100">
                   <PipelineStrip stage={hud.stage} ev={ev} />
+                </div>
+              ) : null}
+              {subjectStep ? (
+                <div className="rounded-full border border-[#7fd8ff]/40 bg-[#01071a]/80 px-3 py-1 font-mono text-[0.62rem] tracking-[0.12em] text-[#7fd8ff] backdrop-blur">
+                  SUBJECT ANATOMY · {subjectStep.toUpperCase()}
                 </div>
               ) : null}
               {phase === "assembling" ? (
@@ -788,7 +988,7 @@ export function SimulationWindow() {
         {/* Right column */}
         <div className="order-3 flex min-w-0 flex-col gap-3">
           <PrismPanel ev={ev} />
-          <LatencyPanel ev={ev} />
+          <LatencyPanel ev={ev} rolling={hud.rolling} />
           <DesignPanel
             design={design}
             beams={beams}
@@ -796,8 +996,24 @@ export function SimulationWindow() {
             onAuto={() => void runAutoDesign()}
             autoProgress={autoProgress}
             autoNote={autoNote}
+            source={!designs[diseaseKey] && subject?.config.array ? "from config.json" : undefined}
           />
           <BeamPanel beams={beams} ev={ev} />
+          <DepthPanel
+            depths={gatedDepths}
+            all={allDepths}
+            name={regionName}
+            targets={disease.targets}
+            subject={
+              subject
+                ? {
+                    label: subject.label,
+                    scalp: subject.sources["scalp"] === "subject",
+                    brain: subject.sources["outer"] === "subject",
+                  }
+                : null
+            }
+          />
         </div>
       </div>
 

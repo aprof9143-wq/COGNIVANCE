@@ -10,14 +10,36 @@ import {
   type ArrayDesign,
   type Vec3,
 } from "./acoustics";
-import { parseAnatomy, placeArray, targetPoint, type Placement } from "./anatomy";
+import {
+  attachRegionMeasures,
+  nearestVertex,
+  parseAnatomy,
+  parseRegionLabels,
+  placeArray,
+  regionMeasures,
+  targetPoint,
+  type AnatomyMesh,
+  type Placement,
+} from "./anatomy";
 import { autoConnect, FULL_TOPOLOGY } from "./autoconnect";
 import { runCohort, virtualPatient } from "./benchmark";
 import { addressableFoci, evaluateDesign, designSpace, pickBest } from "./design";
-import { diseaseByKey, patientParams } from "./diseases";
-import { CircuitSim, computeBeams } from "./loop";
+import { DISEASES, diseaseByKey, patientParams } from "./diseases";
+import { CircuitSim, computeBeams, deliverable } from "./loop";
 import { createNetwork, healthyParams, Recorder, REGION_INDEX as R, REGIONS, step } from "./neural";
+import { NOT_MODELLED, planTarget } from "./plan";
 import { verify, type GateInputs } from "./prism";
+import {
+  allRegionDepths,
+  AMYGDALA_SCALP_RANGE_MM,
+  ANATOMY_ONLY,
+  GATED_REGIONS,
+  isGated,
+  isSimulated,
+  regionDepth,
+  STANDS_FOR,
+  type AnyRegionKey,
+} from "./regions";
 import { COMPONENTS, SAFETY_LIMITS, thermalNoiseUv } from "./specs";
 
 /** A placement `depth` mm straight down from the origin. */
@@ -352,10 +374,103 @@ describe("design search and benchmark", () => {
   });
 });
 
+const readGz = (path: string) => {
+  const buf = gunzipSync(readFileSync(path));
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+};
+
+/** The shipped anatomy, with region measures computed from the label map. */
+const shippedAnatomy = () => {
+  const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+  attachRegionMeasures(an, parseRegionLabels(readGz("public/sim/regions.nii.gz")));
+  return an;
+};
+
+describe("region measures", () => {
+  it("computes volume and per-hemisphere centroids from a label map", () => {
+    // 4 × 2 × 1 voxels of 2 mm, x = 2i − 3 (so columns 0–1 are left, 2–3 right).
+    const affine = new Float64Array([2, 0, 0, -3, 0, 2, 0, 10, 0, 0, 2, -4, 0, 0, 0, 1]);
+    const labels = new Uint8Array([1, 1, 1, 0, 2, 0, 0, 0]);
+    const m = regionMeasures(labels, [4, 2, 1], affine);
+    const one = m.get(1)!;
+    expect(one.voxels).toBe(3);
+    expect(one.volumeMm3).toBe(24);
+    expect(one.sides.left).toEqual([-2, 10, -4]); // voxels (0,0) and (1,0)
+    expect(one.sides.right).toEqual([1, 10, -4]); // voxel (2,0)
+    expect(one.centroid[0]).toBeCloseTo(-1, 9);
+    const two = m.get(2)!;
+    expect(two.sides.right).toBeUndefined();
+    expect(two.centroid).toEqual([-3, 12, -4]); // voxel (0,1)
+  });
+
+  it("refuses a mesh whose label has no voxels", () => {
+    const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+    expect(() => attachRegionMeasures(an, new Map())).toThrow(/no voxels/);
+  });
+});
+
 describe("anatomy asset", () => {
+  it("defines the network model's regions and the anatomy-only ones, none from Harvard-Oxford", () => {
+    const spec = JSON.parse(readFileSync("tools/demo-assets/sim_regions.json", "utf8")) as {
+      regions: { key: string; atlas: string; simulated?: boolean }[];
+    };
+    const simulated = spec.regions.filter((r) => r.simulated !== false).map((r) => r.key);
+    const shown = spec.regions.filter((r) => r.simulated === false).map((r) => r.key);
+    expect(simulated.sort()).toEqual(REGIONS.map((r) => r.key).sort());
+    expect(shown.sort()).toEqual([...ANATOMY_ONLY].sort());
+    const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+    const labels = new Set<number>();
+    for (const [i, r] of spec.regions.entries()) {
+      const mesh = an.meshes.get(r.key)!;
+      expect(mesh.source).toBe(r.atlas);
+      expect(["aseg", "massp", "schaefer2018"]).toContain(mesh.source);
+      // Label values follow the list, so adding regions never renumbers one.
+      expect(mesh.label).toBe(i + 1);
+      labels.add(mesh.label!);
+      // Nothing positional is stored in the asset: it is computed at load.
+      expect(mesh.centroid).toBeUndefined();
+    }
+    expect(labels.size).toBe(spec.regions.length);
+    expect(spec.regions.length).toBe(18);
+  });
+
+  it("keeps anatomy-only regions out of the network and out of every programme", () => {
+    for (const k of ANATOMY_ONLY) {
+      expect(isSimulated(k)).toBe(false);
+      expect((R as Record<string, number>)[k]).toBeUndefined();
+    }
+    for (const d of DISEASES) for (const t of d.targets) expect(isSimulated(t)).toBe(true);
+    // Every broader stand-in region is anatomy-only and cortical.
+    for (const k of Object.keys(STANDS_FOR) as AnyRegionKey[]) {
+      expect(isSimulated(k)).toBe(false);
+      expect(isGated(k)).toBe(false);
+    }
+  });
+
+  it("computes every region's centroids from the label map", () => {
+    const an = shippedAnatomy();
+    for (const key of [...REGIONS.map((r) => r.key), ...ANATOMY_ONLY]) {
+      const mesh = an.meshes.get(key)!;
+      expect(mesh.volumeMm3!).toBeGreaterThan(100);
+      expect(mesh.sides!.left![0]).toBeLessThan(0);
+      expect(mesh.sides!.right![0]).toBeGreaterThan(0);
+    }
+    // V1 is calcarine cortex: medial and occipital.
+    const v1 = targetPoint(an.meshes.get("v1")!, "left");
+    expect(v1[0]).toBeGreaterThan(-20);
+    expect(v1[1]).toBeLessThan(-70);
+    // The extrastriate regions sit above and below it.
+    expect(targetPoint(an.meshes.get("vis_dorsal")!, "left")[2]).toBeGreaterThan(v1[2] + 10);
+    expect(targetPoint(an.meshes.get("vis_ventral")!, "left")[2]).toBeLessThan(v1[2]);
+    // The LGN lies lateral to and below the thalamus centroid.
+    const lgn = targetPoint(an.meshes.get("lgn")!, "left");
+    const th = targetPoint(an.meshes.get("thalamus")!, "left");
+    expect(lgn[0]).toBeLessThan(th[0]);
+    expect(lgn[2]).toBeLessThan(th[2]);
+  });
+
   it("parses the shipped atlas meshes in MNI space and places arrays on the outer surface", () => {
-    const buf = gunzipSync(readFileSync("public/sim/anatomy.bin.gz"));
-    const an = parseAnatomy(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+    const an = shippedAnatomy();
     for (const k of ["cortex", "outer", "hippocampus", "amygdala", "stn", "v1", "motor"])
       expect(an.meshes.has(k)).toBe(true);
     const hip = an.meshes.get("hippocampus")!;
@@ -367,5 +482,157 @@ describe("anatomy asset", () => {
     expect(pl.depthMm).toBeLessThan(30);
     const n = Math.hypot(...pl.normal);
     expect(n).toBeCloseTo(1, 6);
+  });
+});
+
+describe("gated regions and depth", () => {
+  it("finds the nearest vertex of a point set", () => {
+    const pts: AnatomyMesh = {
+      key: "p",
+      name: "p",
+      colour: "#000",
+      positions: new Float32Array([0, 0, 0, 10, 0, 0, 0, 3, 4]),
+      indices: new Uint32Array(0),
+    };
+    const n = nearestVertex(pts, [0, 6, 8]);
+    expect(n.point).toEqual([0, 3, 4]);
+    expect(n.distMm).toBeCloseTo(5, 9);
+  });
+
+  it("ships the scalp as a point set that the scene does not draw as a region", () => {
+    const scalp = shippedAnatomy().meshes.get("scalp")!;
+    expect(scalp.positions.length / 3).toBeGreaterThan(10_000);
+    expect(scalp.indices.length).toBe(0);
+    expect(scalp.label).toBeUndefined();
+  });
+
+  it("covers the whole head, so deep targets measure to the side of the head", () => {
+    const an = shippedAnatomy();
+    const scalp = an.meshes.get("scalp")!;
+    let minZ = Infinity;
+    for (let i = 2; i < scalp.positions.length; i += 3) minZ = Math.min(minZ, scalp.positions[i]!);
+    // Down to the bottom of the image, not just the top of the head.
+    expect(minZ).toBeLessThan(-60);
+    // The amygdala's nearest skin is lateral (temple), not the airway or the cut.
+    const amy = targetPoint(an.meshes.get("amygdala")!, "left");
+    const near = nearestVertex(scalp, amy).point;
+    expect(near[0]).toBeLessThan(-60);
+    expect(Math.abs(near[2] - amy[2])).toBeLessThan(15);
+  });
+
+  it("gates exactly the subcortical regions", () => {
+    const an = shippedAnatomy();
+    expect(GATED_REGIONS.filter(isSimulated).sort()).toEqual([
+      "amygdala",
+      "hippocampus",
+      "stn",
+      "thalamus",
+    ]);
+    let n = 0;
+    for (const mesh of an.meshes.values()) {
+      if (mesh.label === undefined) continue;
+      n++;
+      expect(isGated(mesh.key as AnyRegionKey)).toBe(mesh.source !== "schaefer2018");
+    }
+    expect(n).toBe(18);
+  });
+
+  it("measures depth below the scalp and below the brain surface on the template", () => {
+    const an = shippedAnatomy();
+    const depths = allRegionDepths(an);
+    expect(depths.map((d) => d.region)).toEqual([
+      ...REGIONS.map((r) => r.key).sort(
+        (a, b) => an.meshes.get(a)!.label! - an.meshes.get(b)!.label!,
+      ),
+      ...ANATOMY_ONLY,
+    ]);
+    for (const d of depths) {
+      expect(d.mni).toEqual(targetPoint(an.meshes.get(d.region)!, "left"));
+      expect(d.belowBrainMm).toBeGreaterThan(0);
+      expect(d.belowScalpMm).toBeGreaterThan(d.belowBrainMm);
+    }
+    // The computed amygdala depth falls inside the published 5–7 cm range.
+    const amy = depths.find((d) => d.region === "amygdala")!;
+    expect(amy.belowScalpMm).toBeGreaterThanOrEqual(AMYGDALA_SCALP_RANGE_MM[0]);
+    expect(amy.belowScalpMm).toBeLessThanOrEqual(AMYGDALA_SCALP_RANGE_MM[1]);
+    // Among the network's regions, every gated one lies deeper below the
+    // scalp than every cortical one.
+    const net = depths.filter((d) => isSimulated(d.region));
+    const gated = net.filter((d) => isGated(d.region)).map((d) => d.belowScalpMm);
+    const cortical = net.filter((d) => !isGated(d.region)).map((d) => d.belowScalpMm);
+    expect(Math.min(...gated)).toBeGreaterThan(Math.max(...cortical));
+    // Not so for all cortex: the ventral visual region is on the basal surface,
+    // above the cerebellum, and sits about as deep as the putamen.
+    const at = (k: AnyRegionKey) => depths.find((d) => d.region === k)!.belowScalpMm;
+    expect(at("vis_ventral")).toBeGreaterThan(at("smg") + 20);
+  });
+
+  it("returns nothing until the anatomy has region measures", () => {
+    const an = parseAnatomy(readGz("public/sim/anatomy.bin.gz"));
+    expect(regionDepth(an, "amygdala")).toBeNull();
+  });
+});
+
+describe("placement and plan", () => {
+  const pd = diseaseByKey("parkinsons");
+  const design: ArrayDesign = {
+    ...DEFAULT_ARRAY,
+    frequencyHz: 7.5e6,
+    pitchM: 2 * wavelengthM(7.5e6),
+  };
+
+  it("uses the same acoustic quantities the PRISM gate checks", () => {
+    const beams = computeBeams(design, [{ region: "stn", placement: straight(14) }]);
+    const plan = planTarget(beams[0]!, design, 0.78);
+    const sim = new CircuitSim({
+      disease: pd,
+      severity: 0.8,
+      design,
+      beams,
+      seed: 1,
+      dutyLimit: 0.78,
+      gated: true,
+    });
+    const gate = sim.acoustics([1])[0]!;
+    const by = (k: string) => plan.margins.find((m) => m.key === k)!;
+    expect(by("mi").value).toBeCloseTo(gate.mechanicalIndex, 12);
+    expect(by("ispta").value).toBeCloseTo(gate.isptaMwCm2, 9);
+    expect(by("offTarget").value).toBe(gate.offTargetFraction);
+    // ΔT is the steady state the gate's burst-by-burst heating converges to.
+    let t = 0;
+    for (let i = 0; i < 2000; i++)
+      t = heatStep(
+        t,
+        beams[0]!.metrics.isppaWcm2 * 0.1,
+        design.frequencyHz,
+        beams[0]!.metrics.lateralFwhmMm,
+        0.0156,
+      );
+    expect(by("deltaT").value).toBeCloseTo(t, 9);
+    expect(by("deltaT").value).toBeGreaterThanOrEqual(gate.predictedTempC);
+    expect(plan.centre).toEqual([0, 0, 0]);
+    expect(plan.depthMm).toBe(14);
+  });
+
+  it("passes a deliverable target and fails one the array cannot focus on", () => {
+    const ok = computeBeams(design, [{ region: "stn", placement: straight(14) }])[0]!;
+    expect(deliverable(ok)).toBe(true);
+    expect(planTarget(ok, design, 0.78).pass).toBe(true);
+    const deep = computeBeams(DEFAULT_ARRAY, [{ region: "stn", placement: straight(30) }])[0]!;
+    expect(deliverable(deep)).toBe(false);
+    const plan = planTarget(deep, DEFAULT_ARRAY, 0.78);
+    expect(plan.pass).toBe(false);
+    const failed = plan.margins.filter((m) => !m.pass).map((m) => m.key);
+    expect(failed.some((k) => k === "offTarget" || k === "focus")).toBe(true);
+    for (const m of plan.margins) expect(m.pass).toBe(m.value <= m.limit);
+  });
+
+  it("lists what it does not model without giving it a number", () => {
+    expect(NOT_MODELLED.map((n) => n.label)).toEqual([
+      "RF SAR",
+      "Stimulation charge density",
+      "Distance to major vessels",
+    ]);
+    for (const n of NOT_MODELLED) expect(n.reason).not.toMatch(/\d/);
   });
 });

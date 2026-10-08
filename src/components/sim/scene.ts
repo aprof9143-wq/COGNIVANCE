@@ -19,6 +19,7 @@ import type { ArrayDesign, FieldPlane, Vec3 } from "@/lib/sim/acoustics";
 import type { Anatomy, Placement } from "@/lib/sim/anatomy";
 import type { Net } from "@/lib/sim/autoconnect";
 import type { Stage } from "@/lib/sim/loop";
+import { isSimulated } from "@/lib/sim/regions";
 import type { PortType } from "@/lib/sim/specs";
 
 export type View = "cinematic" | "implant" | "explode" | "section" | "beam";
@@ -229,6 +230,8 @@ export class SimScene {
       pmat: THREE.ShaderMaterial;
       colour: THREE.Color;
       label: HTMLDivElement;
+      /** A node of the network model; anatomy-only regions show no activity. */
+      simulated: boolean;
     }
   >();
   private targets = new Set<string>();
@@ -379,7 +382,9 @@ export class SimScene {
 
   /* -------------------------------------------------------------- anatomy */
 
+  /** Show an anatomy, replacing the one on screen (the template or a loaded subject). */
   setAnatomy(an: Anatomy) {
+    this.clearAnatomy();
     const toGeom = (positions: Float32Array, indices: Uint32Array) => {
       const p = new Float32Array(positions.length);
       for (let i = 0; i < positions.length; i += 3) {
@@ -418,7 +423,8 @@ export class SimScene {
       this.brain.add(m);
     }
     for (const [key, mesh] of an.meshes) {
-      if (key === "cortex" || key === "outer") continue;
+      // Surfaces, not target regions; the scalp is only measured against.
+      if (key === "cortex" || key === "outer" || key === "scalp") continue;
       const colour = new THREE.Color(mesh.colour);
       const mat = new THREE.MeshStandardMaterial({
         color: colour,
@@ -468,8 +474,30 @@ export class SimScene {
       points.renderOrder = 6;
       this.brain.add(points);
       const label = this.makeLabel(mesh.name, "region");
-      this.regions.set(key, { mesh: m, mat, points, pmat, colour, label });
+      this.regions.set(key, {
+        mesh: m,
+        mat,
+        points,
+        pmat,
+        colour,
+        label,
+        simulated: isSimulated(key),
+      });
     }
+    this.setTargets([...this.targets]);
+  }
+
+  /** Remove the anatomy's meshes, particles and labels, freeing their GPU memory. */
+  private clearAnatomy() {
+    for (const o of [...this.brain.children]) {
+      this.brain.remove(o);
+      const m = o as THREE.Mesh | THREE.Points;
+      m.geometry.dispose();
+      (m.material as THREE.Material).dispose();
+    }
+    for (const r of this.regions.values()) r.label.remove();
+    this.regions.clear();
+    this.cortexMat = null;
   }
 
   setTargets(keys: string[]) {
@@ -477,7 +505,7 @@ export class SimScene {
     for (const [k, r] of this.regions) {
       const on = this.targets.has(k);
       r.mat.opacity = on ? 0.85 : 0.22;
-      r.points.visible = true;
+      r.points.visible = r.simulated;
       r.label.dataset["kind"] = on ? "target" : "region";
     }
   }

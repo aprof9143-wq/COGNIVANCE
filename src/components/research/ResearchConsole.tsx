@@ -67,6 +67,7 @@ import {
 } from "@/lib/neuro/linked";
 import { linkTemplateAseg } from "@/lib/neuro/templateAtlas";
 import { setLinkedFiles, setLinkedParcellation } from "@/lib/neuro/linkedFiles";
+import { endSession } from "@/lib/session";
 
 /** EEG analysed over at most this many seconds, so a long recording stays responsive. */
 const ANALYSIS_WINDOW_S = 300;
@@ -587,7 +588,7 @@ export function ResearchConsole() {
   };
 
   const signOut = () => {
-    localStorage.removeItem("cognivance_session");
+    endSession();
     navigate({ to: "/" });
   };
 

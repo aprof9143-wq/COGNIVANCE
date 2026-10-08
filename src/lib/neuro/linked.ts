@@ -6,7 +6,8 @@
  * pixels, file names or patient identifiers — and the tracking dashboard
  * merges it into the open case as it changes. Summaries live in this browser
  * (localStorage) so the dashboard is current in any tab; nothing is sent
- * anywhere.
+ * anywhere. In a demo session (src/lib/session.ts) they are kept in memory
+ * only: nothing is read from or written to storage.
  *
  * Every distinct scan and recording is remembered, so loading a second scan
  * adds a second visit and the longitudinal charts fill in by themselves.
@@ -15,6 +16,7 @@
  */
 
 import { useSyncExternalStore } from "react";
+import { isDemo } from "../session";
 import { region, ATLAS } from "./atlas";
 import type { Biomarker, CaseFile, RegionalMeasurement, Visit } from "./schema";
 
@@ -106,7 +108,8 @@ const MAX_HISTORY = 12;
 const EMPTY: LinkedState = { mri: null, segmentation: null, eeg: null, scans: [], recordings: [] };
 
 let state: LinkedState = EMPTY;
-let hydrated = false;
+/** Which store `state` was loaded for; a change of session reloads it. */
+let hydratedFor: "demo" | "local" | null = null;
 const listeners = new Set<() => void>();
 
 const parse = (raw: string | null): LinkedState => {
@@ -119,8 +122,15 @@ const parse = (raw: string | null): LinkedState => {
 };
 
 function hydrate() {
-  if (hydrated || typeof window === "undefined") return;
-  hydrated = true;
+  if (typeof window === "undefined") return;
+  const mode = isDemo() ? "demo" : "local";
+  if (hydratedFor === mode) return;
+  hydratedFor = mode;
+  if (mode === "demo") {
+    // A demo starts empty and never sees what a signed-in session saved.
+    state = EMPTY;
+    return;
+  }
   try {
     state = parse(localStorage.getItem(KEY));
   } catch {
@@ -130,10 +140,12 @@ function hydrate() {
 
 function commit(next: LinkedState) {
   state = next;
-  try {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  } catch {
-    // Storage full or blocked: the in-memory link still works in this tab.
+  if (!isDemo()) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    } catch {
+      // Storage full or blocked: the in-memory link still works in this tab.
+    }
   }
   for (const l of listeners) l();
 }
@@ -235,7 +247,7 @@ export function offerLinked<K extends "mri" | "eeg">(
 function subscribe(cb: () => void) {
   listeners.add(cb);
   const onStorage = (e: StorageEvent) => {
-    if (e.key !== KEY) return;
+    if (e.key !== KEY || isDemo()) return;
     state = parse(e.newValue);
     cb();
   };
