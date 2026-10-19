@@ -19,6 +19,7 @@ import { Route as ResearchRouteImport } from './routes/research'
 import { Route as SimulationRouteImport } from './routes/simulation'
 import { Route as ViewerRouteImport } from './routes/viewer'
 import { Route as VisionRouteImport } from './routes/vision'
+import { Route as VisionEyeRouteImport } from './routes/vision_.eye'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,11 @@ const VisionRoute = VisionRouteImport.update({
   path: '/vision',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VisionEyeRoute = VisionEyeRouteImport.update({
+  id: '/vision_/eye',
+  path: '/vision/eye',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
+  '/vision/eye': typeof VisionEyeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
+  '/vision/eye': typeof VisionEyeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
+  '/vision_/eye': typeof VisionEyeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/simulation'
     | '/viewer'
     | '/vision'
+    | '/vision/eye'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/simulation'
     | '/viewer'
     | '/vision'
+    | '/vision/eye'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/simulation'
     | '/viewer'
     | '/vision'
+    | '/vision_/eye'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   SimulationRoute: typeof SimulationRoute
   ViewerRoute: typeof ViewerRoute
   VisionRoute: typeof VisionRoute
+  VisionEyeRoute: typeof VisionEyeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VisionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vision_/eye': {
+      id: '/vision_/eye'
+      path: '/vision/eye'
+      fullPath: '/vision/eye'
+      preLoaderRoute: typeof VisionEyeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   SimulationRoute: SimulationRoute,
   ViewerRoute: ViewerRoute,
   VisionRoute: VisionRoute,
+  VisionEyeRoute: VisionEyeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
