@@ -18,6 +18,7 @@ import { Route as NimbleRouteImport } from './routes/nimble'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as SimulationRouteImport } from './routes/simulation'
 import { Route as ViewerRouteImport } from './routes/viewer'
+import { Route as VisionRouteImport } from './routes/vision'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const ViewerRoute = ViewerRouteImport.update({
   path: '/viewer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VisionRoute = VisionRouteImport.update({
+  id: '/vision',
+  path: '/vision',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/research': typeof ResearchRoute
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
+  '/vision': typeof VisionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/research': typeof ResearchRoute
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
+  '/vision': typeof VisionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/research': typeof ResearchRoute
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
+  '/vision': typeof VisionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/research'
     | '/simulation'
     | '/viewer'
+    | '/vision'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/research'
     | '/simulation'
     | '/viewer'
+    | '/vision'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/research'
     | '/simulation'
     | '/viewer'
+    | '/vision'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   ResearchRoute: typeof ResearchRoute
   SimulationRoute: typeof SimulationRoute
   ViewerRoute: typeof ViewerRoute
+  VisionRoute: typeof VisionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ViewerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vision': {
+      id: '/vision'
+      path: '/vision'
+      fullPath: '/vision'
+      preLoaderRoute: typeof VisionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResearchRoute: ResearchRoute,
   SimulationRoute: SimulationRoute,
   ViewerRoute: ViewerRoute,
+  VisionRoute: VisionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

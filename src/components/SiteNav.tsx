@@ -10,6 +10,7 @@ const links: NavLink[] = [
   { label: "Research", to: "/research" },
   { label: "NIMBLE", to: "/nimble" },
   { label: "Benchmarks", to: "/benchmarks" },
+  { label: "Vision", to: "/vision" },
   { label: "Technology", to: "/", hash: "divisions" },
   { label: "Frontiers", to: "/", hash: "frontiers" },
   { label: "About", to: "/about" },
