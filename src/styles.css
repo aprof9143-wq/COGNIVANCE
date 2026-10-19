@@ -505,3 +505,31 @@
   outline: 2px solid #7fd8ff;
   outline-offset: 1px;
 }
+
+/*
+ * Vision module: light, and scoped to .vision-light. Every other page keeps
+ * the dark deep-field system above. Text tokens are checked against both
+ * --v-card and --v-soft at WCAG AA (4.5:1) or better.
+ */
+.vision-light {
+  --v-bg: #eceef4;
+  --v-frame: rgba(255, 255, 255, 0.55);
+  --v-card: #ffffff;
+  --v-soft: #f4f3f8;
+  --v-ink: #16151d;
+  --v-ink-2: #55526a;
+  --v-ink-3: #6c6982;
+  --v-line: #e4e2ec;
+  --v-accent: #6a58e0;
+  --v-accent-ink: #5b49d6;
+  --v-accent-soft: #ece9fd;
+  color-scheme: light;
+  color: var(--v-ink);
+  background:
+    radial-gradient(60% 50% at 15% 0%, #e7e3fb 0%, transparent 70%),
+    radial-gradient(50% 40% at 100% 100%, #dfe9f8 0%, transparent 70%), var(--v-bg);
+}
+.vision-light :focus-visible {
+  outline: 2px solid var(--v-accent);
+  outline-offset: 2px;
+}
