@@ -26,6 +26,7 @@ import { EMMETROPIC_LENGTH, LE_GRAND_RELAXED, power, simulateEye } from "@/lib/v
 import { EyeModel3D } from "./EyeModel3D";
 import { RetinalImage } from "./RetinalImage";
 import { VisualCycle } from "./VisualCycle";
+import { ConceptVision } from "./ConceptVision";
 import { Card, EvidenceTag, VisionPages } from "./ui";
 
 const DISTANCES = [Infinity, 6000, 2000, 1000, 500, 330, 250, 200, 150, 120, 100];
@@ -100,6 +101,7 @@ export function EyeSimulation() {
                   { href: "#eye", label: "The living eye", icon: Eye, active: true },
                   { href: "#retina", label: "Image on the retina", icon: ImageIcon },
                   { href: "#cycle", label: "Where RPE65 works", icon: RefreshCcw },
+                  { href: "#concept", label: "Concept: beyond visible light", icon: Sparkles },
                   { href: "#about", label: "About this model", icon: BookOpen },
                 ].map(({ href, label, icon: Icon, active }) => (
                   <a
@@ -478,6 +480,26 @@ export function EyeSimulation() {
             <VisualCycle />
           </Card>
         </div>
+
+        {/* ------------------------------------------------ concept */}
+        <section
+          id="concept"
+          className="mt-3 scroll-mt-4 rounded-[28px] border-2 border-dashed border-[#e7a3c2] bg-[#fff8fb] p-5"
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-[#b0306a] px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-white">
+              CONCEPT
+            </span>
+            <h2 className="text-[19px] font-medium">
+              Enhanced vision: seeing beyond visible light
+            </h2>
+          </div>
+          <p className="mb-3 mt-1 text-xs text-[var(--v-ink-3)]">
+            The MetaHuman-style concept, rendered in the browser. Kept apart from the science above
+            on purpose.
+          </p>
+          <ConceptVision />
+        </section>
 
         {/* ------------------------------------------------ about */}
         <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
