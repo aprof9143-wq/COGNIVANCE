@@ -130,3 +130,21 @@ describe("linked summaries in a demo", () => {
     expect(JSON.parse(local.getItem("cognivance_linked_v2")!).mri.label).toBe("MNI152 template");
   });
 });
+
+describe("return after Enter Demo", () => {
+  it("accepts only known gated pages", async () => {
+    const { returnTo, GATED_PAGES } = await import("./session");
+    for (const p of GATED_PAGES) expect(returnTo(p)).toBe(p);
+    expect(returnTo("/vision")).toBe("/vision");
+    for (const bad of [
+      "https://example.com",
+      "//example.com",
+      "/vision/../x",
+      "/",
+      "",
+      undefined,
+      3,
+    ])
+      expect(returnTo(bad)).toBeUndefined();
+  });
+});

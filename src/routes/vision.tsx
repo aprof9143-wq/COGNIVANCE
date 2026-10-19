@@ -21,7 +21,7 @@ function Vision() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth" });
+    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/vision" } });
     else setReady(true);
   }, [navigate]);
   if (!ready) return <div className="min-h-screen bg-[#eceef4]" />;

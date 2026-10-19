@@ -21,7 +21,7 @@ function Neuro() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth" });
+    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/neurodegeneration" } });
     else setReady(true);
   }, [navigate]);
   if (!ready) return <div className="min-h-screen bg-[#0a0d12]" />;
