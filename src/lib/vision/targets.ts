@@ -86,7 +86,8 @@ export const DECISIONS: Decision[] = [
     n: 12,
     question: "Meaning of “degeneracy”",
     status: "decided",
-    answer: "Two separate topics: optic-nerve degeneration, and genetic redundancy.",
+    answer:
+      "Two separate topics: degeneration, and genetic redundancy. Long-term modelling covers both retinal degeneration (what RPE65 disease causes) and optic-nerve degeneration.",
     decidedOn: "2026-10-19",
   },
   {
