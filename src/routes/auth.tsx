@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { hasSession, startDemo } from "@/lib/session";
+import { hasSession, returnTo, startDemo, type GatedPage } from "@/lib/session";
 
 function NeuralField() {
   return (
@@ -71,15 +71,23 @@ function NeuralField() {
   );
 }
 
-export const Route = createFileRoute("/auth")({ component: AuthPage });
+export const Route = createFileRoute("/auth")({
+  // ?redirect= names the gated page the visitor was trying to open.
+  validateSearch: (search: Record<string, unknown>): { redirect?: GatedPage } => {
+    const r = returnTo(search["redirect"]);
+    return r ? { redirect: r } : {};
+  },
+  component: AuthPage,
+});
 function AuthPage() {
   const navigate = useNavigate();
+  const destination = Route.useSearch().redirect ?? "/research";
   useEffect(() => {
-    if (hasSession()) navigate({ to: "/research" });
-  }, [navigate]);
+    if (hasSession()) navigate({ to: destination });
+  }, [navigate, destination]);
   const enterDemo = () => {
     startDemo();
-    navigate({ to: "/research" });
+    navigate({ to: destination });
   };
   return (
     <main className="min-h-screen bg-[#020406] px-4 py-4 text-white sm:px-6">

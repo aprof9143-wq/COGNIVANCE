@@ -22,7 +22,7 @@ function Simulation() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth" });
+    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/simulation" } });
     else setReady(true);
   }, [navigate]);
 

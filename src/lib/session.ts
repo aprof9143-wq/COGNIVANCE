@@ -40,6 +40,25 @@ export function startDemo() {
   }
 }
 
+/** Pages behind the session gate. /auth returns you to the one you asked for. */
+export const GATED_PAGES = [
+  "/research",
+  "/viewer",
+  "/simulation",
+  "/neurodegeneration",
+  "/vision",
+  "/vision/eye",
+] as const;
+export type GatedPage = (typeof GATED_PAGES)[number];
+
+/**
+ * Where /auth may send you after Enter Demo. Only a known gated page counts,
+ * so the parameter cannot be used to send visitors anywhere else.
+ */
+export function returnTo(value: unknown): GatedPage | undefined {
+  return GATED_PAGES.find((p) => p === value);
+}
+
 /** Whether the gated pages may open: a demo session or a local account. */
 export function hasSession(): boolean {
   if (isDemo()) return true;

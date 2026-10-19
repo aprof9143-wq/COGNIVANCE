@@ -22,7 +22,7 @@ function Viewer() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth" });
+    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/viewer" } });
     else setReady(true);
   }, [navigate]);
 
