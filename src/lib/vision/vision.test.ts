@@ -40,10 +40,9 @@ describe("evidence", () => {
 });
 
 describe("targets and decisions", () => {
-  it("does not resolve VIN to anything", () => {
-    const vin = targetByKey("vin")!;
-    expect(vin.status).toBe("unresolved");
-    expect("geneSymbol" in vin).toBe(false);
+  it("records VIN loss as vision loss, an outcome, not a gene target", () => {
+    expect(targetByKey("vin")).toBeUndefined();
+    expect(DECISIONS.find((d) => d.n === 11)!.answer).toMatch(/^Vision loss/);
   });
 
   it("records all fourteen benchmark questions, with answers only where decided", () => {
@@ -52,7 +51,7 @@ describe("targets and decisions", () => {
       if (d.status === "open") expect(d.answer).toBeUndefined();
       else expect(d.answer && d.decidedOn).toBeTruthy();
     }
-    expect(DECISIONS.find((d) => d.n === 11)!.status).toBe("open");
+    expect(DECISIONS.find((d) => d.n === 11)!.status).toBe("decided");
   });
 
   it("names RPE65 in human as the first ready target", () => {

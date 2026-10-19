@@ -27,12 +27,6 @@ export const TARGETS: Target[] = [
     condition: "RPE65-associated inherited retinal dystrophy",
     note: "First use case, chosen 2026-10-19. A product decision, not a diagnosis.",
   },
-  {
-    key: "vin",
-    status: "unresolved",
-    label: "“VIN loss”",
-    note: "Meaning not yet defined: gene, protein, variant or another concept. Nothing is loaded or inferred for it until it is.",
-  },
 ];
 
 export function targetByKey(key: string): Target | undefined {
@@ -80,12 +74,20 @@ export const DECISIONS: Decision[] = [
     answer: "Public data only; no patient data. Source licences listed on this page.",
     decidedOn: "2026-10-19",
   },
-  { n: 11, question: "Meaning of “VIN loss”", status: "open" },
+  {
+    n: 11,
+    question: "Meaning of “VIN loss”",
+    status: "decided",
+    answer:
+      "Vision loss: the outcome RPE65-associated dystrophy causes, not a separate gene, protein or variant. It is what the benchmark is ultimately about; how it is measured is still open (question 7).",
+    decidedOn: "2026-10-19",
+  },
   {
     n: 12,
     question: "Meaning of “degeneracy”",
     status: "decided",
-    answer: "Two separate topics: optic-nerve degeneration, and genetic redundancy.",
+    answer:
+      "Two separate topics: degeneration, and genetic redundancy. Long-term modelling covers both retinal degeneration (what RPE65 disease causes) and optic-nerve degeneration.",
     decidedOn: "2026-10-19",
   },
   {
