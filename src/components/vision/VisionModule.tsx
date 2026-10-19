@@ -40,7 +40,6 @@ import {
   plddtBand,
   summarisePlddt,
   type Backbone,
-  type Residue,
 } from "@/lib/vision/pdb";
 import {
   crossCheck,
@@ -58,7 +57,7 @@ import {
   type DecisionStatus,
   type Target,
 } from "@/lib/vision/targets";
-import { StructureViewer, type ColourBy } from "./StructureViewer";
+import { MolViewer, type HoverInfo, type MolColour, type MolStyle } from "./MolViewer";
 import { Card, EvidenceTag, Gap, Spinner, VisionPages } from "./ui";
 import { PlddtChart } from "./PlddtChart";
 
@@ -99,7 +98,7 @@ type StructureState =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "gap"; reason: string }
-  | { status: "ready"; backbone: Backbone; retrievedAt: string };
+  | { status: "ready"; backbone: Backbone; text: string; retrievedAt: string };
 
 function useStructure(src: StructureSource | null) {
   const [state, setState] = useState<StructureState>({ status: "idle" });
@@ -121,7 +120,7 @@ function useStructure(src: StructureSource | null) {
             reason:
               "The file contained no alpha-carbon records. Very large entries are published only as mmCIF, which this viewer does not read yet.",
           });
-        setState({ status: "ready", backbone, retrievedAt: res.retrievedAt });
+        setState({ status: "ready", backbone, text: res.data, retrievedAt: res.retrievedAt });
       })
       .catch((e: Error) => {
         if (e.name !== "AbortError") setState({ status: "gap", reason: e.message });
@@ -170,10 +169,11 @@ export function VisionModule() {
 
   const [mode, setMode] = useState<"predicted" | "experimental">("predicted");
   const [pdbId, setPdbId] = useState<string | null>(null);
-  const [colourBy, setColourBy] = useState<ColourBy>("plddt");
+  const [colourBy, setColourBy] = useState<MolColour>("plddt");
+  const [molStyle, setMolStyle] = useState<MolStyle>("cartoon");
   const [autoRotate, setAutoRotate] = useState(true);
   const [resetKey, setResetKey] = useState(0);
-  const [hover, setHover] = useState<Residue | null>(null);
+  const [hover, setHover] = useState<HoverInfo | null>(null);
 
   const experimental = protein?.pdb ?? [];
   useEffect(() => {
@@ -200,7 +200,7 @@ export function VisionModule() {
     () => (mode === "predicted" && backbone ? summarisePlddt(backbone.residues) : null),
     [mode, backbone],
   );
-  const effectiveColour: ColourBy = mode === "experimental" ? "chain" : colourBy;
+  const effectiveColour: MolColour = mode === "experimental" ? "chain" : colourBy;
 
   const checks = useMemo(
     () => (record ? crossCheck(target.geneSymbol, target.taxonId, gene, protein, model) : []),
@@ -444,13 +444,64 @@ export function VisionModule() {
               </div>
             )}
 
+            <div className="z-10 flex flex-wrap items-center gap-2 px-5 pt-3 text-[12px]">
+              <span className="text-[var(--v-ink-3)]">Show as</span>
+              <div
+                className="flex rounded-full bg-[var(--v-soft)] p-1"
+                role="group"
+                aria-label="Drawing style"
+              >
+                {(
+                  [
+                    ["cartoon", "Ribbon"],
+                    ["surface", "Surface"],
+                    ["atoms", "Atoms"],
+                  ] as const
+                ).map(([k, label]) => (
+                  <button
+                    key={k}
+                    aria-pressed={molStyle === k}
+                    onClick={() => setMolStyle(k)}
+                    className={`rounded-full px-3 py-1 ${molStyle === k ? "bg-[var(--v-ink)] text-white" : ""}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <details className="relative">
+                <summary className="cursor-pointer list-none rounded-full bg-[var(--v-soft)] px-3 py-1.5">
+                  What am I looking at?
+                </summary>
+                <div className="absolute left-0 top-9 z-20 w-[300px] rounded-2xl bg-white p-3 text-[12px] text-[var(--v-ink-2)] shadow-[0_8px_30px_rgba(22,21,29,0.12)]">
+                  <p>
+                    <span className="font-medium text-[var(--v-ink)]">A protein</span> is a chain of
+                    building blocks (amino acids) that folds into a shape. Its shape decides its
+                    job.
+                  </p>
+                  <p className="mt-1.5">
+                    <span className="font-medium text-[var(--v-ink)]">Ribbon</span> follows the
+                    chain: spirals are helices, flat arrows are sheets.{" "}
+                    <span className="font-medium text-[var(--v-ink)]">Surface</span> shows its
+                    outside shape. <span className="font-medium text-[var(--v-ink)]">Atoms</span>{" "}
+                    shows every atom and bond.
+                  </p>
+                  <p className="mt-1.5">
+                    Colour shows how sure the prediction is about each part, not whether that part
+                    works. Point at the model to read any building block.
+                  </p>
+                </div>
+              </details>
+            </div>
+
             <div className="relative flex flex-1 flex-col">
               <div className="relative min-h-[360px] flex-1 sm:min-h-[420px]">
-                {backbone && (
-                  <StructureViewer
-                    backbone={backbone}
+                {structure.status === "ready" && source && (
+                  <MolViewer
+                    pdbText={structure.text}
+                    label={source.recordId}
+                    style={molStyle}
                     colourBy={effectiveColour}
-                    autoRotate={autoRotate}
+                    spin={autoRotate}
                     resetKey={resetKey}
                     onHover={setHover}
                   />
@@ -481,8 +532,7 @@ export function VisionModule() {
 
                 {hover && (
                   <div className="pointer-events-none absolute left-5 top-3 rounded-full bg-[var(--v-ink)] px-3 py-1 text-xs text-white">
-                    {hover.name} {hover.seq}
-                    {hover.icode} · chain {hover.chain}
+                    {hover.name} {hover.seq} · chain {hover.chain}
                     {mode === "predicted" && Number.isFinite(hover.b) && (
                       <>
                         {" "}
@@ -542,6 +592,12 @@ export function VisionModule() {
                             </li>
                           ))}
                     </ul>
+                    {effectiveColour === "plddt" && (
+                      <p className="mt-2 text-[11px] text-[var(--v-ink-2)]">
+                        In plain words: blue parts the model is sure about; orange parts it is
+                        unsure about, often loose, flexible stretches.
+                      </p>
+                    )}
                   </div>
                 )}
 
