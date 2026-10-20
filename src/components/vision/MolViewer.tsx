@@ -24,6 +24,8 @@ type Props = {
   /** Bump to return the camera to its starting view. */
   resetKey: number;
   onHover: (h: HoverInfo | null) => void;
+  /** Residue numbers to select and fly to; empty clears the selection. */
+  focusResidues?: number[] | undefined;
 };
 
 const REPR: Record<MolStyle, string> = {
@@ -32,7 +34,16 @@ const REPR: Record<MolStyle, string> = {
   atoms: "ball-and-stick",
 };
 
-export function MolViewer({ pdbText, label, style, colourBy, spin, resetKey, onHover }: Props) {
+export function MolViewer({
+  pdbText,
+  label,
+  style,
+  colourBy,
+  spin,
+  resetKey,
+  onHover,
+  focusResidues,
+}: Props) {
   const host = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [plugin, setPlugin] = useState<PluginContext | null>(null);
@@ -192,6 +203,36 @@ export function MolViewer({ pdbText, label, style, colourBy, spin, resetKey, onH
       },
     });
   }, [plugin, spin]);
+
+  const focusKey = (focusResidues ?? []).join(",");
+  useEffect(() => {
+    if (!plugin || !loaded) return;
+    run(async () => {
+      const ref = structureRef.current;
+      const cell = ref ? plugin.state.data.cells.get(ref) : undefined;
+      const data = cell?.obj?.data;
+      if (!data) return;
+      const ids = focusKey ? focusKey.split(",").map(Number) : [];
+      if (!ids.length) {
+        plugin.managers.interactivity.lociSelects.deselectAll();
+        return;
+      }
+      const [{ Script }, { StructureSelection }] = await Promise.all([
+        import("molstar/lib/mol-script/script"),
+        import("molstar/lib/mol-model/structure"),
+      ]);
+      const sel = Script.getStructureSelection(
+        (Q) =>
+          Q.struct.generator.atomGroups({
+            "residue-test": Q.core.set.has([Q.set(...ids), Q.ammp("auth_seq_id")]),
+          }),
+        data as never,
+      );
+      const loci = StructureSelection.toLociWithSourceUnits(sel);
+      plugin.managers.interactivity.lociSelects.selectOnly({ loci });
+      plugin.managers.camera.focusLoci(loci, { extraRadius: 14, durationMs: 600 });
+    });
+  }, [plugin, loaded, focusKey]);
 
   useEffect(() => {
     if (plugin && resetKey) plugin.managers.camera.reset();

@@ -20,6 +20,7 @@ import { Route as SimulationRouteImport } from './routes/simulation'
 import { Route as ViewerRouteImport } from './routes/viewer'
 import { Route as VisionRouteImport } from './routes/vision'
 import { Route as VisionEyeRouteImport } from './routes/vision_.eye'
+import { Route as VisionTherapyRouteImport } from './routes/vision_.therapy'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +77,11 @@ const VisionEyeRoute = VisionEyeRouteImport.update({
   path: '/vision/eye',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VisionTherapyRoute = VisionTherapyRouteImport.update({
+  id: '/vision_/therapy',
+  path: '/vision/therapy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
   '/vision/eye': typeof VisionEyeRoute
+  '/vision/therapy': typeof VisionTherapyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
   '/vision/eye': typeof VisionEyeRoute
+  '/vision/therapy': typeof VisionTherapyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
   '/vision_/eye': typeof VisionEyeRoute
+  '/vision_/therapy': typeof VisionTherapyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/viewer'
     | '/vision'
     | '/vision/eye'
+    | '/vision/therapy'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/viewer'
     | '/vision'
     | '/vision/eye'
+    | '/vision/therapy'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/viewer'
     | '/vision'
     | '/vision_/eye'
+    | '/vision_/therapy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   ViewerRoute: typeof ViewerRoute
   VisionRoute: typeof VisionRoute
   VisionEyeRoute: typeof VisionEyeRoute
+  VisionTherapyRoute: typeof VisionTherapyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VisionEyeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vision_/therapy': {
+      id: '/vision_/therapy'
+      path: '/vision/therapy'
+      fullPath: '/vision/therapy'
+      preLoaderRoute: typeof VisionTherapyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   ViewerRoute: ViewerRoute,
   VisionRoute: VisionRoute,
   VisionEyeRoute: VisionEyeRoute,
+  VisionTherapyRoute: VisionTherapyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

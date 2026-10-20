@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -44,11 +44,14 @@ import {
 import {
   crossCheck,
   fetchStructureText,
-  loadVisionRecord,
   rcsbPdbUrl,
   type Check as CheckResult,
-  type VisionRecord,
 } from "@/lib/vision/sources";
+import { useEvidence, useStructure } from "./useEvidence";
+import { GenomeTrack, GroupFilter, ProteinTrack, VariantCard, countGroups } from "./genome";
+import { compareToReference, REFERENCE } from "@/lib/vision/reference";
+import { simulateTherapy } from "@/lib/vision/therapy";
+import type { Variant, VariantGroup } from "@/lib/vision/snapshot";
 import {
   DECISIONS,
   LICENCES,
@@ -58,77 +61,20 @@ import {
   type Target,
 } from "@/lib/vision/targets";
 import { MolViewer, type HoverInfo, type MolColour, type MolStyle } from "./MolViewer";
-import { Card, EvidenceTag, Gap, Spinner, VisionPages } from "./ui";
+import { Card, EvidenceTag, Gap, Spinner, VerdictChip, VisionPages } from "./ui";
 import { PlddtChart } from "./PlddtChart";
 
 type Ready = Extract<Target, { status: "ready" }>;
 
 const fetcher = (u: string, i?: RequestInit) => fetch(u, i);
 
-// ---------------------------------------------------------------- data hooks
-
-type RecordState = { status: "loading" } | { status: "done"; record: VisionRecord };
-
-function useVisionRecord(t: Ready) {
-  const [state, setState] = useState<RecordState>({ status: "loading" });
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    const ac = new AbortController();
-    setState({ status: "loading" });
-    loadVisionRecord(t.geneSymbol, t.taxonId, fetcher, ac.signal)
-      .then((record) => setState({ status: "done", record }))
-      .catch((e: Error) => {
-        if (e.name === "AbortError") return;
-        const gap = { state: "missing" as const, reason: e.message };
-        setState({ status: "done", record: { gene: gap, protein: gap, model: gap } });
-      });
-    return () => ac.abort();
-  }, [t.geneSymbol, t.taxonId, n]);
-  return { state, reload: useCallback(() => setN((x) => x + 1), []) };
-}
-
 type StructureSource = {
-  url: string;
+  key: string;
+  load: (() => Promise<string>) | null;
   kind: "computed" | "measured";
   label: string;
   recordId: string;
 };
-
-type StructureState =
-  | { status: "idle" }
-  | { status: "loading" }
-  | { status: "gap"; reason: string }
-  | { status: "ready"; backbone: Backbone; text: string; retrievedAt: string };
-
-function useStructure(src: StructureSource | null) {
-  const [state, setState] = useState<StructureState>({ status: "idle" });
-  const url = src?.url;
-  useEffect(() => {
-    if (!url) {
-      setState({ status: "idle" });
-      return;
-    }
-    const ac = new AbortController();
-    setState({ status: "loading" });
-    fetchStructureText(url, fetcher, ac.signal)
-      .then((res) => {
-        if (!res.ok) return setState({ status: "gap", reason: res.reason });
-        const backbone = parsePdbBackbone(res.data);
-        if (!backbone.residues.length)
-          return setState({
-            status: "gap",
-            reason:
-              "The file contained no alpha-carbon records. Very large entries are published only as mmCIF, which this viewer does not read yet.",
-          });
-        setState({ status: "ready", backbone, text: res.data, retrievedAt: res.retrievedAt });
-      })
-      .catch((e: Error) => {
-        if (e.name !== "AbortError") setState({ status: "gap", reason: e.message });
-      });
-    return () => ac.abort();
-  }, [url]);
-  return state;
-}
 
 // ---------------------------------------------------------------- small parts
 
@@ -161,8 +107,9 @@ const sourcedReason = (s: Sourced<unknown>) =>
 
 export function VisionModule() {
   const target = TARGETS.find((t): t is Ready => t.status === "ready")!;
-  const { state, reload } = useVisionRecord(target);
-  const record = state.status === "done" ? state.record : null;
+  const { ev, setMode: setDataMode, reload } = useEvidence(target.geneSymbol, target.taxonId);
+  const state = { status: ev.status };
+  const record = ev.status === "done" ? ev.record : null;
   const gene = record ? valueOf(record.gene) : undefined;
   const protein = record ? valueOf(record.protein) : undefined;
   const model = record ? valueOf(record.model) : undefined;
@@ -174,6 +121,26 @@ export function VisionModule() {
   const [autoRotate, setAutoRotate] = useState(true);
   const [resetKey, setResetKey] = useState(0);
   const [hover, setHover] = useState<HoverInfo | null>(null);
+  const [groups, setGroups] = useState<Set<VariantGroup>>(new Set(["pathogenic", "conflicting"]));
+  const [picked, setPicked] = useState<Variant | null>(null);
+  const variantSet = ev.variants ? valueOf(ev.variants) : undefined;
+  const allVariants = useMemo(() => variantSet?.variants ?? [], [variantSet]);
+  const shownVariants = useMemo(
+    () => allVariants.filter((v) => groups.has(v.group)),
+    [allVariants, groups],
+  );
+  const selectedVariant =
+    picked ??
+    allVariants.find((v) => v.protein?.short === "R91W" && v.group === "pathogenic") ??
+    null;
+  const cds = ev.sequences ? valueOf(ev.sequences)?.cds : undefined;
+  const comparison = useMemo(
+    () =>
+      compareToReference(
+        simulateTherapy({ dose: 1, treatedArea: 0.3, viableAtStart: 0.7, days: 365 }),
+      ),
+    [],
+  );
 
   const experimental = protein?.pdb ?? [];
   useEffect(() => {
@@ -184,17 +151,28 @@ export function VisionModule() {
   const source: StructureSource | null =
     mode === "predicted"
       ? model
-        ? { url: model.pdbUrl, kind: "computed", label: "Predicted model", recordId: model.entryId }
+        ? {
+            key: `${ev.mode}:${model.entryId}`,
+            load: ev.loadModelText,
+            kind: "computed",
+            label: "Predicted model",
+            recordId: model.entryId,
+          }
         : null
       : pdbId
         ? {
-            url: rcsbPdbUrl(pdbId),
+            key: `pdb:${pdbId}`,
+            load: async () => {
+              const r = await fetchStructureText(rcsbPdbUrl(pdbId), fetcher);
+              if (!r.ok) throw new Error(r.reason);
+              return r.data;
+            },
             kind: "measured",
             label: "Experimental structure",
             recordId: pdbId,
           }
         : null;
-  const structure = useStructure(source);
+  const structure = useStructure(source?.key ?? null, source?.load ?? null);
   const backbone = structure.status === "ready" ? structure.backbone : null;
   const plddt = useMemo(
     () => (mode === "predicted" && backbone ? summarisePlddt(backbone.residues) : null),
@@ -315,6 +293,31 @@ export function VisionModule() {
                   ),
                 )}
               </div>
+
+              <p className="mt-5 text-xs font-medium text-[var(--v-ink-2)]">Data</p>
+              <div className="mt-2 grid grid-cols-2 gap-1 rounded-full bg-[var(--v-soft)] p-1 text-[12px]">
+                {(
+                  [
+                    ["snapshot", "Snapshot"],
+                    ["live", "Live check"],
+                  ] as const
+                ).map(([k, label]) => (
+                  <button
+                    key={k}
+                    aria-pressed={ev.mode === k}
+                    onClick={() => setDataMode(k)}
+                    className={`rounded-full px-2 py-1 ${ev.mode === k ? "bg-[var(--v-ink)] text-white" : ""}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1.5 text-[11px] text-[var(--v-ink-3)]">
+                {ev.mode === "snapshot" && ev.manifest
+                  ? `Raw responses captured ${new Date(ev.manifest.capturedAt).toLocaleDateString(undefined, { dateStyle: "medium" })} from Ensembl, UniProt, AlphaFold DB and ClinVar. Works offline; every value keeps its source.`
+                  : "Requested now from Ensembl, UniProt and AlphaFold DB. Variants still come from the snapshot."}
+              </p>
+              {ev.fallback && <p className="mt-1 text-[11px] text-[#b57d12]">{ev.fallback}</p>}
             </Card>
 
             <Card className="flex-1">
@@ -322,61 +325,72 @@ export function VisionModule() {
               <h2 className="text-[19px] font-medium">Evidence pipeline</h2>
               <ul className="mt-4 flex flex-col gap-2">
                 {PIPELINE.map((s) => {
-                  const live = s.status === "live";
-                  const src =
+                  const src: Sourced<unknown> | null | undefined =
                     s.key === "gene"
                       ? record?.gene
-                      : s.key === "protein"
+                      : s.key === "protein" || s.key === "cell"
                         ? record?.protein
                         : s.key === "structure"
                           ? record?.model
-                          : undefined;
-                  const status = !live
-                    ? s.status === "not-built"
-                      ? "Not built"
-                      : "Needs decision"
-                    : !record
+                          : s.key === "variant"
+                            ? ev.variants
+                            : undefined;
+                  const status =
+                    ev.status === "loading"
                       ? "Loading"
-                      : src?.state === "value"
-                        ? "Loaded"
-                        : src?.state === "conflict"
-                          ? "Conflict"
-                          : "Gap";
+                      : s.key === "hypothesis" || s.key === "reference"
+                        ? "Ready"
+                        : src?.state === "value"
+                          ? "Loaded"
+                          : src?.state === "conflict"
+                            ? "Conflict"
+                            : "Gap";
                   const Icon =
                     s.key === "gene"
                       ? Dna
-                      : s.key === "protein"
-                        ? Atom
-                        : s.key === "structure"
-                          ? Box
-                          : Layers;
-                  const current = s.key === "structure";
+                      : s.key === "variant"
+                        ? ListChecks
+                        : s.key === "protein"
+                          ? Atom
+                          : s.key === "structure"
+                            ? Box
+                            : s.key === "cell"
+                              ? Eye
+                              : s.key === "hypothesis"
+                                ? Microscope
+                                : Scale;
+                  const ok = status === "Loaded" || status === "Ready";
                   return (
-                    <li
-                      key={s.key}
-                      className={`flex items-center gap-3 rounded-2xl px-2.5 py-2 ${
-                        current
-                          ? "bg-[var(--v-accent)] text-white"
-                          : live
-                            ? "bg-[var(--v-soft)]"
-                            : "border border-dashed border-[var(--v-line)] text-[var(--v-ink-3)]"
-                      }`}
-                    >
-                      <span
-                        className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${
-                          current ? "bg-white text-[var(--v-accent-ink)]" : "bg-[var(--v-card)]"
+                    <li key={s.key}>
+                      <a
+                        href={`#stage-${s.key}`}
+                        className={`flex items-center gap-3 rounded-2xl px-2.5 py-2 ${
+                          ok
+                            ? "bg-[var(--v-soft)] hover:bg-[var(--v-accent-soft)]"
+                            : "border border-dashed border-[var(--v-line)]"
                         }`}
                       >
-                        <Icon className="h-4 w-4" aria-hidden />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[13px] font-medium">{s.label}</span>
-                        <span
-                          className={`block truncate text-[11px] ${current ? "text-white/85" : "text-[var(--v-ink-3)]"}`}
-                        >
-                          {s.source} | {status}
+                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--v-card)]">
+                          <Icon className="h-4 w-4" aria-hidden />
                         </span>
-                      </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[13px] font-medium">{s.label}</span>
+                          <span className="block truncate text-[11px] text-[var(--v-ink-3)]">
+                            {s.source} | {status}
+                          </span>
+                        </span>
+                        {ok ? (
+                          <Check
+                            className="h-3.5 w-3.5 shrink-0 text-[#0f8f7e]"
+                            aria-label="working"
+                          />
+                        ) : (
+                          <CircleDashed
+                            className="h-3.5 w-3.5 shrink-0 text-[var(--v-ink-3)]"
+                            aria-hidden
+                          />
+                        )}
+                      </a>
                     </li>
                   );
                 })}
@@ -504,6 +518,11 @@ export function VisionModule() {
                     spin={autoRotate}
                     resetKey={resetKey}
                     onHover={setHover}
+                    focusResidues={
+                      mode === "predicted" && selectedVariant?.protein
+                        ? [selectedVariant.protein.pos]
+                        : []
+                    }
                   />
                 )}
                 <div className="pointer-events-none absolute inset-0 grid place-items-center p-8">
@@ -881,6 +900,226 @@ export function VisionModule() {
           </Card>
         </div>
 
+        {/* ------------------------------------------------ pipeline stages */}
+        <Card id="stage-variant" className="mt-3">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-[19px] font-medium">Genomic variants</h2>
+                <EvidenceTag kind="reference" label="ClinVar" />
+              </div>
+              {variantSet ? (
+                <p className="text-xs text-[var(--v-ink-3)]">
+                  {variantSet.variants.length.toLocaleString()} variants recorded for RPE65 alone ·{" "}
+                  {countGroups(variantSet.variants).pathogenic} pathogenic or likely pathogenic ·{" "}
+                  {variantSet.multiGene} larger events spanning other genes too are counted, not
+                  mapped.
+                </p>
+              ) : (
+                <p className="text-xs text-[var(--v-ink-3)]">Loading ClinVar…</p>
+              )}
+              {ev.variants?.state === "value" && (
+                <div className="mt-0.5">
+                  <ProvLine p={ev.variants.provenance} />
+                </div>
+              )}
+            </div>
+            <Link
+              to="/vision/therapy"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[var(--v-ink)] px-4 py-2 text-xs font-medium text-white"
+            >
+              Open the gene therapy simulator <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          {ev.variants?.state === "missing" && (
+            <div className="mt-3">
+              <Gap>{ev.variants.reason}</Gap>
+            </div>
+          )}
+          {variantSet && gene && protein && (
+            <>
+              <div className="mt-3">
+                <GroupFilter
+                  value={groups}
+                  onChange={setGroups}
+                  counts={countGroups(allVariants)}
+                />
+              </div>
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+                <div className="flex flex-col gap-4">
+                  <GenomeTrack
+                    gene={gene}
+                    variants={shownVariants}
+                    selected={selectedVariant}
+                    onSelect={setPicked}
+                  />
+                  <ProteinTrack
+                    length={protein.length}
+                    variants={shownVariants}
+                    selected={selectedVariant}
+                    onSelect={setPicked}
+                    plddt={
+                      mode === "predicted" && backbone
+                        ? backbone.residues.map((r) => r.b)
+                        : undefined
+                    }
+                  />
+                </div>
+                <div>
+                  {selectedVariant ? (
+                    <>
+                      <VariantCard v={selectedVariant} cds={cds} />
+                      {selectedVariant.protein && mode === "predicted" && (
+                        <a
+                          href="#structure"
+                          className="mt-2 inline-flex text-[12px] text-[var(--v-accent-ink)] underline underline-offset-2"
+                        >
+                          Amino acid {selectedVariant.protein.pos} is selected in the 3D structure
+                          above
+                        </a>
+                      )}
+                    </>
+                  ) : (
+                    <Gap>Choose a variant on either track.</Gap>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </Card>
+
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <Card id="stage-cell">
+            <div className="flex items-center gap-2">
+              <h2 className="text-[19px] font-medium">Retinal cell & pathway</h2>
+              <EvidenceTag kind="reference" label="UniProt · Reactome" />
+            </div>
+            {protein ? (
+              <dl className="mt-3 grid grid-cols-[120px_minmax(0,1fr)] gap-x-3 gap-y-2 text-[13px]">
+                <dt className="text-[var(--v-ink-3)]">Made in</dt>
+                <dd>{protein.tissue ?? "not stated"}</dd>
+                <dt className="text-[var(--v-ink-3)]">Inside the cell</dt>
+                <dd>{protein.locations.join(", ") || "not stated"}</dd>
+                <dt className="text-[var(--v-ink-3)]">Reaction</dt>
+                <dd>
+                  {protein.reactions.length
+                    ? protein.reactions.slice(0, 2).map((r) => (
+                        <span key={r.name} className="block">
+                          {r.name}
+                          {r.ec && <span className="text-[var(--v-ink-3)]"> · EC {r.ec}</span>}
+                        </span>
+                      ))
+                    : "not stated"}
+                </dd>
+                <dt className="text-[var(--v-ink-3)]">Pathway</dt>
+                <dd>
+                  {protein.pathways.length
+                    ? protein.pathways.map((pw) => (
+                        <a
+                          key={pw.id}
+                          href={`https://reactome.org/content/detail/${pw.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block underline decoration-[var(--v-line)] underline-offset-2"
+                        >
+                          {pw.name} <span className="text-[var(--v-ink-3)]">· {pw.id}</span>
+                        </a>
+                      ))
+                    : "not stated"}
+                </dd>
+              </dl>
+            ) : (
+              <div className="mt-3">
+                <Gap>Needs the protein record.</Gap>
+              </div>
+            )}
+            <p className="mt-3 text-[12px] text-[var(--v-ink-2)]">
+              In plain words: RPE65 is made only in the RPE, the layer of cells behind the retina,
+              where it resets the molecule rods and cones use to catch light.{" "}
+              <Link
+                to="/vision/eye"
+                hash="cycle"
+                className="text-[var(--v-accent-ink)] underline underline-offset-2"
+              >
+                See it in the eye simulation
+              </Link>
+            </p>
+          </Card>
+
+          <Card id="stage-hypothesis">
+            <div className="flex items-center gap-2">
+              <h2 className="text-[19px] font-medium">Intervention hypothesis</h2>
+              <EvidenceTag kind="hypothetical" />
+            </div>
+            <p className="mt-2 text-[15px] font-medium">
+              Gene augmentation: add a working copy of RPE65 to RPE cells.
+            </p>
+            <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-4 text-[13px] text-[var(--v-ink-2)]">
+              <li>
+                <span className="font-medium text-[var(--v-ink)]">Why it could work: </span>
+                ClinVar lists the condition as recessive (
+                {selectedVariant?.conditions[0] ?? "RPE65-related retinopathy"}), so disease needs
+                both copies faulty; one working copy should restore the reset step.
+              </li>
+              <li>
+                <span className="font-medium text-[var(--v-ink)]">What limits it: </span>
+                only cells reached by the injection are treated, and photoreceptors already lost
+                cannot respond.
+              </li>
+              <li>
+                <span className="font-medium text-[var(--v-ink)]">Precedent: </span>
+                an approved therapy works this way (voretigene neparvovec, US FDA, 2017).
+              </li>
+            </ul>
+            <Link
+              to="/vision/therapy"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--v-accent)] px-4 py-2 text-xs font-medium text-white"
+            >
+              Simulate it <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </Card>
+        </div>
+
+        <Card id="stage-reference" className="mt-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-[19px] font-medium">Reference comparison</h2>
+            <EvidenceTag kind="reference" label="Phase 3 trial" />
+            <EvidenceTag kind="computed" label="Model, default inputs" />
+          </div>
+          <p className="mt-1 text-xs text-[var(--v-ink-3)]">
+            {REFERENCE.design} Endpoint: {REFERENCE.endpoint}. The model is compared only where both
+            can speak.
+          </p>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full min-w-[640px] text-left text-[13px]">
+              <thead className="text-[11px] text-[var(--v-ink-3)]">
+                <tr>
+                  <th className="py-1.5 pr-3 font-medium">Aspect</th>
+                  <th className="py-1.5 pr-3 font-medium">Trial (reference)</th>
+                  <th className="py-1.5 pr-3 font-medium">Model (hypothetical)</th>
+                  <th className="py-1.5 font-medium">Verdict</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--v-line)]">
+                {comparison.map((c) => (
+                  <tr key={c.key}>
+                    <td className="py-2 pr-3 font-medium">{c.aspect}</td>
+                    <td className="py-2 pr-3 text-[var(--v-ink-2)]">{c.reference}</td>
+                    <td className="py-2 pr-3 text-[var(--v-ink-2)]">{c.model}</td>
+                    <td className="py-2">
+                      <VerdictChip v={c.verdict} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-[11px] text-[var(--v-ink-3)]">
+            {REFERENCE.citation} Citation entered from the developers' knowledge; check it against
+            the publication.
+          </p>
+        </Card>
+
         {/* ------------------------------------------------ benchmark + scope */}
         <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <Card id="benchmark">
@@ -928,8 +1167,8 @@ export function VisionModule() {
               </li>
               <li>No patient data is loaded, entered or stored.</li>
               <li>
-                Not built yet: genomic variants, retinal cell and pathway, intervention hypotheses,
-                reference comparison, eye-optics simulation and the conceptual vision mode.
+                Modelled, not measured: the gene-therapy time course is a hypothetical model with
+                illustrative parameters, not fitted to any trial.
               </li>
             </ul>
             <p className="mt-4 text-xs font-medium text-[var(--v-ink-2)]">Source terms</p>
