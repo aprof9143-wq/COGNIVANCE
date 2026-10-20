@@ -59,3 +59,44 @@ describe("gene augmentation model (hypothetical)", () => {
     expect(end.viableUntreated).toBeLessThan(base.viableAtStart);
   });
 });
+
+describe("comparison with the trial reference", async () => {
+  const { compareToReference, dayToFraction } = await import("./reference");
+
+  it("compares direction and timing, and never magnitude", () => {
+    const c = compareToReference(simulateTherapy(base));
+    expect(c.find((x) => x.key === "direction")!.verdict).toBe("agrees");
+    expect(c.find((x) => x.key === "magnitude")!.verdict).toBe("not-comparable");
+    expect(c.find((x) => x.key === "durability")!.verdict).toBe("agrees");
+  });
+
+  it("reports no onset when nothing is given", () => {
+    const r = simulateTherapy({ ...base, dose: 0 });
+    expect(dayToFraction(r, 0.5)).toBeNull();
+    expect(compareToReference(r).find((x) => x.key === "direction")!.verdict).toBe("differs");
+  });
+
+  it("flags a too-short simulation as not comparable on durability", () => {
+    const c = compareToReference(simulateTherapy({ ...base, days: 90 }));
+    expect(c.find((x) => x.key === "durability")!.verdict).toBe("not-comparable");
+  });
+});
+
+describe("retina to visual cortex (existing network model)", async () => {
+  const { cortexCurve, cortexAt } = await import("./cortex");
+  const curve = cortexCurve();
+
+  it("spans full loss to healthy", () => {
+    expect(curve[0]!.v1).toBeCloseTo(0, 6);
+    expect(curve[curve.length - 1]!.v1).toBeCloseTo(1, 6);
+  });
+
+  it("gives more cortical response for more retinal signal", () => {
+    expect(cortexAt(curve, 0.8)).toBeGreaterThan(cortexAt(curve, 0.2));
+    expect(cortexAt(curve, 0.5)).toBeGreaterThan(0.05);
+  });
+
+  it("is reproducible for a seed", () => {
+    expect(cortexCurve(7, 5)).toEqual(cortexCurve(7, 5));
+  });
+});

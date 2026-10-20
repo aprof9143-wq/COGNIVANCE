@@ -103,17 +103,54 @@ export const DECISIONS: Decision[] = [
 
 export type StageStatus = "live" | "not-built" | "needs-decision";
 
-export type Stage = { key: string; label: string; source: string; status: StageStatus };
+export type Stage = {
+  key: string;
+  label: string;
+  source: string;
+  status: StageStatus;
+  /** The kind of evidence the stage carries. */
+  kind: "reference" | "computed" | "hypothetical";
+};
 
-/** The brief's workflow, and how much of it this module does today. */
+/** The brief's workflow. Every stage runs on the RPE65 snapshot or live data. */
 export const PIPELINE: Stage[] = [
-  { key: "gene", label: "Gene & transcript", source: "Ensembl", status: "live" },
-  { key: "protein", label: "Protein", source: "UniProt", status: "live" },
-  { key: "structure", label: "3D structure", source: "AlphaFold · PDB", status: "live" },
-  { key: "variant", label: "Genomic variants", source: "ClinVar (planned)", status: "not-built" },
-  { key: "cell", label: "Retinal cell / pathway", source: "—", status: "not-built" },
-  { key: "hypothesis", label: "Intervention hypothesis", source: "—", status: "not-built" },
-  { key: "reference", label: "Reference comparison", source: "—", status: "needs-decision" },
+  { key: "gene", label: "Gene & transcript", source: "Ensembl", status: "live", kind: "reference" },
+  {
+    key: "variant",
+    label: "Genomic variants",
+    source: "ClinVar",
+    status: "live",
+    kind: "reference",
+  },
+  { key: "protein", label: "Protein", source: "UniProt", status: "live", kind: "reference" },
+  {
+    key: "structure",
+    label: "3D structure",
+    source: "AlphaFold DB",
+    status: "live",
+    kind: "computed",
+  },
+  {
+    key: "cell",
+    label: "Retinal cell & pathway",
+    source: "UniProt · Reactome",
+    status: "live",
+    kind: "reference",
+  },
+  {
+    key: "hypothesis",
+    label: "Intervention hypothesis",
+    source: "Gene augmentation model",
+    status: "live",
+    kind: "hypothetical",
+  },
+  {
+    key: "reference",
+    label: "Reference comparison",
+    source: "Phase 3 trial, 2017",
+    status: "live",
+    kind: "reference",
+  },
 ];
 
 export type Licence = { source: string; terms: string; url: string };

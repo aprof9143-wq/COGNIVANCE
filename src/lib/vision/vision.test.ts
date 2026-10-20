@@ -60,12 +60,9 @@ describe("targets and decisions", () => {
     expect(ready[0]).toMatchObject({ geneSymbol: "RPE65", taxonId: 9606 });
   });
 
-  it("does not claim pipeline stages that are not built", () => {
-    expect(PIPELINE.filter((s) => s.status === "live").map((s) => s.key)).toEqual([
-      "gene",
-      "protein",
-      "structure",
-    ]);
+  it("runs every pipeline stage, and labels the modelled one hypothetical", () => {
+    expect(PIPELINE.every((s) => s.status === "live")).toBe(true);
+    expect(PIPELINE.find((s) => s.key === "hypothesis")!.kind).toBe("hypothetical");
   });
 });
 

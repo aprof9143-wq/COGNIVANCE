@@ -153,3 +153,48 @@ describe("parsing helpers", () => {
     expect(translate("ATGTGGTAA")).toBe("MW");
   });
 });
+
+describe("placing ClinVar substitutions on Ensembl's coding sequence (real data)", async () => {
+  const { parseCodingSnv, placeOnCds } = await import("./genome");
+
+  it("places R91W: c.271C>T turns codon 91 CGG into TGG, Arg into Trp", () => {
+    const cds = valueOf(snap.sequences)!.cds;
+    const p = placeOnCds(cds, parseCodingSnv("c.271C>T")!)!;
+    expect(p).toMatchObject({
+      codonIndex: 91,
+      codon: "CGG",
+      mutantCodon: "TGG",
+      aaBefore: "R",
+      aaAfter: "W",
+      refAgrees: true,
+    });
+    expect(p.context[p.at]).toBe("C");
+  });
+
+  it("agrees with ClinVar for nearly every coding substitution", () => {
+    const cds = valueOf(snap.sequences)!.cds;
+    const snvs = valueOf(snap.variants)!.variants.filter(
+      (v) => parseCodingSnv(v.cdna) && v.protein,
+    );
+    expect(snvs.length).toBeGreaterThan(300);
+    let ok = 0;
+    for (const v of snvs) {
+      const p = placeOnCds(cds, parseCodingSnv(v.cdna)!);
+      const alt = v.protein!.short.slice(-1);
+      if (
+        p &&
+        p.refAgrees &&
+        p.codonIndex === v.protein!.pos &&
+        (p.aaAfter === alt || v.protein!.change === "=")
+      )
+        ok++;
+    }
+    expect(ok / snvs.length).toBeGreaterThan(0.99);
+  });
+
+  it("rejects what it cannot place", () => {
+    expect(parseCodingSnv("c.127_128delinsTT")).toBeNull();
+    expect(parseCodingSnv(undefined)).toBeNull();
+    expect(placeOnCds("ATG", { pos: 10, ref: "A", alt: "G" })).toBeNull();
+  });
+});
