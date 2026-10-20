@@ -1,17 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { Sparkles, TriangleAlert } from "lucide-react";
 import {
   BANDS,
   BAND_CODES,
   REGION_NOTES,
-  composite,
-  makeConceptScene,
-  regionAt,
+  type Region,
   type SpectrumMode,
 } from "@/lib/vision/spectrum";
-import { EvidenceTag } from "./ui";
-
-const SIZE = 256;
+import { ConceptScene3D, PAINTS } from "./ConceptScene3D";
 
 const MODES: { key: SpectrumMode; label: string }[] = [
   { key: "human", label: "Human eye" },
@@ -77,45 +73,8 @@ function SpectrumBar({ mode }: { mode: SpectrumMode }) {
  * piece. Nothing here feeds or comes from the benchmark.
  */
 export function ConceptVision() {
-  const scene = useMemo(() => makeConceptScene(SIZE), []);
   const [mode, setMode] = useState<SpectrumMode>("both");
-  const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
-  const human = useRef<HTMLCanvasElement>(null);
-  const concept = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    for (const [c, m] of [
-      [human.current, "human"],
-      [concept.current, mode],
-    ] as const) {
-      if (!c) continue;
-      const p = composite(scene, m);
-      c.getContext("2d")!.putImageData(
-        new ImageData(new Uint8ClampedArray(p.data), SIZE, SIZE),
-        0,
-        0,
-      );
-    }
-  });
-
-  const track = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    setHover({
-      x: Math.min(SIZE - 1, Math.max(0, Math.floor(((e.clientX - r.left) / r.width) * SIZE))),
-      y: Math.min(SIZE - 1, Math.max(0, Math.floor(((e.clientY - r.top) / r.height) * SIZE))),
-    });
-  };
-  const at = hover && regionAt((hover.x + 0.5) / SIZE, (hover.y + 0.5) / SIZE);
-  const mark = hover && (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(22,21,29,0.6)]"
-      style={{
-        left: `${((hover.x + 0.5) / SIZE) * 100}%`,
-        top: `${((hover.y + 0.5) / SIZE) * 100}%`,
-      }}
-    />
-  );
+  const [at, setAt] = useState<Region | null>(null);
 
   return (
     <div>
@@ -151,54 +110,25 @@ export function ConceptVision() {
         ))}
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        {[
-          { ref: human, title: "What a human eye sees", sub: "Visible light only" },
-          {
-            ref: concept,
-            title: "Concept view",
-            sub:
-              MODES.find((m) => m.key === mode)!.label === "Human eye"
-                ? "Same as human"
-                : "False colour, see the key below",
-          },
-        ].map(({ ref, title, sub }) => (
-          <figure key={title}>
-            <div className="relative overflow-hidden rounded-2xl ring-1 ring-[var(--v-line)]">
-              <canvas
-                ref={ref}
-                width={SIZE}
-                height={SIZE}
-                className="block aspect-square w-full cursor-crosshair"
-                onPointerMove={track}
-                onPointerLeave={() => setHover(null)}
-              />
-              {mark}
-            </div>
-            <figcaption className="mt-1.5 text-[12px]">
-              <span className="font-medium">{title}</span>
-              {ref === concept && (
-                <>
-                  {" "}
-                  <EvidenceTag kind="hypothetical" label="Concept" />
-                </>
-              )}
-              <span className="block text-[11px] text-[var(--v-ink-3)]">{sub}</span>
-            </figcaption>
-          </figure>
-        ))}
+      <div className="mt-3">
+        <ConceptScene3D mode={mode} onInspect={setAt} />
+        <p className="mt-1.5 text-[11px] text-[var(--v-ink-3)]">
+          Drag the handle to move the split; drag the scene to look around. Left: visible light, as
+          a human eye sees it. Right: the concept view, in false colour.
+        </p>
       </div>
 
       <div className="mt-3 rounded-2xl bg-[var(--v-soft)] p-3 text-[12px]" aria-live="polite">
-        {at && hover ? (
+        {at ? (
           <>
-            <p className="font-medium first-letter:uppercase">{at.region}</p>
+            <p className="font-medium first-letter:uppercase">{at}</p>
             <p className="mt-0.5 text-[var(--v-ink-2)]">
-              Ultraviolet {Math.round(at.paint.uv * 100)}% · near-infrared{" "}
-              {Math.round(at.paint.nir * 100)}%{" "}
+              Ultraviolet {Math.round(PAINTS[at].uv * 100)}%
+              {at === "petal" ? " at the tips, about 4% near the centre" : ""} · near-infrared{" "}
+              {Math.round(PAINTS[at].nir * 100)}%{" "}
               <span className="text-[var(--v-ink-3)]">(illustrative values)</span>
             </p>
-            {REGION_NOTES[at.region] && <p className="mt-1">{REGION_NOTES[at.region]}</p>}
+            {REGION_NOTES[at] && <p className="mt-1">{REGION_NOTES[at]}</p>}
           </>
         ) : (
           <p className="text-[var(--v-ink-2)]">
@@ -229,8 +159,8 @@ export function ConceptVision() {
               near-infrared, water dark in it.
             </li>
             <li>
-              Drawn by this app: the scene and its values, chosen to illustrate those effects; not
-              measurements.
+              Built by this app: the 3D scene and its values, chosen to illustrate those effects;
+              not measurements.
             </li>
             <li>
               Not covered: radiation exposure (X-rays, gamma). That is a separate use case and needs

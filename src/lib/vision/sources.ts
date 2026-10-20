@@ -87,6 +87,8 @@ export type GeneRecord = {
         version?: number | undefined;
         biotype?: string | undefined;
         exonCount: number;
+        /** Genomic coordinates, in transcript order. */
+        exons: { id: string; start: number; end: number }[];
         translation?: { id: string; length: number } | undefined;
       }
     | undefined;
@@ -97,7 +99,7 @@ const EnsemblTranscript = z.object({
   version: z.number().optional(),
   biotype: z.string().optional(),
   is_canonical: z.number().optional(),
-  Exon: z.array(z.unknown()).optional(),
+  Exon: z.array(z.object({ id: z.string(), start: z.number(), end: z.number() })).optional(),
   Translation: z.object({ id: z.string(), length: z.number() }).optional(),
 });
 
@@ -140,10 +142,14 @@ export function toGeneRecord(g: z.infer<typeof EnsemblGene>): GeneRecord {
       version: canon.version,
       biotype: canon.biotype,
       exonCount: canon.Exon?.length ?? 0,
+      exons: (canon.Exon ?? []).map(({ id, start, end }) => ({ id, start, end })),
       translation: canon.Translation,
     },
   };
 }
+
+/** Parse a raw Ensembl lookup (expand=1) response. Throws on an unexpected shape. */
+export const parseEnsemblGene = (raw: unknown): GeneRecord => toGeneRecord(EnsemblGene.parse(raw));
 
 export async function fetchGene(
   symbol: string,
@@ -153,7 +159,7 @@ export async function fetchGene(
   const url = `${ENSEMBL}/lookup/symbol/homo_sapiens/${encodeURIComponent(symbol)}?content-type=application/json;expand=1`;
   const releaseUrl = `${ENSEMBL}/info/data?content-type=application/json`;
   const [gene, rel] = await Promise.all([
-    get(url, (raw) => toGeneRecord(EnsemblGene.parse(raw)), "json", fetcher, signal),
+    get(url, parseEnsemblGene, "json", fetcher, signal),
     get(
       releaseUrl,
       (raw) => z.object({ releases: z.array(z.number()) }).parse(raw),
@@ -190,6 +196,12 @@ export type ProteinRecord = {
   sequenceVersion?: number | undefined;
   lastUpdated?: string | undefined;
   functionText?: string | undefined;
+  /** Where the protein is made, as UniProt states it. */
+  tissue?: string | undefined;
+  /** Reactions it catalyses, with EC numbers. */
+  reactions: { name: string; ec?: string | undefined }[];
+  /** Reactome pathways it takes part in. */
+  pathways: { id: string; name: string }[];
   locations: string[];
   diseases: { id: string; acronym?: string | undefined; mim?: string | undefined }[];
   ensemblGeneIds: string[];
@@ -226,6 +238,7 @@ const UniProtEntry = z.object({
       z.object({
         commentType: z.string(),
         texts: z.array(Text).optional(),
+        reaction: z.object({ name: z.string(), ecNumber: z.string().optional() }).optional(),
         subcellularLocations: z.array(z.object({ location: Text.optional() })).optional(),
         disease: z
           .object({
@@ -274,6 +287,18 @@ export function toProteinRecord(e: z.infer<typeof UniProtEntry>): ProteinRecord 
         .flatMap((c) => c.texts ?? [])
         .map((t) => t.value)
         .join(" ") || undefined,
+    tissue:
+      comments
+        .filter((c) => c.commentType === "TISSUE SPECIFICITY")
+        .flatMap((c) => c.texts ?? [])
+        .map((t) => t.value)
+        .join(" ") || undefined,
+    reactions: comments
+      .filter((c) => c.commentType === "CATALYTIC ACTIVITY" && c.reaction)
+      .map((c) => ({ name: c.reaction!.name, ec: c.reaction!.ecNumber })),
+    pathways: xrefs
+      .filter((x) => x.database === "Reactome")
+      .map((x) => ({ id: x.id, name: prop(x, "PathwayName") ?? x.id })),
     locations: comments
       .filter((c) => c.commentType === "SUBCELLULAR LOCATION")
       .flatMap((c) => c.subcellularLocations ?? [])
@@ -303,6 +328,13 @@ export function toProteinRecord(e: z.infer<typeof UniProtEntry>): ProteinRecord 
   };
 }
 
+/** Parse a raw UniProtKB search response into its entries. Throws on an unexpected shape. */
+export const parseUniProtSearch = (raw: unknown): ProteinRecord[] =>
+  z
+    .object({ results: z.array(UniProtEntry) })
+    .parse(raw)
+    .results.map(toProteinRecord);
+
 export async function fetchProtein(
   symbol: string,
   taxonId: number,
@@ -311,17 +343,7 @@ export async function fetchProtein(
 ): Promise<Sourced<ProteinRecord>> {
   const query = `gene_exact:${symbol} AND organism_id:${taxonId} AND reviewed:true`;
   const url = `${UNIPROT}/uniprotkb/search?query=${encodeURIComponent(query)}&format=json&size=5`;
-  const res = await get(
-    url,
-    (raw) =>
-      z
-        .object({ results: z.array(UniProtEntry) })
-        .parse(raw)
-        .results.map(toProteinRecord),
-    "json",
-    fetcher,
-    signal,
-  );
+  const res = await get(url, parseUniProtSearch, "json", fetcher, signal);
   if (!res.ok) return missing(res.reason);
   const prov = (p: ProteinRecord): Provenance => ({
     source: "UniProtKB REST",
@@ -378,40 +400,47 @@ const AlphaFoldEntry = z.object({
   globalMetricValue: z.number().optional(),
 });
 
+/** The model for `accession` from a raw AlphaFold DB prediction response, or null if none. */
+export function parseAlphaFold(raw: unknown, accession: string): ModelRecord | null {
+  const mine = z
+    .array(AlphaFoldEntry)
+    .parse(raw)
+    .filter((e) => e.uniprotAccession === accession);
+  const e = mine.find((x) => x.entryId === `AF-${accession}-F1`) ?? mine[0];
+  if (!e) return null;
+  return {
+    entryId: e.entryId,
+    accession,
+    version: e.latestVersion,
+    created: e.modelCreatedDate,
+    start: e.uniprotStart,
+    end: e.uniprotEnd,
+    sequence: e.uniprotSequence,
+    pdbUrl: e.pdbUrl,
+    globalPlddt: e.globalMetricValue,
+    others: mine.filter((x) => x !== e).map((x) => x.entryId),
+  };
+}
+
+export const modelProvenance = (m: ModelRecord, url: string, retrievedAt: string): Provenance => ({
+  source: "AlphaFold DB API",
+  url,
+  recordId: m.version ? `${m.entryId} v${m.version}` : m.entryId,
+  release: m.created ? `model created ${m.created.slice(0, 10)}` : undefined,
+  retrievedAt,
+  note: "Predicted by AlphaFold. A model, not a measurement.",
+});
+
 export async function fetchModel(
   accession: string,
   fetcher: Fetcher,
   signal?: AbortSignal,
 ): Promise<Sourced<ModelRecord>> {
   const url = `${ALPHAFOLD}/api/prediction/${encodeURIComponent(accession)}`;
-  const res = await get(url, (raw) => z.array(AlphaFoldEntry).parse(raw), "json", fetcher, signal);
+  const res = await get(url, (raw) => parseAlphaFold(raw, accession), "json", fetcher, signal);
   if (!res.ok) return missing(res.reason);
-  const mine = res.data.filter((e) => e.uniprotAccession === accession);
-  const e = mine.find((x) => x.entryId === `AF-${accession}-F1`) ?? mine[0];
-  if (!e) return missing(`AlphaFold DB returned no model for ${accession}.`);
-  return sourced(
-    {
-      entryId: e.entryId,
-      accession,
-      version: e.latestVersion,
-      created: e.modelCreatedDate,
-      start: e.uniprotStart,
-      end: e.uniprotEnd,
-      sequence: e.uniprotSequence,
-      pdbUrl: e.pdbUrl,
-      globalPlddt: e.globalMetricValue,
-      others: mine.filter((x) => x !== e).map((x) => x.entryId),
-    },
-    "computed",
-    {
-      source: "AlphaFold DB API",
-      url,
-      recordId: e.latestVersion ? `${e.entryId} v${e.latestVersion}` : e.entryId,
-      release: e.modelCreatedDate ? `model created ${e.modelCreatedDate}` : undefined,
-      retrievedAt: res.retrievedAt,
-      note: "Predicted by AlphaFold. A model, not a measurement.",
-    },
-  );
+  if (!res.data) return missing(`AlphaFold DB returned no model for ${accession}.`);
+  return sourced(res.data, "computed", modelProvenance(res.data, url, res.retrievedAt));
 }
 
 /** A coordinate file as text, for parsePdbBackbone. */

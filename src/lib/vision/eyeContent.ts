@@ -274,6 +274,14 @@ export const CITATIONS: Citation[] = [
     text: "Russell S, et al. Efficacy and safety of voretigene neparvovec (AAV2-hRPE65v2) in patients with RPE65-mediated inherited retinal dystrophy: a randomised, controlled, open-label, phase 3 trial. Lancet. 2017;390:849–860.",
   },
   {
+    id: "moon",
+    text: "Moon P, Spencer DE. On the Stiles-Crawford effect. J Opt Soc Am. 1944;34:319–329. (Pupil diameter versus luminance.)",
+  },
+  {
+    id: "watson",
+    text: "Watson AB, Yellott JI. A unified formula for light-adapted pupil size. J Vis. 2012;12(10):12.",
+  },
+  {
     id: "fda",
     text: "US FDA. FDA approves novel gene therapy to treat patients with a rare form of inherited vision loss. News release, 19 December 2017.",
   },

@@ -1,0 +1,42 @@
+name: vision-snapshot
+
+# Captures the public RPE65 reference records the Vision module shows
+# (Ensembl, UniProt, AlphaFold DB, ClinVar) and commits them, with a
+# provenance manifest, to public/vision/snapshot/rpe65/.
+#
+# Runs when this workflow or the capture script changes, or by hand.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/vision-snapshot.yml"
+      - "tools/vision-snapshot/**"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vision-snapshot-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Capture
+        run: python tools/vision-snapshot/capture.py
+      - name: Commit the snapshot
+        run: |
+          git config user.name "vision-snapshot[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/vision/snapshot
+          if git diff --cached --quiet; then
+            echo "Snapshot unchanged."
+          else
+            git commit -m "data(vision): RPE65 reference snapshot $(date -u +%Y-%m-%d)"
+            git push
+          fi

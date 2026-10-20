@@ -48,6 +48,7 @@ export const GATED_PAGES = [
   "/neurodegeneration",
   "/vision",
   "/vision/eye",
+  "/vision/therapy",
 ] as const;
 export type GatedPage = (typeof GATED_PAGES)[number];
 
