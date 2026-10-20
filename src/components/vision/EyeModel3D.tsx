@@ -181,6 +181,7 @@ const LOOK: Partial<Record<PartKey, Look>> = {
 };
 
 const HIGHLIGHT = new THREE.Color("#6a58e0");
+const BLACK = new THREE.Color(0);
 
 type Built = {
   group: THREE.Group;
@@ -189,7 +190,11 @@ type Built = {
   dispose: () => void;
 };
 
-function buildEye(r: EyeResult): Built {
+/** Parts that change shape as the eye focuses or the pupil moves; rebuilt alone while it adapts. */
+const OPTIC_PARTS = new Set<PartKey>(["lens", "iris"]);
+
+function buildEye(r: EyeResult, which: "shell" | "optics"): Built {
+  const mine = (k: PartKey) => OPTIC_PARTS.has(k) === (which === "optics");
   const { out, cz, R } = profiles(r);
   const group = new THREE.Group();
   const meshes = new Map<PartKey, THREE.Mesh[]>();
@@ -203,6 +208,7 @@ function buildEye(r: EyeResult): Built {
   };
 
   for (const [k, outline] of Object.entries(out) as [PartKey, Vec[]][]) {
+    if (!mine(k)) continue;
     const look = LOOK[k]!;
     const transparent = look.opacity !== undefined;
     add(
@@ -239,6 +245,20 @@ function buildEye(r: EyeResult): Built {
           }),
         ),
       );
+  }
+
+  const opt = (z: number, y: number) => new THREE.Vector3(z, y, 0);
+  if (which === "optics") {
+    anchors.set("iris", opt(r.eye.stopZ - 0.25, (r.eye.pupilRadius + 5.9) / 2));
+    anchors.set("lens", opt((r.eye.surfaces[2]!.z + r.eye.surfaces[3]!.z) / 2, 1.6));
+    return {
+      group,
+      meshes,
+      anchors,
+      dispose: () => {
+        for (const t of trash) t.dispose();
+      },
+    };
   }
 
   // Zonule fibres: from the ciliary body to the lens equator, in the cut plane.
@@ -315,11 +335,8 @@ function buildEye(r: EyeResult): Built {
     ),
   );
 
-  const opt = (z: number, y: number) => new THREE.Vector3(z, y, 0);
   anchors.set("cornea", opt(r.eye.surfaces[0]!.z + sag(7.8, 4.6), 4.6));
   anchors.set("aqueous", opt(2.0, -2.2));
-  anchors.set("iris", opt(r.eye.stopZ - 0.25, (r.eye.pupilRadius + 5.9) / 2));
-  anchors.set("lens", opt((r.eye.surfaces[2]!.z + r.eye.surfaces[3]!.z) / 2, 1.6));
   anchors.set("ciliary", opt(5.6, 8.6));
   anchors.set("vitreous", opt(cz - 1, -4));
   const onShell = (deg: number, rad: number) =>
@@ -422,7 +439,8 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
   const three = useRef<{
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
-    eye: Built | null;
+    shell: Built | null;
+    optics: Built | null;
     rays: ReturnType<typeof buildRays> | null;
   } | null>(null);
   const selectRef = useRef(onSelect);
@@ -463,7 +481,7 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
     controls.minPolarAngle = 1.0;
     controls.maxPolarAngle = 2.1;
     controls.target.copy(target);
-    three.current = { scene, camera, eye: null, rays: null };
+    three.current = { scene, camera, shell: null, optics: null, rays: null };
 
     const fit = () => {
       const w = el.clientWidth;
@@ -499,7 +517,10 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
         ),
         camera,
       );
-      const meshes = [...(three.current?.eye?.meshes.values() ?? [])].flat();
+      const meshes = [
+        ...(three.current?.shell?.meshes.values() ?? []),
+        ...(three.current?.optics?.meshes.values() ?? []),
+      ].flat();
       const hit = ray.intersectObjects(meshes, false).find((h) => h.object.userData["part"]);
       if (hit) selectRef.current(hit.object.userData["part"] as PartKey);
     };
@@ -514,11 +535,11 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
       for (const p of three.current?.rays?.photons ?? []) placePhoton(p, t);
       renderer.render(scene, camera);
 
-      const anchors = three.current?.eye?.anchors;
+      const tc = three.current;
+      if (!tc?.shell || !tc.optics) return;
       const w = el.clientWidth;
       const h = el.clientHeight;
-      if (!anchors) return;
-      for (const [k, a] of anchors) {
+      for (const [k, a] of [...tc.shell.anchors, ...tc.optics.anchors]) {
         const lab = labelEls.current.get(k);
         const line = lineEls.current.get(k);
         const dot = dotEls.current.get(k);
@@ -549,7 +570,8 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
       renderer.domElement.removeEventListener("pointerup", onUp);
       ro.disconnect();
       controls.dispose();
-      three.current?.eye?.dispose();
+      three.current?.shell?.dispose();
+      three.current?.optics?.dispose();
       three.current?.rays?.dispose();
       env.dispose();
       pmrem.dispose();
@@ -559,15 +581,27 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
     };
   }, []);
 
-  // The eye itself: rebuilt when its shape changes.
+  // The eye wall changes only with eye length; the lens and iris change many
+  // times a second while the eye adapts, so they are rebuilt on their own.
   const { accommodation, eye } = result;
   useEffect(() => {
     const t = three.current;
     if (!t) return;
-    t.eye?.dispose();
-    if (t.eye) t.scene.remove(t.eye.group);
-    t.eye = buildEye(result);
-    t.scene.add(t.eye.group);
+    t.shell?.dispose();
+    if (t.shell) t.scene.remove(t.shell.group);
+    t.shell = buildEye(result, "shell");
+    t.scene.add(t.shell.group);
+    paintHighlight();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eye.axialLength]);
+  useEffect(() => {
+    const t = three.current;
+    if (!t) return;
+    t.optics?.dispose();
+    if (t.optics) t.scene.remove(t.optics.group);
+    t.optics = buildEye(result, "optics");
+    t.scene.add(t.optics.group);
+    paintHighlight();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accommodation, eye.pupilRadius, eye.axialLength]);
 
@@ -581,18 +615,21 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accommodation, eye.pupilRadius, eye.axialLength, distance, showRays]);
 
+  const hlRef = useRef(highlight);
+  hlRef.current = highlight;
+  function paintHighlight() {
+    const t = three.current;
+    for (const built of [t?.shell, t?.optics])
+      for (const [k, ms] of built?.meshes ?? [])
+        for (const m of ms) {
+          const on = hlRef.current.includes(k);
+          const mat = m.material as THREE.MeshStandardMaterial;
+          mat.emissive.copy(on ? HIGHLIGHT : BLACK);
+          mat.emissiveIntensity = on ? 0.45 : 0;
+        }
+  }
   const hl = highlight.join(",");
-  useEffect(() => {
-    const meshes = three.current?.eye?.meshes;
-    if (!meshes) return;
-    for (const [k, ms] of meshes)
-      for (const m of ms) {
-        const mat = m.material as THREE.MeshStandardMaterial;
-        mat.emissive.copy(highlight.includes(k) ? HIGHLIGHT : new THREE.Color(0));
-        mat.emissiveIntensity = highlight.includes(k) ? 0.45 : 0;
-      }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hl, accommodation, eye.pupilRadius, eye.axialLength]);
+  useEffect(paintHighlight, [hl]);
 
   return (
     <div
