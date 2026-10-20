@@ -176,7 +176,12 @@ const gene = (o: Partial<GeneRecord> = {}): GeneRecord => ({
   end: 100,
   strand: 1,
   transcriptCount: 1,
-  canonical: { id: "ENSTTEST1", exonCount: 2, translation: { id: "ENSPTEST1", length: 4 } },
+  canonical: {
+    id: "ENSTTEST1",
+    exonCount: 2,
+    exons: [],
+    translation: { id: "ENSPTEST1", length: 4 },
+  },
   ...o,
 });
 const protein = (o: Partial<ProteinRecord> = {}): ProteinRecord => ({
@@ -186,6 +191,8 @@ const protein = (o: Partial<ProteinRecord> = {}): ProteinRecord => ({
   taxonId: 9606,
   length: 4,
   sequence: "MAAA",
+  reactions: [],
+  pathways: [],
   locations: [],
   diseases: [],
   ensemblGeneIds: ["ENSGTEST1"],
@@ -246,7 +253,12 @@ describe("cross-checks", () => {
         "TEST1",
         9606,
         gene({
-          canonical: { id: "T", exonCount: 1, translation: { id: "ENSPTEST1.4", length: 4 } },
+          canonical: {
+            id: "T",
+            exonCount: 1,
+            exons: [],
+            translation: { id: "ENSPTEST1.4", length: 4 },
+          },
         }),
         protein(),
         model(),
