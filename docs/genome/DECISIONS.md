@@ -4,22 +4,24 @@ Decisions about the Genome platform. These are separate from the 14 Vision bench
 `/vision` (`src/lib/vision/targets.ts`). Those carry their own numbers: Vision decision 4 is "Intended
 population" and decision 5 is "Input data and quality requirements", which are **not** D4 and D5 below.
 
-## D4: not recorded
+## D4: undefined (not found)
 
-The Genome v1 brief (2026-10-27) refers to a decision D4, but no D4 entry exists in the repository and the
-brief does not state its content.
-
-**Status: unknown.** The product owner needs to supply it. Nothing has been assumed.
+| Field | Value |
+| --- | --- |
+| **Status** | **Undefined.** No D4 decision is recorded in the repository or in the context provided (checked 2026-10-27). |
+| **Content** | None. Nothing has been assumed or invented for D4. |
+| **Needs** | The project owner to provide D4's content, or to confirm that a new decision should be created under this number. |
 
 ## D5: first-panel gene list
 
 | Field | Value |
 | --- | --- |
 | **Question** | Which genes make up the first inherited-retinal-disease panel for Genome v1? |
-| **Status** | **Unresolved.** |
-| **Configured** | `config/genome/panels/ird-first-panel.json` v0.1.0: `reviewStatus: proposed`, `decisionStatus: unresolved`, members RPE65 only. |
-| **Proposed** | Ten candidates for confirmation are listed in [GENOME_V1.md §3](GENOME_V1.md#3-first-ird-panel-d5-proposed-not-approved). They are not entered in the configuration. |
-| **Needs** | Product-owner confirmation of the list, then the steps in GENOME_V1.md §3. Clinical approval of a panel is a separate review that the repository does not yet document. |
+| **Status** | **Proposed, awaiting genomics/clinical review.** Not resolved, not approved, not authoritative. |
+| **Proposed list** | RPE65, ABCA4, USH2A, RPGR, PRPH2, CRB1, RDH12, CEP290, BEST1, CHM. Proposed by the product owner on 2026-10-27, and recorded in [GENOME_V1.md §3](GENOME_V1.md#3-first-ird-panel-d5-proposed-awaiting-genomicsclinical-review) only. |
+| **Configured** | `config/genome/panels/ird-first-panel.json` is deliberately unchanged in membership: RPE65 only, `reviewStatus: proposed`, `decisionStatus: unresolved`. |
+| **Needs** | Genomics and clinical review of the proposed list. After approval, follow the steps in GENOME_V1.md §3. |
+| **Caveat** | The proposed list does not imply clinical validity or diagnostic completeness. |
 
 ## GV1-INPUT: Genome v1 input scope
 
@@ -28,7 +30,7 @@ brief does not state its content.
 | **Question** | Which reference build and file versions does Genome v1 accept? |
 | **Answer** | GRCh38 only. VCF 4.2 or later; the header gate knows 4.2–4.5. Other builds and versions are rejected clearly. No liftover, conversion or downgrading. |
 | **Source** | Stated in the product owner's Genome v1 brief, 2026-10-27. |
-| **Status** | Decided. It may be the D4 the brief refers to; to be confirmed by the product owner. |
+| **Status** | Decided. A separate entry; it is not D4. |
 | **Implemented in** | `src/lib/genome/vcf.ts`, `config/genome/*.json` (assembly pinned), `tools/vision-snapshot/capture.py` (refuses non-GRCh38 answers), `src/lib/vision/snapshot.ts` (GRCh38 ClinVar locations only). |
 
 ## GV1-LICENCE: Commercial-pilot use of external components

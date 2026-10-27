@@ -153,3 +153,34 @@ describe("licence inventory document", () => {
     expect(md).not.toMatch(/\*\*approved\*\*/);
   });
 });
+
+describe("D5 proposed panel stays out of the authoritative configuration", () => {
+  it("the spec lists the product owner's ten proposed genes; only RPE65 is configured", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const spec = readFileSync(join(__dirname, "../../../docs/genome/GENOME_V1.md"), "utf8");
+    const section = spec.slice(
+      spec.indexOf("## 3. First IRD panel"),
+      spec.indexOf("## 4. Data sources"),
+    );
+    expect(section).toMatch(/proposed, awaiting genomics\/clinical review/);
+    const proposed = [...section.matchAll(/^\| \d+ \| ([A-Z0-9]+) \|/gm)].map((m) => m[1]);
+    expect(proposed).toEqual([
+      "RPE65",
+      "ABCA4",
+      "USH2A",
+      "RPGR",
+      "PRPH2",
+      "CRB1",
+      "RDH12",
+      "CEP290",
+      "BEST1",
+      "CHM",
+    ]);
+    const ird = PANELS.find((p) => p.panelId === "ird-first-panel")!;
+    expect(ird.members).toEqual(["RPE65"]);
+    expect(isAuthoritative(ird)).toBe(false);
+    const registered = new Set(REGISTRY.genes.map((g) => g.symbol));
+    expect(proposed.filter((g) => registered.has(g!))).toEqual(["RPE65"]);
+  });
+});

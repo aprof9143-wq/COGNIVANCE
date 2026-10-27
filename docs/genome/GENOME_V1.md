@@ -1,6 +1,7 @@
 # Genome v1 specification
 
-Status: **draft for review**, 2026-10-27. Decision D5 (the first-panel gene list) is unresolved; see
+Status: **draft for review**, 2026-10-27. Decision D5 (the first-panel gene list) has a proposed list awaiting
+genomics/clinical review and is not yet authoritative. D4 is undefined. See
 [DECISIONS.md](DECISIONS.md).
 
 Cognivance is being developed toward a clinically benchmarked vision-therapy platform and, in time, an
@@ -22,7 +23,7 @@ Genome v1 is the genomic evidence layer of the Vision module. It continues the i
 | Reject other builds and versions clearly; no silent conversion | Coded rejections with reasons; no liftover or version rewriting exists anywhere in the repository | Done |
 | Explicit out-of-scope list | §7 | Done |
 | Central, versioned gene and panel configuration | §2; nothing else in the Genome code carries a gene list | Done (Vision UI still names RPE65; see §8) |
-| IRD panel of about 10 genes | Proposed candidates in §3 for confirmation; the configured panel lists RPE65 only and is `proposed` | **Awaiting D5** |
+| IRD panel of about 10 genes | Product owner's proposed list of 10 genes in §3, awaiting genomics/clinical review; the configured panel lists RPE65 only and is `proposed` | **Awaiting review (D5)** |
 | Generalised snapshot capture, any registered HGNC symbol | `tools/vision-snapshot/capture.py --gene SYMBOL` | Done |
 | One SHA-256 manifest per gene | `public/vision/snapshot/<gene>/manifest.json` and `SHA256SUMS` (§5) | Done |
 | Parser tests per source, RPE65 and a second gene, offline | `src/lib/genome/sources.test.ts`, `tools/vision-snapshot/test_capture.py` | Done |
@@ -67,35 +68,43 @@ Any disagreement stops that gene's capture before anything is written. In the ap
 3. Record the verification.
 4. Bump `registryVersion`.
 
-## 3. First IRD panel (D5): proposed, not approved
+## 3. First IRD panel (D5): proposed, awaiting genomics/clinical review
 
-The configured panel `ird-first-panel` v0.1.0 lists **RPE65 only**. RPE65 is the condition recorded on
-2026-10-19 (Vision decision 1). No approved first-panel gene list exists in the repository.
+**Status: proposed, not approved.** On 2026-10-27 the product owner proposed the ten genes below as the first
+inherited-retinal-disease panel. The list is recorded **here, in the spec, only**. It awaits genomics and
+clinical review. It is not authoritative, not validated, and not a diagnostically complete IRD panel. Being
+listed here implies nothing clinical.
 
-The ten candidates below are offered **for the product owner to confirm, change or reject**. They are not in
-the configuration, are not validated, and are not a diagnostically complete IRD panel. Being listed here
-implies nothing clinical.
+| # | Gene | Note |
+| --- | --- | --- |
+| 1 | RPE65 | Current focus of the Vision module; already registered and captured |
+| 2 | ABCA4 | Proposed by the product owner, 2026-10-27 |
+| 3 | USH2A | Proposed by the product owner, 2026-10-27 |
+| 4 | RPGR | Proposed by the product owner, 2026-10-27 |
+| 5 | PRPH2 | Proposed by the product owner, 2026-10-27 |
+| 6 | CRB1 | Proposed by the product owner, 2026-10-27 |
+| 7 | RDH12 | Proposed by the product owner, 2026-10-27 |
+| 8 | CEP290 | Proposed by the product owner, 2026-10-27 |
+| 9 | BEST1 | Proposed by the product owner, 2026-10-27 |
+| 10 | CHM | Proposed by the product owner, 2026-10-27 |
 
-| Candidate | Why it is proposed (product narrative, not clinical evidence) |
-| --- | --- |
-| RPE65 | Current focus; the existing Vision evidence and simulation are built on it |
-| LRAT | Visual-cycle enzyme acting with RPE65 |
-| RLBP1 | Visual-cycle retinoid-binding protein |
-| RDH5 | Visual-cycle dehydrogenase |
-| RHO | Rod photoreceptor pigment; also the capture tool's second test gene |
-| ABCA4 | Photoreceptor retinoid transporter, linked to the visual cycle |
-| USH2A | Frequently discussed IRD gene |
-| RPGR | Frequently discussed IRD gene |
-| CEP290 | Frequently discussed IRD gene |
-| CHM | Frequently discussed IRD gene |
+**What is deliberately not done yet**
 
-To adopt a list:
+- **The authoritative configuration is unchanged.** `config/genome/panels/ird-first-panel.json` still lists
+  RPE65 only, with `reviewStatus: proposed` and `decisionStatus: unresolved`.
+- **The nine other genes are not registered.** Registering them means entering their HGNC, Ensembl and
+  UniProt identifiers, and that waits for the review.
+- **RHO is not in the proposed list.** It stays in the registry only as the capture tool's second test gene
+  (`role: test-gene`).
 
-1. Record D5 as resolved.
-2. Register each gene.
-3. Capture each gene so its identifiers are verified.
-4. Set the panel's members, bump `panelVersion`, and set `reviewStatus` to `approved` only after the review
-   the product owner requires.
+**After genomics/clinical review approves a list**
+
+1. Record D5 as resolved in DECISIONS.md, with the reviewers and date.
+2. Register each gene in `genes.json`.
+3. Capture each gene, so its identifiers are checked against HGNC, Ensembl and UniProt.
+4. Set the panel's `members` and bump `panelVersion`.
+5. Set `reviewStatus: approved` and `decisionStatus: resolved` only once the review the product owner requires
+   is recorded.
 
 ## 4. Data sources
 
@@ -231,7 +240,8 @@ Each item was checked against the repository on 2026-10-27.
   of a service built on its data; the app does not show them yet.
 - **Hard-coded RPE65 in the UI:** the Vision UI (`targets.ts`, `useEvidence`) still names RPE65 directly.
   Moving it onto the registry is a UI change left for a later pull request.
-- **Unrecorded decisions:** D4 is not recorded anywhere in the repository (see DECISIONS.md).
+- **D4 is undefined:** it is not recorded in the repository or in the context provided. The project owner
+  needs to supply it, or confirm that a new decision should be created (see DECISIONS.md).
 
 ## 9. Verifying
 
