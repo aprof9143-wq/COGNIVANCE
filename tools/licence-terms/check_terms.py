@@ -21,7 +21,10 @@ import html
 import json
 import pathlib
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -31,7 +34,21 @@ UA = "Cognivance-licence-terms-check/1 (+https://github.com/aprof9143-wq/COGNIVA
 KEYWORDS = re.compile(r"licen[cs]e|commercial|attribut|restrict|copyright|cc[- ]by|cc0|public domain|terms of use|permission", re.I)
 
 
+def pdf_text(raw: bytes) -> str:
+    """Text of a PDF via pdftotext (poppler), if the runner has it."""
+    if not shutil.which("pdftotext"):
+        return ""
+    with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
+        f.write(raw)
+        f.flush()
+        out = subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, check=False)
+    return out.stdout.decode("utf-8", errors="replace")
+
+
 def visible_text(raw: bytes, content_type: str) -> str:
+    if "pdf" in content_type:
+        text = pdf_text(raw)
+        return "\n".join(re.sub(r"\s+", " ", l).strip() for l in text.splitlines() if l.strip())
     text = raw.decode("utf-8", errors="replace")
     if "html" in content_type:
         text = re.sub(r"(?is)<(script|style|noscript)[^>]*>.*?</\1>", " ", text)
@@ -60,12 +77,11 @@ def check(url: str) -> dict:
         print(f"!! {url}: {e}")
         return entry
     print(f"\n==== {url} -> {entry['finalUrl']} ({entry['status']}, {len(body)} B)")
-    if "pdf" in ctype:
-        print("   (PDF: read it directly; its SHA-256 is recorded)")
-    else:
-        lines = [l for l in visible_text(body, ctype).splitlines() if KEYWORDS.search(l)]
-        for line in lines[:40]:
-            print("   | " + line[:400])
+    lines = [l for l in visible_text(body, ctype).splitlines() if KEYWORDS.search(l)]
+    if not lines:
+        print("   (no licence-related text found: the page may be rendered by JavaScript or be a PDF the runner could not read)")
+    for line in lines[:40]:
+        print("   | " + line[:1200])
     return entry
 
 

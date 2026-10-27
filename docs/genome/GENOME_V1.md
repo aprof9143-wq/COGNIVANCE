@@ -26,7 +26,7 @@ Genome v1 is the genomic evidence layer of the Vision module. It continues the i
 | Generalised snapshot capture, any registered HGNC symbol | `tools/vision-snapshot/capture.py --gene SYMBOL` | Done |
 | One SHA-256 manifest per gene | `public/vision/snapshot/<gene>/manifest.json` and `SHA256SUMS` (§5) | Done |
 | Parser tests per source, RPE65 and a second gene, offline | `src/lib/genome/sources.test.ts`, `tools/vision-snapshot/test_capture.py` | Done |
-| Licence inventory and commercial-pilot safeguard | [LICENCES.md](LICENCES.md), `config/genome/licences.json`, enforced in capture and `assertSourceAllowed` | Done; every data source still unverified |
+| Licence inventory and commercial-pilot safeguard | [LICENCES.md](LICENCES.md), `config/genome/licences.json`, enforced in capture and `assertSourceAllowed` | Done. Terms read from the official pages for Ensembl/EMBL-EBI, NCBI, HGNC and RCSB; UniProt and AlphaFold still unverified; nothing approved |
 
 ## 2. Gene registry and panels
 
@@ -102,7 +102,9 @@ To adopt a list:
 The sources are HGNC, Ensembl REST, UniProtKB REST, AlphaFold DB and NCBI ClinVar (E-utilities). RCSB PDB is
 used by the Vision structure view when an experimental entry exists.
 
-Every source's terms are unverified, and none is approved for commercial-pilot use. See
+Terms read on 2026-10-27 from the official pages (via the CI runner) are recorded for Ensembl/EMBL-EBI, NCBI,
+HGNC and RCSB. UniProt and AlphaFold DB are still unverified. ClinVar needs legal review. None is approved
+for commercial-pilot use. See
 [LICENCES.md](LICENCES.md).
 
 ## 5. Snapshot capture and per-gene manifests
@@ -225,9 +227,9 @@ Each item was checked against the repository on 2026-10-27.
 ## 8. Known limitations and follow-ups
 
 - **RHO identifiers:** they come from the developers' knowledge until the first RHO capture confirms them.
-- **Licences:** every data-source term is unverified, because the build environment cannot reach the
-  providers. The `licence-terms` workflow records what the official pages say, as evidence for a person to
-  review.
+- **Licences:** UniProt and AlphaFold DB terms are still unverified, ClinVar needs legal review, and no item
+  is approved for commercial-pilot use. NCBI requires its disclaimer and copyright notice to be shown to users
+  of a service built on its data; the app does not show them yet.
 - **Hard-coded RPE65 in the UI:** the Vision UI (`targets.ts`, `useEvidence`) still names RPE65 directly.
   Moving it onto the registry is a UI change left for a later pull request.
 - **Unrecorded decisions:** D4 is not recorded anywhere in the repository (see DECISIONS.md).
