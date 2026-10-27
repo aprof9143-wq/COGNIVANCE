@@ -73,6 +73,8 @@ export type GeneRecord = {
   ensemblId: string;
   version?: number | undefined;
   symbol: string;
+  /** HGNC ID as Ensembl reports it (cited in its description); not looked up separately. */
+  hgncId?: string | undefined;
   description?: string | undefined;
   biotype?: string | undefined;
   assembly: string;
@@ -129,6 +131,7 @@ export function toGeneRecord(g: z.infer<typeof EnsemblGene>): GeneRecord {
     ensemblId: g.id,
     version: g.version,
     symbol: g.display_name,
+    hgncId: /Acc:(HGNC:\d+)/.exec(g.description ?? "")?.[1],
     description: g.description ?? undefined,
     biotype: g.biotype,
     assembly: g.assembly_name,
@@ -204,6 +207,8 @@ export type ProteinRecord = {
   pathways: { id: string; name: string }[];
   locations: string[];
   diseases: { id: string; acronym?: string | undefined; mim?: string | undefined }[];
+  /** HGNC IDs from UniProt's own cross-references. */
+  hgncIds: string[];
   ensemblGeneIds: string[];
   ensemblProteinIds: string[];
   pdb: {
@@ -313,6 +318,7 @@ export function toProteinRecord(e: z.infer<typeof UniProtEntry>): ProteinRecord 
             ? c.disease!.diseaseCrossReference.id
             : undefined,
       })),
+    hgncIds: xrefs.filter((x) => x.database === "HGNC").map((x) => x.id),
     ensemblGeneIds: [...new Set(ensembl.flatMap((x) => prop(x, "GeneId") ?? []).map(unversioned))],
     ensemblProteinIds: [
       ...new Set(ensembl.flatMap((x) => prop(x, "ProteinId") ?? []).map(unversioned)),

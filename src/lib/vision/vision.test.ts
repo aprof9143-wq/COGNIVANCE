@@ -192,6 +192,7 @@ const protein = (o: Partial<ProteinRecord> = {}): ProteinRecord => ({
   pathways: [],
   locations: [],
   diseases: [],
+  hgncIds: [],
   ensemblGeneIds: ["ENSGTEST1"],
   ensemblProteinIds: ["ENSPTEST1"],
   pdb: [],

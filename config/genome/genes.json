@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "registryVersion": "1.0.0",
+  "assembly": "GRCh38",
+  "note": "Genes the Genome v1 tooling may capture. Registration is not panel membership and says nothing about clinical relevance. Expected identifiers are checked against the sources on every capture; a mismatch stops the capture.",
+  "genes": [
+    {
+      "symbol": "RPE65",
+      "hgncId": "HGNC:10294",
+      "ensemblGeneId": "ENSG00000116745",
+      "uniprotAccession": "Q16518",
+      "taxonId": 9606,
+      "role": "current-focus",
+      "idsVerified": {
+        "on": "2026-10-20",
+        "how": "Source-reported in the captured snapshot: Ensembl lookup (description cites HGNC:10294) and UniProtKB Q16518 (HGNC and Ensembl cross-references)."
+      }
+    },
+    {
+      "symbol": "RHO",
+      "hgncId": "HGNC:10012",
+      "ensemblGeneId": "ENSG00000163914",
+      "uniprotAccession": "P08100",
+      "taxonId": 9606,
+      "role": "test-gene",
+      "idsVerified": null,
+      "note": "Second gene for exercising the generalised capture path. Identifiers entered from the developers' knowledge and not yet confirmed by a capture; the first capture checks them against HGNC, Ensembl and UniProt. Not a panel decision (see D5)."
+    }
+  ]
+}
