@@ -33,7 +33,7 @@
       "version": "UniProt release 2026_03 (X-UniProt-Release header, RPE65 snapshot)",
       "supplies": "Reviewed protein entry: sequence, function, tissue, catalytic activity, cross-references (HGNC, Ensembl, Reactome, PDB).",
       "softwareLicence": "Not applicable: only the public REST service is called.",
-      "dataTerms": "Not verified. The licence and copyright pages were fetched on 2026-10-27 (licence-terms run 40534185586 (2026-10-27); page hashes in docs/genome/terms-check.json) but are rendered by JavaScript, so no text could be read; https://rest.uniprot.org/help/license is added for the next run. Secondary sources indicate CC BY 4.0.",
+      "dataTerms": "Not verified. The licence and copyright pages were fetched on 2026-10-27 but are rendered by JavaScript, so no text could be read; https://rest.uniprot.org/help/license answered HTTP 500. Secondary sources indicate CC BY 4.0.",
       "termsUrls": [
         "https://www.uniprot.org/help/license",
         "https://www.uniprot.org/help/copyright",
@@ -55,7 +55,7 @@
       "version": "Model AF-Q16518-F1 version 6 (RPE65 snapshot)",
       "supplies": "Predicted structure coordinates and per-residue confidence (pLDDT).",
       "softwareLicence": "Not applicable: AlphaFold code and model parameters are not used or bundled.",
-      "dataTerms": "Not verified. The FAQ (JavaScript-rendered) and the licence disclaimer PDF were fetched on 2026-10-27 (licence-terms run 40534185586 (2026-10-27); page hashes in docs/genome/terms-check.json) but their text was not read; the next run extracts the PDF text. Secondary sources indicate CC BY 4.0 with EMBL-EBI terms. EMBL-EBI terms of use (read 2026-10-27, see ensembl-rest) apply to EMBL-EBI resources and defer to resource-specific terms. The API also links AlphaMissense annotation files, which are a separate component (see alphamissense) and are not used.",
+      "dataTerms": "Not verified. The FAQ (JavaScript-rendered) and the licence disclaimer PDF were fetched on 2026-10-27 (licence-terms run 40534185586 (2026-10-27); page hashes in docs/genome/terms-check.json) but no text could be extracted (JavaScript page; the runner had no PDF text tool). Secondary sources indicate CC BY 4.0 with EMBL-EBI terms. EMBL-EBI terms of use (read 2026-10-27, see ensembl-rest) apply to EMBL-EBI resources and defer to resource-specific terms. The API also links AlphaMissense annotation files, which are a separate component (see alphamissense) and are not used.",
       "termsUrls": [
         "https://alphafold.ebi.ac.uk/faq",
         "https://alphafold.ebi.ac.uk/assets/License-Disclaimer.pdf",
@@ -77,7 +77,7 @@
       "version": "No release number in the response; snapshot retrieved 2026-10-20",
       "supplies": "Submitted variant records for a gene: HGVS, classification, review status, conditions, GRCh38 location.",
       "softwareLicence": "Not applicable: only the public E-utilities service is called.",
-      "dataTerms": "NCBI policies page read on 2026-10-27 (licence-terms run 40534185586 (2026-10-27); page hashes in docs/genome/terms-check.json): information created by or for the US government is public domain, and NLM asks to be acknowledged; the site 'contains resources which incorporate material contributed or licensed by individuals, companies, or organizations that may be protected by U.S. and foreign copyright laws'; for molecular databases 'NCBI itself places no restrictions on the use' (the log line was truncated after this point); and 'NCBI's Disclaimer and Copyright notice must be evident to users of your service.' The E-utilities guidelines and ClinVar 'maintenance and use' pages were fetched but yielded no readable licence text.",
+      "dataTerms": "NCBI policies page read on 2026-10-27 (licence-terms runs 40534185586 and 40534934746; page hashes in docs/genome/terms-check.json). Government-created information 'is within the public domain' and NLM asks to be acknowledged. For the molecular databases: 'NCBI itself places no restrictions on the use or distribution of the data contained therein. Nor do we accept data when the submitter has requested restrictions on reuse or redistribution. However, some submitters of the original data ... may claim patent, copyright, or other intellectual property rights in all or a portion of the data ... NCBI cannot provide comment or unrestricted permission concerning the use, copying, or distribution of the information contained in the molecular databases.' Also: 'All persons reproducing, redistributing, or making commercial use of this information are expected to adhere to the terms and conditions asserted by the copyright holder', and 'NCBI's Disclaimer and Copyright notice must be evident to users of your service.' The E-utilities guidelines and ClinVar 'maintenance and use' pages were fetched but no licence text could be extracted.",
       "termsUrls": [
         "https://www.ncbi.nlm.nih.gov/home/about/policies/",
         "https://www.ncbi.nlm.nih.gov/books/NBK25497/",
