@@ -4,7 +4,7 @@
   "pages": [
     {
       "bytes": 50531,
-      "checkedAt": "2026-10-27T16:05:32+00:00",
+      "checkedAt": "2026-10-27T16:14:49+00:00",
       "contentType": "application/pdf",
       "finalUrl": "https://alphafold.ebi.ac.uk/assets/License-Disclaimer.pdf",
       "id": "alphafold-db",
@@ -15,7 +15,7 @@
     },
     {
       "bytes": 79827,
-      "checkedAt": "2026-10-27T16:05:32+00:00",
+      "checkedAt": "2026-10-27T16:14:49+00:00",
       "contentType": "text/html;charset=UTF-8",
       "finalUrl": "https://alphafold.ebi.ac.uk/faq",
       "id": "alphafold-db",
@@ -26,7 +26,7 @@
     },
     {
       "bytes": 30260,
-      "checkedAt": "2026-10-27T16:05:33+00:00",
+      "checkedAt": "2026-10-27T16:14:50+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
       "id": "alphafold-db",
@@ -36,30 +36,30 @@
       "url": "https://www.ebi.ac.uk/about/terms-of-use/"
     },
     {
-      "bytes": 21337,
-      "checkedAt": "2026-10-27T16:05:33+00:00",
+      "bytes": 21338,
+      "checkedAt": "2026-10-27T16:14:50+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://www.ncbi.nlm.nih.gov/books/NBK25497/",
       "id": "clinvar-eutils",
       "lastModified": null,
-      "sha256": "f1d43d867e3cad4c73d0490317b0796a71af142d7487551583805b458bc83b0b",
+      "sha256": "a6ca5595a17e9378fd0bd3567609981ffc118a4cb78e067ef8c711ada1f82592",
       "status": 200,
       "url": "https://www.ncbi.nlm.nih.gov/books/NBK25497/"
     },
     {
       "bytes": 21376,
-      "checkedAt": "2026-10-27T16:05:33+00:00",
+      "checkedAt": "2026-10-27T16:14:50+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/",
       "id": "clinvar-eutils",
       "lastModified": null,
-      "sha256": "4adf8ed47645f163f6963b4ee266e4c556629b470a34217e41d0a1dbcb361e55",
+      "sha256": "b59f927f7193621192d90fb78380d2871dd742c8445c13d8a9e9087dd212b629",
       "status": 200,
       "url": "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/"
     },
     {
       "bytes": 38936,
-      "checkedAt": "2026-10-27T16:05:33+00:00",
+      "checkedAt": "2026-10-27T16:14:50+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.ncbi.nlm.nih.gov/home/about/policies/",
       "id": "clinvar-eutils",
@@ -70,7 +70,7 @@
     },
     {
       "bytes": 30260,
-      "checkedAt": "2026-10-27T16:05:30+00:00",
+      "checkedAt": "2026-10-27T16:14:47+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
       "id": "ensembl-rest",
@@ -81,18 +81,18 @@
     },
     {
       "bytes": 24855,
-      "checkedAt": "2026-10-27T16:05:25+00:00",
+      "checkedAt": "2026-10-27T16:14:38+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://jun2026.archive.ensembl.org/info/about/legal/disclaimer.html",
       "id": "ensembl-rest",
       "lastModified": null,
-      "sha256": "6fd81ba99ff42bb2150f2ce3102eebac03cec44be4daab9d32081befadcf8f8f",
+      "sha256": "d1c898822ef221e8293f8cebaf2951f33652fd28a21c30c5da9ef20d001bad7d",
       "status": 200,
       "url": "https://www.ensembl.org/info/about/legal/disclaimer.html"
     },
     {
       "bytes": 6144,
-      "checkedAt": "2026-10-27T16:05:33+00:00",
+      "checkedAt": "2026-10-27T16:14:50+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.genenames.org/about/license/",
       "id": "hgnc-rest",
@@ -103,7 +103,7 @@
     },
     {
       "bytes": 70745,
-      "checkedAt": "2026-10-27T16:05:34+00:00",
+      "checkedAt": "2026-10-27T16:14:50+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.genenames.org/help/rest/",
       "id": "hgnc-rest",
@@ -114,18 +114,18 @@
     },
     {
       "bytes": 225143,
-      "checkedAt": "2026-10-27T16:05:35+00:00",
+      "checkedAt": "2026-10-27T16:14:51+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://github.com/molstar/molstar/blob/master/LICENSE",
       "id": "molstar",
       "lastModified": null,
-      "sha256": "e94a71595abeca0c9e801690dba6149c713057d859adb1b62a6e3fcc86a6bd2f",
+      "sha256": "9a8e12a82a1b90853cdeb1f106ef6a6d9c37cf68b096c00ca0ffbe6a395782a8",
       "status": 200,
       "url": "https://github.com/molstar/molstar/blob/master/LICENSE"
     },
     {
       "bytes": 95023,
-      "checkedAt": "2026-10-27T16:05:35+00:00",
+      "checkedAt": "2026-10-27T16:14:52+00:00",
       "contentType": "text/html",
       "finalUrl": "https://docs.python.org/3/license.html",
       "id": "python-stdlib",
@@ -136,17 +136,17 @@
     },
     {
       "bytes": 41993,
-      "checkedAt": "2026-10-27T16:05:34+00:00",
+      "checkedAt": "2026-10-27T16:14:51+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://www.rcsb.org/pages/usage-policy",
       "id": "rcsb-pdb",
       "lastModified": null,
-      "sha256": "62c3dc7dd27942ac8d2e7c2d66789279c513ce5d58ad5ab9010c7347fecdaff9",
+      "sha256": "71520e7c6d6c7d42eef00aa9db74649d5edf5f3f627025ef6f97d5860e05aa4c",
       "status": 200,
       "url": "https://www.rcsb.org/pages/usage-policy"
     },
     {
-      "checkedAt": "2026-10-27T16:05:32+00:00",
+      "checkedAt": "2026-10-27T16:14:48+00:00",
       "error": "HTTP Error 500: ",
       "id": "uniprot-rest",
       "status": null,
@@ -154,7 +154,7 @@
     },
     {
       "bytes": 6577,
-      "checkedAt": "2026-10-27T16:05:31+00:00",
+      "checkedAt": "2026-10-27T16:14:48+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.uniprot.org/help/copyright",
       "id": "uniprot-rest",
@@ -165,7 +165,7 @@
     },
     {
       "bytes": 6577,
-      "checkedAt": "2026-10-27T16:05:31+00:00",
+      "checkedAt": "2026-10-27T16:14:48+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.uniprot.org/help/license",
       "id": "uniprot-rest",
@@ -175,13 +175,13 @@
       "url": "https://www.uniprot.org/help/license"
     },
     {
-      "bytes": 224140,
-      "checkedAt": "2026-10-27T16:05:34+00:00",
+      "bytes": 224145,
+      "checkedAt": "2026-10-27T16:14:51+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://github.com/colinhacks/zod/blob/main/LICENSE",
       "id": "zod",
       "lastModified": null,
-      "sha256": "8653e8fc838f779521aa03d59a177a85313b263cb4de3cc5f2bf8157c2111884",
+      "sha256": "9914fe4f1f2d364eb31216561b182bcfd305a4330c153411ff63d2b2edaa9631",
       "status": 200,
       "url": "https://github.com/colinhacks/zod/blob/main/LICENSE"
     }
