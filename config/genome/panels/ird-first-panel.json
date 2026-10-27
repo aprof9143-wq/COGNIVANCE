@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "panelId": "ird-first-panel",
+  "panelVersion": "0.1.1",
+  "title": "Inherited retinal disease: first Genome v1 panel",
+  "assembly": "GRCh38",
+  "reviewStatus": "proposed",
+  "decision": "D5",
+  "decisionStatus": "unresolved",
+  "members": ["RPE65"],
+  "note": "D5 is not resolved. The product owner's proposed list of ten genes (2026-10-27) is recorded in docs/genome/GENOME_V1.md section 3 only and awaits genomics/clinical review; it is deliberately not entered here. Only RPE65, the recorded first condition (Vision decision 1, 2026-10-19), is listed. This panel is not clinically approved, not validated, and not diagnostically complete."
+}

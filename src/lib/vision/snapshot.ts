@@ -10,6 +10,7 @@
 
 import { z } from "zod";
 import { gunzip } from "@/lib/sim/anatomy";
+import { snapshotDir } from "@/lib/genome/config";
 import { missing, sourced, type Provenance, type Sourced } from "./evidence";
 import {
   modelProvenance,
@@ -22,7 +23,8 @@ import {
   type ProteinRecord,
 } from "./sources";
 
-export const SNAPSHOT_BASE = "/vision/snapshot/rpe65/";
+/** RPE65's folder; every registered gene has its own (snapshotDir). */
+export const SNAPSHOT_BASE = snapshotDir("RPE65");
 
 const ManifestFile = z.object({
   file: z.string(),
@@ -34,15 +36,33 @@ const ManifestFile = z.object({
   gzip: z.boolean(),
   headers: z.record(z.string()).default({}),
   note: z.string().optional(),
+  /** Manifest v2: digest of the file as stored (gzip included). */
+  storedSha256: z.string().optional(),
 });
 export type ManifestFile = z.infer<typeof ManifestFile>;
 
 const Manifest = z.object({
+  /** Absent in version 1 manifests. */
+  schemaVersion: z.number().optional(),
   gene: z.string(),
+  hgncId: z.string().optional(),
   taxonId: z.number(),
+  assembly: z.string().optional(),
   capturedAt: z.string(),
+  complete: z.boolean().optional(),
+  sources: z
+    .array(
+      z.object({
+        step: z.string(),
+        licenceId: z.string(),
+        status: z.enum(["ok", "failed", "skipped"]),
+        reason: z.string().optional(),
+      }),
+    )
+    .optional(),
   files: z.array(ManifestFile),
 });
+export const parseManifest = (raw: unknown) => Manifest.parse(raw);
 export type Manifest = z.infer<typeof Manifest>;
 
 // ---------------------------------------------------------------- ClinVar
@@ -137,7 +157,14 @@ const Record_ = z.object({
       z.object({
         cdna_change: z.string().optional(),
         variation_loc: z
-          .array(z.object({ assembly_name: z.string(), start: z.string(), stop: z.string() }))
+          .array(
+            z.object({
+              assembly_name: z.string(),
+              status: z.string().optional(),
+              start: z.string(),
+              stop: z.string(),
+            }),
+          )
           .default([]),
       }),
     )
@@ -148,6 +175,8 @@ export type VariantSet = {
   variants: Variant[];
   /** Records ClinVar returned that span other genes too (large deletions etc.). */
   multiGene: number;
+  /** IDs ClinVar listed but returned no summary for (missing, or an error document). */
+  unavailable: number;
   total: number;
 };
 
@@ -155,19 +184,29 @@ export type VariantSet = {
 export function parseClinVar(batches: unknown[], gene: string): VariantSet {
   const variants: Variant[] = [];
   let multiGene = 0;
+  let unavailable = 0;
   let total = 0;
   for (const raw of batches) {
     const { result } = Esummary.parse(raw);
     for (const uid of result.uids) {
       total++;
-      const r = Record_.parse(result[uid]);
+      const doc = result[uid];
+      if (doc === undefined || (typeof doc === "object" && doc !== null && "error" in doc)) {
+        unavailable++;
+        continue;
+      }
+      // A summary that is present but malformed throws: it is not patched up.
+      const r = Record_.parse(doc);
       if (r.genes.length !== 1 || r.genes[0]!.symbol !== gene) {
         multiGene++;
         continue;
       }
       const g = r.germline_classification;
       const vs = r.variation_set[0];
-      const loc = vs?.variation_loc.find((l) => l.assembly_name === "GRCh38");
+      // GRCh38 only (Genome v1); ClinVar's GRCh37 locations are ignored, not converted.
+      const loc = vs?.variation_loc.find(
+        (l) => l.assembly_name === "GRCh38" && (l.status ?? "current") === "current",
+      );
       const classification = g?.description || "not provided";
       variants.push({
         uid: r.uid,
@@ -186,7 +225,7 @@ export function parseClinVar(batches: unknown[], gene: string): VariantSet {
       });
     }
   }
-  return { variants, multiGene, total };
+  return { variants, multiGene, unavailable, total };
 }
 
 // ---------------------------------------------------------------- DNA
@@ -232,10 +271,15 @@ export type SnapshotRecord = {
   structure: () => Promise<string>;
 };
 
-async function readFile(name: string, m: Manifest, fetcher: Fetcher): Promise<string> {
+async function readFile(
+  base: string,
+  name: string,
+  m: Manifest,
+  fetcher: Fetcher,
+): Promise<string> {
   const meta = m.files.find((f) => f.file === name);
   if (!meta) throw new Error(`${name} is not in the snapshot`);
-  const res = await fetcher(SNAPSHOT_BASE + name);
+  const res = await fetcher(base + name);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   const buf = await res.arrayBuffer();
   return new TextDecoder().decode(meta.gzip ? await gunzip(buf) : buf);
@@ -265,11 +309,15 @@ async function attempt<T>(fn: () => Promise<Sourced<T>>): Promise<Sourced<T>> {
   }
 }
 
-export async function loadSnapshot(fetcher: Fetcher): Promise<SnapshotRecord> {
-  const res = await fetcher(SNAPSHOT_BASE + "manifest.json");
+export async function loadSnapshot(fetcher: Fetcher, symbol = "RPE65"): Promise<SnapshotRecord> {
+  const base = snapshotDir(symbol);
+  const res = await fetcher(base + "manifest.json");
   if (!res.ok) throw new Error(`Snapshot manifest: HTTP ${res.status}`);
   const m = Manifest.parse(await res.json());
-  const json = async (name: string) => JSON.parse(await readFile(name, m, fetcher)) as unknown;
+  if (m.gene !== symbol)
+    throw new Error(`The snapshot in ${base} is for ${m.gene}, not ${symbol}.`);
+  const json = async (name: string) =>
+    JSON.parse(await readFile(base, name, m, fetcher)) as unknown;
 
   const gene = attempt<GeneRecord>(async () => {
     const g = parseEnsemblGene(await json("ensembl_lookup.json"));
@@ -360,6 +408,6 @@ export async function loadSnapshot(fetcher: Fetcher): Promise<SnapshotRecord> {
     model: mo,
     variants: v,
     sequences: s,
-    structure: () => readFile("alphafold_model.pdb.gz", m, fetcher),
+    structure: () => readFile(base, "alphafold_model.pdb.gz", m, fetcher),
   };
 }

@@ -1,0 +1,52 @@
+name: licence-terms
+
+# Fetches the terms pages listed in config/genome/licences.json and records
+# their status, time and SHA-256 in docs/genome/terms-check.json, printing the
+# licence-related lines to the log for review. Evidence only: it approves
+# nothing (see docs/genome/LICENCES.md).
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/licence-terms.yml"
+      - "tools/licence-terms/**"
+      - "config/genome/licences.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: licence-terms-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch terms pages
+        run: python tools/licence-terms/check_terms.py
+      - name: Commit the record
+        # Put this run's record on top of the latest branch head, so a
+        # concurrent push never causes a merge conflict.
+        run: |
+          git config user.name "licence-terms[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp docs/genome/terms-check.json "$RUNNER_TEMP/terms-check.json"
+          for attempt in 1 2 3; do
+            git fetch -q origin "$GITHUB_REF_NAME"
+            git checkout -q -f --detach "origin/$GITHUB_REF_NAME"
+            cp "$RUNNER_TEMP/terms-check.json" docs/genome/terms-check.json
+            git add docs/genome/terms-check.json
+            if git diff --cached --quiet; then
+              echo "Unchanged."
+              exit 0
+            fi
+            git commit -q -m "docs(genome): terms pages checked $(date -u +%Y-%m-%d)"
+            if git push origin "HEAD:$GITHUB_REF_NAME"; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          exit 1
