@@ -1,6 +1,6 @@
 {
   "assembly": "GRCh38",
-  "capturedAt": "2026-10-27T15:50:23+00:00",
+  "capturedAt": "2026-10-27T15:56:23+00:00",
   "complete": true,
   "ensemblGeneId": "ENSG00000116745",
   "files": [
@@ -9,7 +9,7 @@
       "file": "alphafold_model.pdb.gz",
       "gzip": true,
       "headers": {},
-      "retrievedAt": "2026-10-27T15:51:12+00:00",
+      "retrievedAt": "2026-10-27T15:56:54+00:00",
       "sha256": "35685434f5b2d02810a1be9329f1cac16fd624f2822b609cdce208a1e275b40e",
       "status": 200,
       "storedBytes": 77213,
@@ -21,7 +21,7 @@
       "file": "alphafold_prediction.json",
       "gzip": false,
       "headers": {},
-      "retrievedAt": "2026-10-27T15:51:11+00:00",
+      "retrievedAt": "2026-10-27T15:56:53+00:00",
       "sha256": "d73cdcb3ea14d9594974b31723f198ea09450370a63c81c30138bc3337d7ab72",
       "status": 200,
       "storedBytes": 2777,
@@ -35,7 +35,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:12+00:00",
+      "retrievedAt": "2026-10-27T15:56:54+00:00",
       "sha256": "1fc2ce081341c733b99c5bc398aab71ddcc61c30cb80679d6eebec230f52f106",
       "status": 200,
       "storedBytes": 12639,
@@ -49,7 +49,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:14+00:00",
+      "retrievedAt": "2026-10-27T15:56:56+00:00",
       "sha256": "6bfc5c4e786e507123edc0e9fc482d1320a9e25f63261697c0c2c5809253ac6e",
       "status": 200,
       "storedBytes": 29322,
@@ -63,7 +63,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:16+00:00",
+      "retrievedAt": "2026-10-27T15:56:58+00:00",
       "sha256": "65da2e63aea1c15cb31f24e371e1c3ce55072a30df327ee962855992df1b642a",
       "status": 200,
       "storedBytes": 33847,
@@ -77,7 +77,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:18+00:00",
+      "retrievedAt": "2026-10-27T15:57:00+00:00",
       "sha256": "0d610632c4434a01ff0cdfa59e8318395204188a46af176971ad4ceda69eb58b",
       "status": 200,
       "storedBytes": 32798,
@@ -91,7 +91,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:20+00:00",
+      "retrievedAt": "2026-10-27T15:57:02+00:00",
       "sha256": "66c130041c17fdcae3abd22382f157a1cb485f64874b2d552879c72f0c6f6f30",
       "status": 200,
       "storedBytes": 36660,
@@ -105,7 +105,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:22+00:00",
+      "retrievedAt": "2026-10-27T15:57:04+00:00",
       "sha256": "961e7180c1400b8885649b9e3bdc4005b1c147b0c92707ac33d7858b35e6e4a3",
       "status": 200,
       "storedBytes": 34289,
@@ -119,7 +119,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:25+00:00",
+      "retrievedAt": "2026-10-27T15:57:07+00:00",
       "sha256": "3a55a36a2009058131a731931beb93419fda98700328bae998b88f96b4251196",
       "status": 200,
       "storedBytes": 96786,
@@ -133,7 +133,7 @@
       "headers": {
         "Content-Type": "application/json; charset=UTF-8"
       },
-      "retrievedAt": "2026-10-27T15:51:27+00:00",
+      "retrievedAt": "2026-10-27T15:57:08+00:00",
       "sha256": "8996327879d13d8810c3fc02e031de505af34f1a994f001d417d91bc83d7c4a4",
       "status": 200,
       "storedBytes": 28501,
@@ -148,11 +148,11 @@
         "Content-Type": "application/json"
       },
       "note": "Coding sequence of the canonical transcript.",
-      "retrievedAt": "2026-10-27T15:50:58+00:00",
-      "sha256": "66673cefe745ffeb42c3dcddd50f67fc88e0e84a7ef725d23df577449d92bb67",
+      "retrievedAt": "2026-10-27T15:56:50+00:00",
+      "sha256": "6f4bb47ffd1769d8436a1ec102d7a3d778aa3b5730d2434925e57e8957cb5142",
       "status": 200,
       "storedBytes": 1702,
-      "storedSha256": "66673cefe745ffeb42c3dcddd50f67fc88e0e84a7ef725d23df577449d92bb67",
+      "storedSha256": "6f4bb47ffd1769d8436a1ec102d7a3d778aa3b5730d2434925e57e8957cb5142",
       "url": "https://rest.ensembl.org/sequence/id/ENST00000262340?type=cds;content-type=application/json"
     },
     {
@@ -163,11 +163,11 @@
         "Content-Type": "application/json"
       },
       "note": "Genomic sequence of the whole gene, on the gene's strand.",
-      "retrievedAt": "2026-10-27T15:51:10+00:00",
-      "sha256": "a2c64e9d53b83fdbd579d8578b52f02e9ae977215d0b7fada0491dc177847b28",
+      "retrievedAt": "2026-10-27T15:56:52+00:00",
+      "sha256": "5e05e5ab88737cbd848277da7c18b7bcbc2152f49b9f9646d7108fd96b5443a9",
       "status": 200,
       "storedBytes": 22391,
-      "storedSha256": "a2c64e9d53b83fdbd579d8578b52f02e9ae977215d0b7fada0491dc177847b28",
+      "storedSha256": "5e05e5ab88737cbd848277da7c18b7bcbc2152f49b9f9646d7108fd96b5443a9",
       "url": "https://rest.ensembl.org/sequence/region/human/1:68428822..68451103:-1?content-type=application/json"
     },
     {
@@ -177,11 +177,11 @@
       "headers": {
         "Content-Type": "application/json"
       },
-      "retrievedAt": "2026-10-27T15:50:45+00:00",
-      "sha256": "aa88c6a4d386fca8091924c03fcc1c0ad7b9837e00a835f09854ceabc1ddcd40",
+      "retrievedAt": "2026-10-27T15:56:45+00:00",
+      "sha256": "bed444b724167cd907ea67f12fa1e3b70696dd78c18b98c34c056e9b169097e6",
       "status": 200,
       "storedBytes": 16540,
-      "storedSha256": "aa88c6a4d386fca8091924c03fcc1c0ad7b9837e00a835f09854ceabc1ddcd40",
+      "storedSha256": "bed444b724167cd907ea67f12fa1e3b70696dd78c18b98c34c056e9b169097e6",
       "url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/RPE65?content-type=application/json;expand=1"
     },
     {
@@ -191,7 +191,7 @@
       "headers": {
         "Content-Type": "application/json"
       },
-      "retrievedAt": "2026-10-27T15:50:46+00:00",
+      "retrievedAt": "2026-10-27T15:56:46+00:00",
       "sha256": "86e87c46ae1a424702676493d024d0508ce60f6c951b0b2803ce10269e09c20c",
       "status": 200,
       "storedBytes": 18,
@@ -203,11 +203,11 @@
       "file": "hgnc_symbol.json",
       "gzip": false,
       "headers": {},
-      "retrievedAt": "2026-10-27T15:50:24+00:00",
-      "sha256": "9e015072113e77f2eb389634d7f5319776f810f7f7499e1337964f71f311e5c0",
+      "retrievedAt": "2026-10-27T15:56:24+00:00",
+      "sha256": "a93d5f7812dd898dc83bc58a9840a6b8ec4c636a8226b5315c5e5f8215d9c19b",
       "status": 200,
       "storedBytes": 1250,
-      "storedSha256": "9e015072113e77f2eb389634d7f5319776f810f7f7499e1337964f71f311e5c0",
+      "storedSha256": "a93d5f7812dd898dc83bc58a9840a6b8ec4c636a8226b5315c5e5f8215d9c19b",
       "url": "https://rest.genenames.org/fetch/symbol/RPE65"
     },
     {
@@ -219,7 +219,7 @@
         "X-UniProt-Release": "2026_03",
         "X-UniProt-Release-Date": "02-September-2026"
       },
-      "retrievedAt": "2026-10-27T15:51:11+00:00",
+      "retrievedAt": "2026-10-27T15:56:53+00:00",
       "sha256": "d079aa23bb8ca4bffb8d237de52ee352c2e1074e1c567fdaca663c1d94dc4d29",
       "status": 200,
       "storedBytes": 98338,
@@ -282,7 +282,7 @@
   ],
   "mode": "research",
   "note": "Raw responses, unchanged. Files ending .gz are gzip of the raw bytes. sha256 is of the raw response; storedSha256 is of the file as stored.",
-  "registryVersion": "1.0.0",
+  "registryVersion": "1.0.1",
   "schemaVersion": 2,
   "sources": [
     {
