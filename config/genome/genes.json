@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "registryVersion": "1.0.0",
+  "registryVersion": "1.0.1",
   "assembly": "GRCh38",
   "note": "Genes the Genome v1 tooling may capture. Registration is not panel membership and says nothing about clinical relevance. Expected identifiers are checked against the sources on every capture; a mismatch stops the capture.",
   "genes": [
@@ -23,8 +23,11 @@
       "uniprotAccession": "P08100",
       "taxonId": 9606,
       "role": "test-gene",
-      "idsVerified": null,
-      "note": "Second gene for exercising the generalised capture path. Identifiers entered from the developers' knowledge and not yet confirmed by a capture; the first capture checks them against HGNC, Ensembl and UniProt. Not a panel decision (see D5)."
+      "idsVerified": {
+        "on": "2026-10-27",
+        "how": "Live capture, vision-snapshot run 40534942810: HGNC, Ensembl and UniProt reported HGNC:10012, ENSG00000163914 and P08100 (all seven identifier checks agree)."
+      },
+      "note": "Second gene for exercising the generalised capture path. Not a panel decision (see D5)."
     }
   ]
 }

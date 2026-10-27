@@ -34,7 +34,7 @@ Genome v1 is the genomic evidence layer of the Vision module. It continues the i
 
 - Each entry records the HGNC symbol, HGNC ID, Ensembl gene ID, UniProt accession and taxon (9606).
 - `idsVerified` says whether the identifiers have been confirmed against the sources, and how. RPE65's were
-  confirmed from the 2026-10-20 snapshot. RHO's are not yet confirmed.
+  confirmed from the 2026-10-20 snapshot, and RHO's by a live capture on 2026-10-27.
 - `role` is `current-focus`, `test-gene` or `panel-candidate`.
 - Registration lets the tools capture a gene. It is not panel membership and says nothing about clinical
   relevance.
@@ -226,7 +226,6 @@ Each item was checked against the repository on 2026-10-27.
 
 ## 8. Known limitations and follow-ups
 
-- **RHO identifiers:** they come from the developers' knowledge until the first RHO capture confirms them.
 - **Licences:** UniProt and AlphaFold DB terms are still unverified, ClinVar needs legal review, and no item
   is approved for commercial-pilot use. NCBI requires its disclaimer and copyright notice to be shown to users
   of a service built on its data; the app does not show them yet.

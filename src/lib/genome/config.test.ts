@@ -30,9 +30,8 @@ describe("gene registry", () => {
     expect(getGene("RHO").symbol).toBe("RHO");
   });
 
-  it("marks identifiers unverified until a capture has confirmed them", () => {
-    expect(getGene("RPE65").idsVerified).not.toBeNull();
-    expect(getGene("RHO").idsVerified).toBeNull();
+  it("records how each gene's identifiers were verified", () => {
+    for (const g of REGISTRY.genes) expect(g.idsVerified?.how).toMatch(/HGNC/);
   });
 
   it("fails clearly for invalid and unknown symbols", () => {

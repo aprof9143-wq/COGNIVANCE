@@ -1,7 +1,7 @@
 /**
  * SYNTHETIC test fixtures for a second gene, RHO, shaped like the real
  * responses of each source. The identifiers are those in the gene registry
- * (themselves awaiting confirmation by a capture); coordinates, sequences,
+ * (confirmed by a live capture on 2026-10-27); coordinates, sequences,
  * versions and variant records are made up for testing and are not real data.
  * Not a panel decision (D5).
  */
