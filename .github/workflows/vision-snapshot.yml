@@ -1,16 +1,31 @@
 name: vision-snapshot
 
-# Captures the public RPE65 reference records the Vision module shows
-# (Ensembl, UniProt, AlphaFold DB, ClinVar) and commits them, with a
-# provenance manifest, to public/vision/snapshot/rpe65/.
+# Captures the public reference records the Vision module shows (HGNC,
+# Ensembl, UniProt, AlphaFold DB, ClinVar) for registered genes and commits
+# them, with one SHA-256 manifest per gene, to public/vision/snapshot/<gene>/.
 #
-# Runs when this workflow or the capture script changes, or by hand.
+# Runs when this workflow, the capture tool or the gene registry changes
+# (capturing RPE65, the regression gene), or by hand for any registered genes.
 on:
   workflow_dispatch:
+    inputs:
+      genes:
+        description: "Space-separated HGNC symbols from config/genome/genes.json"
+        default: "RPE65"
+        required: true
+      allow_partial:
+        description: "Write a capture even if some sources failed (recorded in its manifest)"
+        type: boolean
+        default: false
+      commit:
+        description: "Commit the result (otherwise it is only uploaded as a workflow artifact)"
+        type: boolean
+        default: true
   push:
     paths:
       - ".github/workflows/vision-snapshot.yml"
       - "tools/vision-snapshot/**"
+      - "config/genome/genes.json"
 
 permissions:
   contents: write
@@ -22,14 +37,30 @@ concurrency:
 jobs:
   capture:
     runs-on: ubuntu-latest
+    env:
+      GENES: ${{ github.event.inputs.genes || 'RPE65' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Unit tests (offline)
+        run: python -m unittest discover -s tools/vision-snapshot -p "test_*.py" -v
       - name: Capture
-        run: python tools/vision-snapshot/capture.py
+        run: |
+          args=""
+          for g in $GENES; do args="$args --gene $g"; done
+          if [ "${{ github.event.inputs.allow_partial }}" = "true" ]; then args="$args --allow-partial"; fi
+          python tools/vision-snapshot/capture.py $args
+      - name: Upload the capture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vision-snapshot
+          path: public/vision/snapshot
+          if-no-files-found: ignore
       - name: Commit the snapshot
+        if: github.event_name == 'push' || github.event.inputs.commit == 'true'
         run: |
           git config user.name "vision-snapshot[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -37,6 +68,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Snapshot unchanged."
           else
-            git commit -m "data(vision): RPE65 reference snapshot $(date -u +%Y-%m-%d)"
-            git push
+            git commit -m "data(vision): reference snapshot ${GENES} $(date -u +%Y-%m-%d)"
+            git push || (git pull --no-rebase --no-edit && git push)
           fi

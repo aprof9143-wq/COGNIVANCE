@@ -1,0 +1,30 @@
+name: genome-tools
+
+# Offline unit tests for the Genome v1 capture tool and its configuration.
+# Path-filtered like core.yml, so unrelated changes do not run it.
+on:
+  pull_request:
+    paths:
+      - "tools/vision-snapshot/**"
+      - "config/genome/**"
+      - ".github/workflows/genome-tools.yml"
+  push:
+    branches: [main]
+    paths:
+      - "tools/vision-snapshot/**"
+      - "config/genome/**"
+      - ".github/workflows/genome-tools.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Capture tool tests (no network)
+        run: python -m unittest discover -s tools/vision-snapshot -p "test_*.py" -v
