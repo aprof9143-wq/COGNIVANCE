@@ -1,0 +1,42 @@
+name: licence-terms
+
+# Fetches the terms pages listed in config/genome/licences.json and records
+# their status, time and SHA-256 in docs/genome/terms-check.json, printing the
+# licence-related lines to the log for review. Evidence only: it approves
+# nothing (see docs/genome/LICENCES.md).
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/licence-terms.yml"
+      - "tools/licence-terms/**"
+      - "config/genome/licences.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: licence-terms-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch terms pages
+        run: python tools/licence-terms/check_terms.py
+      - name: Commit the record
+        run: |
+          git config user.name "licence-terms[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/genome/terms-check.json
+          if git diff --cached --quiet; then
+            echo "Unchanged."
+          else
+            git commit -m "docs(genome): terms pages checked $(date -u +%Y-%m-%d)"
+            git push || (git pull --no-rebase --no-edit && git push)
+          fi
