@@ -234,6 +234,7 @@ class Capture:
         self.checks.append(
             {"check": what, "source": source, "expected": expected, "reported": reported, "result": result}
         )
+        print(f"  check {source} {what}: {result} (expected {expected}, reported {reported})")
         if result == "differ":
             raise CaptureError(
                 f"{self.symbol}: {source} reports {what} {reported}, the registry says {expected}. "

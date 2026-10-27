@@ -30,13 +30,23 @@ jobs:
       - name: Fetch terms pages
         run: python tools/licence-terms/check_terms.py
       - name: Commit the record
+        # Put this run's record on top of the latest branch head, so a
+        # concurrent push never causes a merge conflict.
         run: |
           git config user.name "licence-terms[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/genome/terms-check.json
-          if git diff --cached --quiet; then
-            echo "Unchanged."
-          else
-            git commit -m "docs(genome): terms pages checked $(date -u +%Y-%m-%d)"
-            git push || (git pull --no-rebase --no-edit && git push)
-          fi
+          cp docs/genome/terms-check.json "$RUNNER_TEMP/terms-check.json"
+          for attempt in 1 2 3; do
+            git fetch -q origin "$GITHUB_REF_NAME"
+            git checkout -q -f --detach "origin/$GITHUB_REF_NAME"
+            cp "$RUNNER_TEMP/terms-check.json" docs/genome/terms-check.json
+            git add docs/genome/terms-check.json
+            if git diff --cached --quiet; then
+              echo "Unchanged."
+              exit 0
+            fi
+            git commit -q -m "docs(genome): terms pages checked $(date -u +%Y-%m-%d)"
+            if git push origin "HEAD:$GITHUB_REF_NAME"; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          exit 1
