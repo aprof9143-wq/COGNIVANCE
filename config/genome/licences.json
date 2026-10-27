@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "inventoryVersion": "1.1.0",
+  "inventoryVersion": "1.2.0",
   "reviewedOn": "2026-10-27",
   "note": "Machine-readable side of docs/genome/LICENCES.md. Software licences and data/service terms are recorded separately. Nothing here is a legal conclusion. 'commercialPilot' is 'approved' only after a named person has reviewed the current terms; until then every item is 'not-approved', and tools running in commercial-pilot mode refuse to use it.",
   "items": [
@@ -23,7 +23,8 @@
       "reviewStatus": "terms-read-pending-review",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
-      "followUp": "A named reviewer to confirm that no third-party-constrained Ensembl data is used, and that the redirect to the archive site does not change the terms; record the approval or restriction here."
+      "followUp": "A named reviewer to confirm that no third-party-constrained Ensembl data is used, and that the redirect to the archive site does not change the terms; record the approval or restriction here.",
+      "appUse": "not-restricted"
     },
     {
       "id": "uniprot-rest",
@@ -42,10 +43,11 @@
       "commercialUse": "unverified",
       "attribution": "If CC BY 4.0 is confirmed: attribution and a link to the licence are required.",
       "redistribution": "Raw responses are redistributed in public/vision/snapshot/. Confirm attribution is displayed alongside.",
-      "reviewStatus": "unverified",
+      "reviewStatus": "awaiting-human-review",
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
-      "followUp": "Confirm the licence and required attribution text; confirm cross-referenced content (e.g. Reactome names) carries no separate terms."
+      "followUp": "Awaiting human review (product owner, 2026-10-27): a person must read the current terms pages directly; the CI runner could not extract their text. Confirm the licence and required attribution text; confirm cross-referenced content (e.g. Reactome names) carries no separate terms.",
+      "appUse": "not-restricted"
     },
     {
       "id": "alphafold-db",
@@ -64,10 +66,11 @@
       "commercialUse": "unverified",
       "attribution": "If CC BY 4.0 is confirmed: attribution and citation of the AlphaFold DB papers.",
       "redistribution": "A model file is redistributed in public/vision/snapshot/. Confirm this is permitted.",
-      "reviewStatus": "unverified",
+      "reviewStatus": "awaiting-human-review",
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
-      "followUp": "Read the licence disclaimer PDF and FAQ; keep model parameters and AlphaMissense out of scope unless separately reviewed."
+      "followUp": "Awaiting human review (product owner, 2026-10-27): a person must read the current terms pages directly; the CI runner could not extract their text. Read the licence disclaimer PDF and FAQ; keep model parameters and AlphaMissense out of scope unless separately reviewed.",
+      "appUse": "not-restricted"
     },
     {
       "id": "clinvar-eutils",
@@ -86,10 +89,12 @@
       "commercialUse": "unclear",
       "attribution": "NLM requests acknowledgment; NCBI's disclaimer and copyright notice must be evident to users of a service built on it.",
       "redistribution": "Raw esummary batches are redistributed in public/vision/snapshot/. Needs legal review because of submitter content.",
-      "reviewStatus": "needs-legal-review",
+      "reviewStatus": "requires-legal-review",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
-      "followUp": "Legal review of reuse and redistribution of submitter content; display NCBI's disclaimer and copyright notice wherever ClinVar data is shown; confirm E-utilities rate limits and the tool/email parameters."
+      "followUp": "Legal review of reuse and redistribution of submitter content (required). Display NCBI's disclaimer and copyright notice wherever ClinVar data is shown; NCBI data use stays blocked for the app until then. Confirm E-utilities rate limits and the tool/email parameters.",
+      "appUse": "blocked",
+      "appUseCondition": "Blocked for the app (product owner, 2026-10-27) until NCBI's required disclaimer and copyright notice are displayed to users. NCBI's policies state that its Disclaimer and Copyright notice must be evident to users of a service built on its data. ClinVar reuse also requires legal review."
     },
     {
       "id": "hgnc-rest",
@@ -110,7 +115,8 @@
       "reviewStatus": "terms-read-pending-review",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
-      "followUp": "Named reviewer sign-off; read the REST help page for rate limits."
+      "followUp": "Named reviewer sign-off; read the REST help page for rate limits.",
+      "appUse": "not-restricted"
     },
     {
       "id": "rcsb-pdb",
@@ -128,7 +134,8 @@
       "reviewStatus": "terms-read-pending-review",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
-      "followUp": "Named reviewer sign-off."
+      "followUp": "Named reviewer sign-off.",
+      "appUse": "not-restricted"
     },
     {
       "id": "zod",
@@ -146,7 +153,8 @@
       "reviewStatus": "software-licence-checked",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
-      "followUp": "Named reviewer sign-off; confirm notices are shipped with the build."
+      "followUp": "Named reviewer sign-off; confirm notices are shipped with the build.",
+      "appUse": "not-restricted"
     },
     {
       "id": "molstar",
@@ -164,7 +172,8 @@
       "reviewStatus": "software-licence-checked",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
-      "followUp": "Named reviewer sign-off; confirm notices are shipped with the build."
+      "followUp": "Named reviewer sign-off; confirm notices are shipped with the build.",
+      "appUse": "not-restricted"
     },
     {
       "id": "python-stdlib",
@@ -182,7 +191,8 @@
       "reviewStatus": "software-licence-checked",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
-      "followUp": "Named reviewer sign-off; low priority because nothing is distributed."
+      "followUp": "Named reviewer sign-off; low priority because nothing is distributed.",
+      "appUse": "not-restricted"
     },
     {
       "id": "alphamissense",
@@ -200,7 +210,8 @@
       "reviewStatus": "not-reviewed",
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
-      "followUp": "Review terms before any use; must not enter a commercial-pilot path until approved."
+      "followUp": "Review terms before any use; must not enter a commercial-pilot path until approved.",
+      "appUse": "not-restricted"
     },
     {
       "id": "other-variant-predictors",
@@ -218,7 +229,8 @@
       "reviewStatus": "not-reviewed",
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
-      "followUp": "Per-predictor review before any use."
+      "followUp": "Per-predictor review before any use.",
+      "appUse": "not-restricted"
     }
   ]
 }

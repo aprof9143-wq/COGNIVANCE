@@ -4,6 +4,7 @@ import {
   LICENCES,
   PANELS,
   REGISTRY,
+  appUseBlock,
   assertSourceAllowed,
   getGene,
   isAuthoritative,
@@ -139,6 +140,28 @@ describe("licence inventory and the commercial-pilot safeguard", () => {
       items: [{ ...LICENCES.items[0]!, commercialPilot: "approved" as const }],
     };
     expect(assertSourceAllowed(LICENCES.items[0]!.id, "commercial-pilot", approved)).toBeTruthy();
+  });
+});
+
+describe("review states set by the product owner (2026-10-27)", () => {
+  const item = (id: string) => LICENCES.items.find((i) => i.id === id)!;
+
+  it("UniProt and AlphaFold DB terms await human review", () => {
+    expect(item("uniprot-rest").reviewStatus).toBe("awaiting-human-review");
+    expect(item("alphafold-db").reviewStatus).toBe("awaiting-human-review");
+  });
+
+  it("ClinVar reuse requires legal review", () => {
+    expect(item("clinvar-eutils").reviewStatus).toBe("requires-legal-review");
+  });
+
+  it("NCBI data use is blocked for the app until NCBI's notice is displayed", () => {
+    expect(appUseBlock("clinvar-eutils")).toMatch(/disclaimer and copyright notice/);
+    expect(LICENCES.items.filter((i) => i.appUse === "blocked").map((i) => i.id)).toEqual([
+      "clinvar-eutils",
+    ]);
+    expect(appUseBlock("hgnc-rest")).toBeNull();
+    expect(() => appUseBlock("no-such-source")).toThrow(/not in the licence/);
   });
 });
 

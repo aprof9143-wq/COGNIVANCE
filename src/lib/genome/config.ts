@@ -71,6 +71,10 @@ const LicenceItem = z.object({
   reviewStatus: z.string(),
   termsCheckedOn: z.string().nullable(),
   commercialPilot: z.enum(["approved", "not-approved"]),
+  /** Whether the web app may use this item at all, independent of commercial-pilot approval. */
+  appUse: z.enum(["not-restricted", "blocked"]),
+  /** What must happen before a blocked item may be used by the app. */
+  appUseCondition: z.string().optional(),
   followUp: z.string(),
 });
 export type LicenceItem = z.infer<typeof LicenceItem>;
@@ -142,6 +146,18 @@ export const isAuthoritative = (p: Panel) =>
 /** Where a gene's captured snapshot is served; one folder per gene. */
 export const snapshotDir = (symbol: string) =>
   `/vision/snapshot/${getGene(symbol).symbol.toLowerCase()}/`;
+
+/**
+ * Why the app may not use an item, or null if nothing blocks it. A blocked item
+ * stays blocked until the condition in the inventory is met and recorded.
+ */
+export function appUseBlock(id: string, licences: Licences = LICENCES): string | null {
+  const item = licences.items.find((i) => i.id === id);
+  if (!item) throw new GenomeConfigError(`${id} is not in the licence inventory.`);
+  return item.appUse === "blocked"
+    ? (item.appUseCondition ?? `${item.name} is blocked for the app.`)
+    : null;
+}
 
 export type UseMode = "research" | "commercial-pilot";
 

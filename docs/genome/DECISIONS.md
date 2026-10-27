@@ -4,13 +4,15 @@ Decisions about the Genome platform. These are separate from the 14 Vision bench
 `/vision` (`src/lib/vision/targets.ts`). Those carry their own numbers: Vision decision 4 is "Intended
 population" and decision 5 is "Input data and quality requirements", which are **not** D4 and D5 below.
 
-## D4: undefined (not found)
+## D4: new decision (no prior entry)
 
 | Field | Value |
 | --- | --- |
-| **Status** | **Undefined.** No D4 decision is recorded in the repository or in the context provided (checked 2026-10-27). |
-| **Content** | None. Nothing has been assumed or invented for D4. |
-| **Needs** | The project owner to provide D4's content, or to confirm that a new decision should be created under this number. |
+| **Status** | **Created 2026-10-27 as a new decision**, at the project owner's instruction. |
+| **History** | The repository had no existing D4 entry (checked 2026-10-27), so D4's original meaning, if it ever had one, is **unknown**. It has not been backfilled, and no earlier meaning is assumed. |
+| **Question** | Not yet stated. |
+| **Answer** | None yet. |
+| **Needs** | The project owner to state the question this new D4 decides. |
 
 ## D5: first-panel gene list
 
@@ -41,3 +43,4 @@ population" and decision 5 is "Input data and quality requirements", which are *
 | **Answer** | Only once `config/genome/licences.json` marks it `commercialPilot: approved`, after a named person has reviewed its current software licence and data/service terms. Until then the capture tool and `assertSourceAllowed` refuse it in commercial-pilot mode. |
 | **Source** | Genome v1 brief, 2026-10-27. |
 | **Status** | Decided. No item is approved yet. |
+| **Current review states** | Set by the product owner on 2026-10-27. **UniProt and AlphaFold DB:** terms awaiting human review. **ClinVar:** reuse requires legal review. **NCBI data:** use blocked for the app until NCBI's required disclaimer and copyright notice are displayed to users (`appUse: blocked` in `licences.json`). |

@@ -1,7 +1,7 @@
 # Genome v1 specification
 
 Status: **draft for review**, 2026-10-27. Decision D5 (the first-panel gene list) has a proposed list awaiting
-genomics/clinical review and is not yet authoritative. D4 is undefined. See
+genomics/clinical review and is not yet authoritative. D4 is a new decision whose question is not yet stated. See
 [DECISIONS.md](DECISIONS.md).
 
 Cognivance is being developed toward a clinically benchmarked vision-therapy platform and, in time, an
@@ -235,13 +235,17 @@ Each item was checked against the repository on 2026-10-27.
 
 ## 8. Known limitations and follow-ups
 
-- **Licences:** UniProt and AlphaFold DB terms are still unverified, ClinVar needs legal review, and no item
-  is approved for commercial-pilot use. NCBI requires its disclaimer and copyright notice to be shown to users
-  of a service built on its data; the app does not show them yet.
+- **Licences:**
+  - UniProt and AlphaFold DB terms are awaiting human review.
+  - ClinVar reuse requires legal review.
+  - NCBI data use is **blocked for the app** until NCBI's required disclaimer and copyright notice are displayed
+    to users. The block is recorded in `licences.json` and checked by `appUseBlock`, but the Vision pages do not
+    enforce it yet: they still show ClinVar variants.
+  - No item is approved for commercial-pilot use.
 - **Hard-coded RPE65 in the UI:** the Vision UI (`targets.ts`, `useEvidence`) still names RPE65 directly.
   Moving it onto the registry is a UI change left for a later pull request.
-- **D4 is undefined:** it is not recorded in the repository or in the context provided. The project owner
-  needs to supply it, or confirm that a new decision should be created (see DECISIONS.md).
+- **D4 is a new decision with no question yet.** The repository had no earlier D4, so its original meaning is
+  unknown; nothing was backfilled. The project owner needs to state its question (see DECISIONS.md).
 
 ## 9. Verifying
 
