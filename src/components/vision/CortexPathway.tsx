@@ -5,7 +5,17 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
-import { loadAnatomy, type Anatomy, type AnatomyMesh } from "@/lib/sim/anatomy";
+import { loadAnatomy, type Anatomy } from "@/lib/sim/anatomy";
+import {
+  FALLBACK,
+  meshGeometry,
+  pathways,
+  SCHEMATIC,
+  sideOf,
+  w,
+  type Path,
+  type V3,
+} from "@/lib/vision/pathway";
 
 /**
  * The visual pathway in MNI152 space: eye → optic nerve → chiasm → optic
@@ -17,16 +27,6 @@ import { loadAnatomy, type Anatomy, type AnatomyMesh } from "@/lib/sim/anatomy";
  * `retina` (light response reaching the optic nerve, fraction of healthy) and
  * `v1` (cortical response computed by the network model).
  */
-
-type V3 = [number, number, number];
-/** MNI RAS mm → three.js world (y up, anterior toward −z). */
-const w = ([x, y, z]: V3) => new THREE.Vector3(x, z, -y);
-
-const SCHEMATIC: { eyeL: V3; eyeR: V3; chiasm: V3 } = {
-  eyeL: [-32, 62, -36],
-  eyeR: [32, 62, -36],
-  chiasm: [0, 4, -14],
-};
 
 const LABELS = [
   {
@@ -68,58 +68,6 @@ const LABELS = [
 ];
 
 let anatomyPromise: Promise<Anatomy> | null = null;
-
-function meshGeometry(m: AnatomyMesh) {
-  const g = new THREE.BufferGeometry();
-  const p = new Float32Array(m.positions.length);
-  for (let i = 0; i < m.positions.length; i += 3) {
-    p[i] = m.positions[i]!;
-    p[i + 1] = m.positions[i + 2]!;
-    p[i + 2] = -m.positions[i + 1]!;
-  }
-  g.setAttribute("position", new THREE.BufferAttribute(p, 3));
-  g.setIndex(new THREE.BufferAttribute(m.indices, 1));
-  g.computeVertexNormals();
-  return g;
-}
-
-type Path = { curve: THREE.CatmullRomCurve3; stage: "retina" | "cortex" };
-
-function pathways(lgnL: V3, lgnR: V3, v1L: V3, v1R: V3): Path[] {
-  const out: Path[] = [];
-  for (const side of [-1, 1] as const) {
-    const eye = side < 0 ? SCHEMATIC.eyeL : SCHEMATIC.eyeR;
-    const lgn = side < 0 ? lgnL : lgnR;
-    const v1 = side < 0 ? v1L : v1R;
-    // Each eye sends fibres to both sides; the nasal half crosses at the chiasm.
-    for (const toSide of [-1, 1] as const) {
-      const target = toSide < 0 ? lgnL : lgnR;
-      out.push({
-        stage: "retina",
-        curve: new THREE.CatmullRomCurve3(
-          [
-            eye,
-            [side * 22, 40, -30],
-            [side * 9, 14, -20],
-            SCHEMATIC.chiasm,
-            [toSide * 12, -6, -12],
-            [toSide * 19, -16, -10],
-            target,
-          ].map((p) => w(p as V3)),
-        ),
-      });
-    }
-    out.push({
-      stage: "cortex",
-      curve: new THREE.CatmullRomCurve3(
-        [lgn, [side * 33, -34, -2], [side * 31, -58, 2], [side * 20, -76, 3], v1].map((p) =>
-          w(p as V3),
-        ),
-      ),
-    });
-  }
-  return out;
-}
 
 type Props = { retina: number; v1: number };
 
@@ -245,15 +193,11 @@ export function CortexPathway({ retina, v1 }: Props) {
         glow.lgn.push(lgnMat);
         const v1 = add("v1", v1Mat);
         const lgn = add("lgn", lgnMat);
-        const side = (m: AnatomyMesh | null, s: "left" | "right", fb: V3): V3 => {
-          const p = m?.sides?.[s];
-          return p ? [p[0], p[1], p[2]] : fb;
-        };
         const paths = pathways(
-          side(lgn, "left", [-24, -24, -8]),
-          side(lgn, "right", [24, -24, -7]),
-          side(v1, "left", [-8, -88, 1]),
-          side(v1, "right", [11, -80, 4]),
+          sideOf(lgn, "left", FALLBACK.lgnL),
+          sideOf(lgn, "right", FALLBACK.lgnR),
+          sideOf(v1, "left", FALLBACK.v1L),
+          sideOf(v1, "right", FALLBACK.v1R),
         );
         const pulseGeo = new THREE.SphereGeometry(1.6, 12, 8);
         trash.push(pulseGeo);

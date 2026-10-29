@@ -274,6 +274,8 @@ export class SimScene {
   private pxScale = 1000;
   private fade = 1;
   private otherFade = 1;
+  /** Presentation look for the landing page (see setShowcase). */
+  private showcase = false;
 
   constructor(host: HTMLElement, labels: HTMLElement) {
     this.host = host;
@@ -1281,7 +1283,7 @@ export class SimScene {
   setView(view: View) {
     this.view = view;
     this.explodeTarget = view === "explode" ? 1 : 0;
-    this.bloom.strength = view === "cinematic" ? 0.7 : 0.45;
+    this.bloom.strength = (view === "cinematic" ? 0.7 : 0.45) + (this.showcase ? 0.35 : 0);
     const site = this.placement ? toThree(this.placement.centre) : new THREE.Vector3();
     const out = this.placement
       ? toThree(this.placement.normal).negate().normalize()
@@ -1342,6 +1344,27 @@ export class SimScene {
     } else {
       this.clip.set(new THREE.Vector3(1, 0, 0), 1e6);
     }
+  }
+
+  /**
+   * A presentation look for the landing page: every region but the targets in
+   * one cool palette and fainter, a brighter glass cortex and more bloom, so
+   * the target and the implant carry the colour. Call after setTargets.
+   */
+  setShowcase(on: boolean) {
+    this.showcase = on;
+    const cool = new THREE.Color(0x3a64c8);
+    for (const [k, r] of this.regions) {
+      const c = on && !this.targets.has(k) ? r.colour.clone().lerp(cool, 0.8) : r.colour;
+      r.mat.color.copy(c);
+      r.mat.emissive.copy(c);
+      (r.pmat.uniforms["uColor"]!.value as THREE.Color).copy(c);
+    }
+    if (this.cortexMat) {
+      this.cortexMat.uniforms["uRimStrength"]!.value = on ? 0.95 : 0.6;
+      (this.cortexMat.uniforms["uRim"]!.value as THREE.Color).set(on ? 0xb4f0ff : 0x8fe3ff);
+    }
+    this.setView(this.view);
   }
 
   /** Stop or resume drawing, e.g. while the view is scrolled off screen. */
@@ -1423,7 +1446,7 @@ export class SimScene {
       }
       const stim = L.delivered.includes(k);
       const f = this.fade * (target ? 1 : this.otherFade);
-      r.mat.opacity = (target ? 0.85 : 0.22) * f;
+      r.mat.opacity = (target ? 0.85 : this.showcase ? 0.1 : 0.22) * f;
       r.mat.depthWrite = f > 0.6;
       r.pmat.uniforms["uFade"]!.value = f;
       r.mat.emissiveIntensity =
