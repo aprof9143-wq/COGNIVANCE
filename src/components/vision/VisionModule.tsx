@@ -55,7 +55,7 @@ import { simulateTherapy } from "@/lib/vision/therapy";
 import type { Variant, VariantGroup } from "@/lib/vision/snapshot";
 import {
   DECISIONS,
-  LICENCES,
+  sourceTerms,
   PIPELINE,
   TARGETS,
   type DecisionStatus,
@@ -63,6 +63,7 @@ import {
 } from "@/lib/vision/targets";
 import { MolViewer, type HoverInfo, type MolColour, type MolStyle } from "./MolViewer";
 import { Card, EvidenceTag, Gap, Spinner, VerdictChip, Withheld } from "./ui";
+import { StatusLine, StatusPanel } from "./StatusPanel";
 import { PlddtChart } from "./PlddtChart";
 
 type Ready = Extract<Target, { status: "ready" }>;
@@ -212,6 +213,9 @@ export function VisionModule() {
 
   return (
     <div className="vision-light min-h-screen px-3 py-3 font-sans sm:px-6 sm:py-6">
+      <div className="mx-auto max-w-[1440px]">
+        <StatusLine />
+      </div>
       <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)_330px]">
           {/* ------------------------------------------------ left */}
@@ -1156,9 +1160,9 @@ export function VisionModule() {
                 clinically validated. Do not use it for diagnosis or treatment decisions.
               </li>
               <li>
-                Public reference data, requested live from your browser. Databases change between
-                releases; each value shows its release and retrieval time. Export the record to keep
-                what you saw.
+                Public reference data, from a captured snapshot by default or, with Live check,
+                requested from your browser. Databases change between releases; each value shows its
+                release and retrieval time. Export the record to keep what you saw.
               </li>
               <li>
                 Predicted structures are models. pLDDT is the model's confidence in itself, not a
@@ -1170,28 +1174,43 @@ export function VisionModule() {
                 illustrative parameters, not fitted to any trial.
               </li>
             </ul>
-            <p className="mt-4 text-xs font-medium text-[var(--v-ink-2)]">Source terms</p>
+            <p className="mt-4 text-xs font-medium text-[var(--v-ink-2)]">
+              Sources and their terms
+            </p>
             <ul className="mt-2 flex flex-col gap-1.5">
-              {LICENCES.map((l) => (
-                <li key={l.source} className="flex items-center justify-between gap-2 text-[13px]">
-                  <span>{l.source}</span>
-                  <a
-                    href={l.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[var(--v-ink-2)] underline decoration-[var(--v-line)] underline-offset-2"
-                  >
-                    {l.terms}
-                    <ExternalLink className="h-3 w-3" aria-hidden />
-                  </a>
+              {sourceTerms().map((l) => (
+                <li key={l.id} className="flex items-baseline justify-between gap-3 text-[13px]">
+                  <span className="min-w-0">
+                    {l.source}
+                    <span className="text-[var(--v-ink-3)]">
+                      {" "}
+                      ({l.shown ? "shown" : "withheld"}; {l.review})
+                    </span>
+                  </span>
+                  {l.url && (
+                    <a
+                      href={l.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex shrink-0 items-center gap-1 text-[var(--v-ink-2)] underline decoration-[var(--v-line)] underline-offset-2"
+                    >
+                      Terms
+                      <ExternalLink className="h-3 w-3" aria-hidden />
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
             <p className="mt-3 text-[11px] text-[var(--v-ink-3)]">
-              As each provider publishes them. Confirm before redistributing any data.
+              From the licence inventory. No source's terms have been approved for commercial use,
+              and none may be redistributed until a reviewer confirms its terms allow it.
             </p>
           </Card>
         </div>
+
+        <Card className="mt-3">
+          <StatusPanel />
+        </Card>
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ export const COMPANY = {
   legal: "Cognivance Labs",
   tagline: "The simulation layer for brain and eye medicine.",
   pitch:
-    "Cognivance turns a patient's genome, imaging and EEG into one traceable model of the nervous system, so a therapy can be tested in silico, from the gene to the visual cortex, before it is tested in a person.",
+    "Cognivance is building one traceable model of the nervous system from genome, imaging and EEG, so that therapies can one day be tested in silico, from the gene to the visual cortex, before they are tested in a person.",
   disclaimer:
     "Research software. Not a medical device, not FDA-cleared or approved, and not for clinical decision-making.",
   year: 2026,
@@ -71,7 +71,7 @@ export const MODULES: {
   group: "Genome & Vision" | "Brain" | "Platform";
   name: string;
   blurb: string;
-  status: "Live data" | "Model" | "Demo data" | "Protocol";
+  status: "Reference data" | "Model" | "Demo data" | "Protocol";
 }[] = [
   {
     key: "vision",
@@ -80,7 +80,7 @@ export const MODULES: {
     name: "Gene & protein evidence",
     blurb:
       "RPE65 from gene to structure: Ensembl, UniProt and AlphaFold DB, every value traced to its source.",
-    status: "Live data",
+    status: "Reference data",
   },
   {
     key: "therapy",
@@ -120,7 +120,8 @@ export const MODULES: {
     to: "/viewer",
     group: "Brain",
     name: "Imaging workstation",
-    blurb: "A diagnostic-style viewer: MPR, window/level, measurements and fibre tracts on MNI152.",
+    blurb:
+      "An imaging viewer for research: MPR, window/level, measurements and fibre tracts on MNI152.",
     status: "Demo data",
   },
   {

@@ -4,6 +4,9 @@
  * the module must not behave as if it had one.
  */
 
+import { LICENCES as INVENTORY, REGISTRY, type Licences, type Registry } from "@/lib/genome/config";
+import { allowed } from "@/lib/genome/policy";
+
 export type Target =
   | {
       key: string;
@@ -17,17 +20,39 @@ export type Target =
     }
   | { key: string; status: "unresolved"; label: string; note: string };
 
-export const TARGETS: Target[] = [
-  {
-    key: "rpe65",
-    status: "ready",
-    label: "RPE65",
-    geneSymbol: "RPE65",
-    taxonId: 9606,
+/**
+ * The condition each selectable gene is studied for: a product decision,
+ * recorded here, not a diagnosis or a clinical claim. A gene without an entry
+ * is not offered.
+ */
+const CONDITIONS: Record<string, { condition: string; note: string }> = {
+  RPE65: {
     condition: "RPE65-associated inherited retinal dystrophy",
     note: "First use case, chosen 2026-10-19. A product decision, not a diagnosis.",
   },
-];
+};
+
+/**
+ * The genes the Vision pages offer, from the gene registry rather than a list
+ * of their own: those with the role "current-focus", verified identifiers and a
+ * recorded condition. (A test checks each also has a display copy.) Being
+ * offered here says nothing about panel membership or approval: panels are
+ * separate and the first IRD panel is not authoritative (decision D5).
+ */
+export function selectableTargets(registry: Registry = REGISTRY): Target[] {
+  return registry.genes
+    .filter((g) => g.role === "current-focus" && g.idsVerified && CONDITIONS[g.symbol])
+    .map((g) => ({
+      key: g.symbol.toLowerCase(),
+      status: "ready" as const,
+      label: g.symbol,
+      geneSymbol: g.symbol,
+      taxonId: g.taxonId,
+      ...CONDITIONS[g.symbol]!,
+    }));
+}
+
+export const TARGETS: Target[] = selectableTargets();
 
 export function targetByKey(key: string): Target | undefined {
   return TARGETS.find((t) => t.key === key);
@@ -154,28 +179,34 @@ export const PIPELINE: Stage[] = [
   },
 ];
 
-export type Licence = { source: string; terms: string; url: string };
+export type SourceTerms = {
+  id: string;
+  source: string;
+  shown: boolean;
+  review: string;
+  url: string;
+};
 
-/** As each provider publishes them. Confirm before redistributing any data. */
-export const LICENCES: Licence[] = [
-  {
-    source: "Ensembl",
-    terms: "No restrictions on data use",
-    url: "https://www.ensembl.org/info/about/legal/disclaimer.html",
-  },
-  {
-    source: "UniProt",
-    terms: "CC BY 4.0",
-    url: "https://www.uniprot.org/help/license",
-  },
-  {
-    source: "AlphaFold DB",
-    terms: "CC BY 4.0",
-    url: "https://alphafold.ebi.ac.uk/faq",
-  },
-  {
-    source: "RCSB PDB",
-    terms: "CC0 1.0",
-    url: "https://www.rcsb.org/pages/usage-policy",
-  },
-];
+/** Plain words for the licence inventory's review states. */
+const REVIEW_WORDS: Record<string, string> = {
+  "terms-read-pending-review": "terms read, review pending",
+  "awaiting-human-review": "terms not yet verified",
+  "requires-legal-review": "legal review required",
+};
+
+/**
+ * The data sources and the state of their terms, from the licence inventory
+ * (config/genome/licences.json) rather than a list of licence names: nothing is
+ * stated as a source's licence until a person has verified it.
+ */
+export function sourceTerms(licences: Licences = INVENTORY): SourceTerms[] {
+  return licences.items
+    .filter((i) => i.kind === "data-source" && i.used)
+    .map((i) => ({
+      id: i.id,
+      source: i.name,
+      shown: allowed(i.id, "display", "research", { licences }),
+      review: REVIEW_WORDS[i.reviewStatus] ?? i.reviewStatus,
+      url: i.termsUrls[0] ?? "",
+    }));
+}

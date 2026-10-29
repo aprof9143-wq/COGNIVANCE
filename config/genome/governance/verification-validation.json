@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "recordVersion": "1.0.0",
+  "effectiveFrom": "2026-10-29",
+  "note": "Verification and validation plans. Only software verification exists today. No analytical or clinical validation has been planned in detail, run or approved, so those entries have no dataset, results or approver. A passing test suite verifies the software against its own requirements; it does not establish clinical validity.",
+  "protocols": [
+    {
+      "id": "VER-001",
+      "kind": "software-verification",
+      "purpose": "Check the software against REQ-001 to REQ-013 and REQ-017 with automated tests.",
+      "dataset": "Synthetic fixtures, and the captured public reference snapshot for RPE65 (data/genome/snapshot/rpe65) and its display copy. No patient data.",
+      "metrics": [
+        "Every test in pnpm test and the Python tool tests passes on the commit under review."
+      ],
+      "acceptanceCriteria": "All tests pass; every requirement marked implemented names at least one test that exists (src/lib/genome/governance.test.ts).",
+      "results": null,
+      "approver": null,
+      "status": "implemented"
+    },
+    {
+      "id": "VER-002",
+      "kind": "accessibility-check",
+      "purpose": "Status, warning, withheld, loading and error states are announced and readable.",
+      "dataset": "Server-rendered markup of the status and notice components.",
+      "metrics": ["Roles and accessible names present; statement text present in the markup."],
+      "acceptanceCriteria": "The tests in src/lib/genome/status.test.ts pass.",
+      "results": null,
+      "approver": null,
+      "status": "incomplete",
+      "note": "Automated markup checks only. No audit against an accessibility standard, and no testing with assistive technology, has been done."
+    },
+    {
+      "id": "VAL-001",
+      "kind": "analytical-validation",
+      "purpose": "Confirm displayed reference values match their sources for each registered gene.",
+      "dataset": null,
+      "metrics": [],
+      "acceptanceCriteria": null,
+      "results": null,
+      "approver": null,
+      "status": "requires-qualified-review",
+      "note": "Not started. Needs a protocol written and approved by a qualified genomics reviewer."
+    },
+    {
+      "id": "VAL-002",
+      "kind": "clinical-validation",
+      "purpose": "Evidence that a clinical function meets a clinical intended use.",
+      "dataset": null,
+      "metrics": [],
+      "acceptanceCriteria": null,
+      "results": null,
+      "approver": null,
+      "status": "requires-qualified-review",
+      "note": "Not started and cannot be defined until a clinical intended use exists (release-gate.json, INTENDED-USE)."
+    }
+  ]
+}

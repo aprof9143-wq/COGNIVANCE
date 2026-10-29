@@ -675,7 +675,7 @@ export function Workstation() {
         <div className="leading-tight">
           <h1 className="text-[15px] font-semibold">Imaging workstation</h1>
           <p className="text-[12px] text-[color:var(--k-8095bf)]">
-            MRI · segmentation · tractography · EEG — decision-support visualisation
+            MRI · segmentation · tractography · EEG — research visualisation
           </p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">

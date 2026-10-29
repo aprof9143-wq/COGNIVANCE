@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "recordVersion": "1.0.0",
+  "effectiveFrom": "2026-10-29",
+  "status": "research-only",
+  "note": "The current intended use of Genome v1 and the Vision pages it feeds, as the software is built today. It is not a clinical intended-use statement: none exists, and writing one needs a qualified clinical reviewer (release-gate.json, INTENDED-USE). Nothing here asserts that any regulation applies or is satisfied.",
+  "intendedUse": "Research and demonstration: an evidence layer that shows public reference records for registered inherited-retinal-disease genes (gene, transcript, protein and predicted structure), each with its source, release and retrieval time, alongside clearly labelled hypothetical models.",
+  "excludedUses": [
+    "Clinical decision-making of any kind",
+    "Diagnosis, screening or prognosis for any person",
+    "Patient-specific interpretation of genomic data",
+    "Determining whether a variant is pathogenic",
+    "Selecting, recommending or ranking treatments or therapies",
+    "Predicting a patient's response to a therapy",
+    "Processing identifiable patient genomic, clinical or neural data",
+    "Uploading clinical VCF files or other patient data",
+    "Designing, generating or recommending genome edits or engineered genomes"
+  ],
+  "targetUsers": [
+    "Researchers and members of the product team evaluating the platform",
+    "Prospective partners and investors viewing a demonstration"
+  ],
+  "notTargetUsers": [
+    "Clinicians making care decisions",
+    "Patients or members of the public seeking medical information"
+  ],
+  "useEnvironment": "A web browser, in a demo session with no accounts. Public reference data only; no patient data is loaded, entered or stored.",
+  "scope": {
+    "conditions": [
+      {
+        "name": "RPE65-associated inherited retinal dystrophy",
+        "basis": "Chosen as the first use case on 2026-10-19 (src/lib/vision/targets.ts). A product decision, not a diagnosis and not a clinical claim."
+      }
+    ],
+    "genes": {
+      "registry": "config/genome/genes.json",
+      "panel": "config/genome/panels/ird-first-panel.json",
+      "note": "Registration lets the tools capture a gene; it is not panel membership. The first IRD panel is proposed and not authoritative while decision D5 is unresolved."
+    },
+    "referenceBuilds": ["GRCh38"],
+    "inputTypes": [
+      {
+        "type": "VCF header (text)",
+        "versions": ["4.2", "4.3", "4.4", "4.5"],
+        "scope": "Header validation only: version and GRCh38 build. No variant record is read, and there is no upload screen.",
+        "status": "implemented-unvalidated"
+      }
+    ],
+    "species": [
+      {
+        "taxonId": 9606,
+        "name": "Homo sapiens"
+      }
+    ]
+  },
+  "limitations": [
+    "Public reference data only, captured on the dates in each manifest; sources may have changed since.",
+    "ClinVar variant records are withheld by the source policy, so no variant is shown.",
+    "The gene-therapy time course is a hypothetical model with illustrative, unfitted parameters. It predicts nothing for any patient.",
+    "The cortex response comes from a reduced network model, not from any person's brain.",
+    "The eye model is a population-average schematic eye, not any person's eye.",
+    "AlphaFold structures are predictions with their own per-residue confidence, not measurements.",
+    "No analytical or clinical validation has been performed.",
+    "The eye simulation can show a visitor's own picture through the model eye. The picture stays in the browser, is never stored or sent, and is not meant for medical images."
+  ],
+  "speciesCaveats": [
+    "Every record is for Homo sapiens (taxon 9606). No cross-species comparison exists in the software.",
+    "If cross-species comparison is added, orthology or pathway overlap must not be presented as proof of causation or clinical relevance, and no animal model may be presented as capturing the full human phenotype."
+  ]
+}
