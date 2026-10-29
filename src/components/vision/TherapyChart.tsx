@@ -128,7 +128,7 @@ export function TherapyChart({
         ))}
       </svg>
       {h && (
-        <div className="pointer-events-none absolute left-12 top-2 rounded-xl bg-[var(--v-ink)] px-3 py-2 text-[11px] text-white shadow">
+        <div className="pointer-events-none absolute left-12 top-2 rounded-xl bg-[var(--v-ink)] px-3 py-2 text-[11px] text-[var(--v-on-ink)] shadow">
           <p className="font-medium">
             {yearly ? `Year ${(h.day / 365).toFixed(2)}` : `Day ${h.day}`}
           </p>

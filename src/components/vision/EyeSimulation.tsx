@@ -48,7 +48,7 @@ import { useAdaptingEye } from "./useAdaptingEye";
 import { RetinalImage } from "./RetinalImage";
 import { VisualCycle } from "./VisualCycle";
 import { ConceptVision } from "./ConceptVision";
-import { Card, EvidenceTag, VisionPages } from "./ui";
+import { Card, EvidenceTag } from "./ui";
 
 const DISTANCES = [Infinity, 6000, 2000, 1000, 500, 330, 250, 200, 150, 120, 100];
 const RELAXED_POWER = power(LE_GRAND_RELAXED);
@@ -156,25 +156,15 @@ export function EyeSimulation() {
 
   return (
     <div className="vision-light min-h-screen px-3 py-3 font-sans sm:px-6 sm:py-6">
-      <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 backdrop-blur sm:p-3.5">
+      <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)_330px]">
           {/* ------------------------------------------------ left */}
           <div className="order-2 flex flex-col gap-3 lg:order-none">
             <Card>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[15px] font-semibold tracking-[0.18em]">COGNIVANCE</p>
-                  <p className="text-xs text-[var(--v-ink-3)]">Vision · eye simulation</p>
-                </div>
-                <Link
-                  to="/"
-                  aria-label="Back to Cognivance"
-                  className="grid h-10 w-10 place-items-center rounded-full bg-[var(--v-ink)] text-white"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Link>
-              </div>
-              <VisionPages active="eye" />
+              <p className="text-[13px] font-semibold tracking-[-0.01em]">
+                Vision · eye simulation
+              </p>
+              <p className="text-xs text-[var(--v-ink-3)]">On this page</p>
               <nav className="mt-4 flex flex-col gap-1 text-sm" aria-label="Sections">
                 {[
                   { href: "#eye", label: "The living eye", icon: Eye, active: true },
@@ -217,7 +207,7 @@ export function EyeSimulation() {
                       <span
                         className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[12px] font-medium ${
                           step === s.n
-                            ? "bg-white text-[var(--v-accent-ink)]"
+                            ? "bg-[var(--v-card)] text-[var(--v-accent-ink)]"
                             : "bg-[var(--v-card)]"
                         }`}
                       >
@@ -277,16 +267,16 @@ export function EyeSimulation() {
                   onSelect={select}
                 />
                 <div className="pointer-events-none absolute right-4 top-3 flex flex-col items-end gap-1 text-[11px]">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--v-ink)] px-2.5 py-1 text-white">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--v-ink)] px-2.5 py-1 text-[var(--v-on-ink)]">
                     <span
-                      className={`h-1.5 w-1.5 rounded-full ${adapting ? "animate-pulse bg-[#f5b544]" : "bg-[#46c08f]"}`}
+                      className={`h-1.5 w-1.5 rounded-full ${adapting ? "animate-pulse bg-[color:var(--kv-f5b544)]" : "bg-[color:var(--kv-46c08f)]"}`}
                       aria-hidden
                     />
                     {adapting ? "Adapting" : "Settled"} · pupil {live.pupil.toFixed(1)} mm · lens{" "}
                     {Math.round(live.acc * 100)}%
                   </span>
                   {frame?.note && (
-                    <span className="rounded-full bg-white/90 px-2.5 py-1 font-medium">
+                    <span className="rounded-full bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] px-2.5 py-1 font-medium">
                       {frame.note}
                     </span>
                   )}
@@ -301,13 +291,13 @@ export function EyeSimulation() {
                     ).map(([c, t]) => (
                       <span
                         key={t}
-                        className="inline-flex items-center gap-2 rounded-full bg-white/85 px-2.5 py-1"
+                        className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_oklab,var(--v-card)_85%,transparent)] px-2.5 py-1"
                       >
                         <span className="h-0.5 w-5 rounded" style={{ background: c }} aria-hidden />
                         {t}
                       </span>
                     ))}
-                    <span className="rounded-full bg-white/85 px-2.5 py-1 text-[var(--v-ink-2)]">
+                    <span className="rounded-full bg-[color-mix(in_oklab,var(--v-card)_85%,transparent)] px-2.5 py-1 text-[var(--v-ink-2)]">
                       Object: {fmtDistance(distance)} (rays shortened to fit)
                     </span>
                   </div>
@@ -316,7 +306,7 @@ export function EyeSimulation() {
 
               <div className="flex flex-wrap items-end justify-between gap-3 px-4 pb-4 sm:pointer-events-none sm:absolute sm:inset-x-0 sm:bottom-0">
                 {current ? (
-                  <div className="max-w-[340px] rounded-3xl bg-white/90 p-4 shadow-[0_8px_30px_rgba(22,21,29,0.08)] backdrop-blur sm:pointer-events-auto">
+                  <div className="max-w-[340px] rounded-3xl bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] p-4 shadow-[0_8px_30px_rgba(22,21,29,0.08)] backdrop-blur sm:pointer-events-auto">
                     <p className="text-[11px] text-[var(--v-ink-3)]">
                       Step {current.n} of {STEPS.length}
                     </p>
@@ -333,7 +323,7 @@ export function EyeSimulation() {
                       </button>
                       <button
                         onClick={() => setStep(current.n < STEPS.length ? current.n + 1 : null)}
-                        className="inline-flex h-8 items-center gap-1 rounded-full bg-[var(--v-ink)] px-3 text-[12px] text-white"
+                        className="inline-flex h-8 items-center gap-1 rounded-full bg-[var(--v-ink)] px-3 text-[12px] text-[var(--v-on-ink)]"
                       >
                         {current.n < STEPS.length ? "Next" : "Explore freely"}
                         <ChevronRight className="h-3.5 w-3.5" />
@@ -343,12 +333,12 @@ export function EyeSimulation() {
                 ) : (
                   <button
                     onClick={() => setStep(1)}
-                    className="rounded-full bg-white/90 px-4 py-2 text-[12px] shadow-[0_8px_30px_rgba(22,21,29,0.08)] sm:pointer-events-auto"
+                    className="rounded-full bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] px-4 py-2 text-[12px] shadow-[0_8px_30px_rgba(22,21,29,0.08)] sm:pointer-events-auto"
                   >
                     Start the guided tour
                   </button>
                 )}
-                <p className="ml-auto max-w-[260px] rounded-2xl bg-white/85 px-3 py-2 text-[11px] text-[var(--v-ink-2)] sm:pointer-events-auto">
+                <p className="ml-auto max-w-[260px] rounded-2xl bg-[color-mix(in_oklab,var(--v-card)_85%,transparent)] px-3 py-2 text-[11px] text-[var(--v-ink-2)] sm:pointer-events-auto">
                   <Info className="mr-1 inline h-3 w-3 align-[-1px]" aria-hidden />A model eye (Le
                   Grand schematic eye): a population average, not anyone's eye. Optics to scale;
                   other tissues drawn approximately.
@@ -397,7 +387,7 @@ export function EyeSimulation() {
                     onClick={() => select(p.key)}
                     className={`rounded-full px-2 py-0.5 text-[11px] ${
                       highlight.includes(p.key)
-                        ? "bg-[var(--v-ink)] text-white"
+                        ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]"
                         : "bg-[var(--v-soft)]"
                     }`}
                   >
@@ -474,7 +464,7 @@ export function EyeSimulation() {
                       setAuto(!auto);
                     }}
                     aria-pressed={auto}
-                    className={`shrink-0 rounded-full px-3 py-1 text-[12px] ${auto ? "bg-[var(--v-ink)] text-white" : "bg-[var(--v-soft)]"}`}
+                    className={`shrink-0 rounded-full px-3 py-1 text-[12px] ${auto ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]" : "bg-[var(--v-soft)]"}`}
                   >
                     Auto
                   </button>
@@ -508,7 +498,7 @@ export function EyeSimulation() {
                       setAutoPupil(!autoPupil);
                     }}
                     aria-pressed={autoPupil}
-                    className={`shrink-0 rounded-full px-3 py-1 text-[12px] ${autoPupil ? "bg-[var(--v-ink)] text-white" : "bg-[var(--v-soft)]"}`}
+                    className={`shrink-0 rounded-full px-3 py-1 text-[12px] ${autoPupil ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]" : "bg-[var(--v-soft)]"}`}
                   >
                     Auto
                   </button>
@@ -558,7 +548,7 @@ export function EyeSimulation() {
                     <button
                       key={t}
                       onClick={() => setLength(v)}
-                      className={`rounded-full px-2 py-0.5 ${Math.abs(length - v) < 0.05 ? "bg-[var(--v-ink)] text-white" : "bg-[var(--v-soft)]"}`}
+                      className={`rounded-full px-2 py-0.5 ${Math.abs(length - v) < 0.05 ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]" : "bg-[var(--v-soft)]"}`}
                     >
                       {t}
                     </button>
@@ -571,7 +561,7 @@ export function EyeSimulation() {
                 <EvidenceTag kind="computed" label="Calculated live" />
               </div>
               <div
-                className={`mt-2 rounded-2xl p-3 text-[13px] ${sharp ? "bg-[#e3f4f1]" : "bg-[#fbf0dc]"}`}
+                className={`mt-2 rounded-2xl p-3 text-[13px] ${sharp ? "bg-[color:var(--kv-e3f4f1)]" : "bg-[color:var(--kv-fbf0dc)]"}`}
                 aria-live="polite"
               >
                 <p className="font-medium">
@@ -641,11 +631,13 @@ export function EyeSimulation() {
                       document.getElementById("eye")?.scrollIntoView({ behavior: "smooth" });
                     }}
                     className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-left ${
-                      on ? "bg-[var(--v-accent)] text-white" : "bg-[var(--v-soft)] hover:bg-white"
+                      on
+                        ? "bg-[var(--v-accent)] text-white"
+                        : "bg-[var(--v-soft)] hover:bg-[var(--v-card)]"
                     }`}
                   >
                     <span
-                      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${on ? "bg-white text-[var(--v-accent-ink)]" : "bg-[var(--v-card)]"}`}
+                      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${on ? "bg-[var(--v-card)] text-[var(--v-accent-ink)]" : "bg-[var(--v-card)]"}`}
                     >
                       {on ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                     </span>
@@ -713,10 +705,10 @@ export function EyeSimulation() {
         {/* ------------------------------------------------ concept */}
         <section
           id="concept"
-          className="mt-3 scroll-mt-4 rounded-[28px] border-2 border-dashed border-[#e7a3c2] bg-[#fff8fb] p-5"
+          className="mt-3 scroll-mt-4 rounded-[28px] border-2 border-dashed border-[color:var(--kv-e7a3c2)] bg-[color:var(--kv-fff8fb)] p-5"
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-[#b0306a] px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-white">
+            <span className="rounded-full bg-[color:var(--kv-b0306a)] px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-white">
               CONCEPT
             </span>
             <h2 className="text-[19px] font-medium">
@@ -778,7 +770,7 @@ export function EyeSimulation() {
                 <li key={c.id}>{c.text}</li>
               ))}
             </ol>
-            <p className="mt-3 rounded-2xl bg-[#fbf0dc] p-3 text-[11px] text-[var(--v-ink)]">
+            <p className="mt-3 rounded-2xl bg-[color:var(--kv-fbf0dc)] p-3 text-[11px] text-[var(--v-ink)]">
               {CITATION_NOTE}
             </p>
           </Card>

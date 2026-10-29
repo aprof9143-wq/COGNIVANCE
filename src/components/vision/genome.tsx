@@ -55,7 +55,7 @@ export function GroupFilter({
             }}
             className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 ${
               on
-                ? "border-[var(--v-ink)] bg-white"
+                ? "border-[var(--v-ink)] bg-[var(--v-card)]"
                 : "border-[var(--v-line)] bg-[var(--v-soft)] opacity-60"
             }`}
           >
@@ -325,7 +325,9 @@ export function VariantCard({ v, cds }: { v: Variant; cds?: string | undefined }
           aria-hidden
         />
         <p className="text-[14px] font-medium">{v.protein?.short ?? v.cdna ?? v.accession}</p>
-        <span className="rounded-full bg-white px-2 py-0.5 text-[11px]">{v.classification}</span>
+        <span className="rounded-full bg-[var(--v-card)] px-2 py-0.5 text-[11px]">
+          {v.classification}
+        </span>
         <EvidenceTag kind="reference" label="ClinVar" />
       </div>
       <p className="mt-1 break-words font-mono text-[11px] text-[var(--v-ink-2)]">{v.title}</p>
@@ -350,14 +352,14 @@ export function VariantCard({ v, cds }: { v: Variant; cds?: string | undefined }
         )}
       </dl>
       {placed && (
-        <div className="mt-2 rounded-xl bg-white p-2.5">
+        <div className="mt-2 rounded-xl bg-[var(--v-card)] p-2.5">
           <div className="flex items-center gap-2">
             <p className="font-medium">On Ensembl's coding sequence</p>
             <EvidenceTag kind="computed" />
           </div>
           <p className="mt-1 break-all font-mono text-[12px] tracking-wider">
             {placed.context.slice(0, placed.at)}
-            <span className="rounded bg-[#d0507c] px-0.5 text-white">
+            <span className="rounded bg-[color:var(--kv-d0507c)] px-0.5 text-white">
               {placed.context[placed.at]}
             </span>
             {placed.context.slice(placed.at + 1)}
@@ -368,7 +370,7 @@ export function VariantCard({ v, cds }: { v: Variant; cds?: string | undefined }
             {placed.aaAfter}
           </p>
           <p
-            className={`mt-1 flex items-center gap-1 ${placed.refAgrees && proteinAgrees ? "text-[#0f8f7e]" : "text-[#b57d12]"}`}
+            className={`mt-1 flex items-center gap-1 ${placed.refAgrees && proteinAgrees ? "text-[color:var(--kv-0f8f7e)]" : "text-[color:var(--kv-b57d12)]"}`}
           >
             {placed.refAgrees && proteinAgrees ? (
               <Check className="h-3.5 w-3.5" />

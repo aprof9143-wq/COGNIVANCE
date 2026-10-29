@@ -461,7 +461,7 @@ export function CortexPathway({ retina, v1 }: Props) {
           ref={(e) => {
             if (e) labelEls.current.set(l.key, e);
           }}
-          className="pointer-events-none absolute left-0 top-0 whitespace-nowrap rounded-full border border-white/15 bg-[#0b1433]/85 px-2.5 py-1 text-[11px] leading-tight text-white backdrop-blur"
+          className="pointer-events-none absolute left-0 top-0 whitespace-nowrap rounded-full border border-white/15 bg-[color:var(--kv-0b1433)]/85 px-2.5 py-1 text-[11px] leading-tight text-white backdrop-blur"
         >
           <span className="block font-medium">{l.text}</span>
           <span className="block text-[10px] text-white/60">{l.sub}</span>

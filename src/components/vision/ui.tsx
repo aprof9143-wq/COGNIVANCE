@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { CircleDashed, Dna, Eye, FileText, RefreshCw } from "lucide-react";
+import { CircleDashed, RefreshCw } from "lucide-react";
 import { EVIDENCE, type EvidenceKind } from "@/lib/vision/evidence";
 import type { Verdict } from "@/lib/vision/reference";
 
@@ -24,13 +23,13 @@ export function Card({
 }
 
 const KIND_TINT: Record<EvidenceKind, string> = {
-  measured: "bg-[#e3f4f1]",
-  reference: "bg-[#e6eefc]",
-  user: "bg-[#efeff3]",
+  measured: "bg-[color:var(--kv-e3f4f1)]",
+  reference: "bg-[color:var(--kv-e6eefc)]",
+  user: "bg-[color:var(--kv-efeff3)]",
   computed: "bg-[var(--v-accent-soft)]",
-  inferred: "bg-[#fbf0dc]",
-  hypothetical: "bg-[#fbe6ee]",
-  validated: "bg-[#e3f4e6]",
+  inferred: "bg-[color:var(--kv-fbf0dc)]",
+  hypothetical: "bg-[color:var(--kv-fbe6ee)]",
+  validated: "bg-[color:var(--kv-e3f4e6)]",
 };
 
 export function EvidenceTag({ kind, label }: { kind: EvidenceKind; label?: string }) {
@@ -62,38 +61,12 @@ export function Spinner({ label }: { label: string }) {
   );
 }
 
-/** Switch between the module's pages. */
-export function VisionPages({ active }: { active: "evidence" | "therapy" | "eye" }) {
-  const pages = [
-    { key: "evidence", to: "/vision", label: "Gene & protein", icon: FileText },
-    { key: "therapy", to: "/vision/therapy", label: "Gene therapy", icon: Dna },
-    { key: "eye", to: "/vision/eye", label: "Eye simulation", icon: Eye },
-  ] as const;
-  return (
-    <div className="mt-5 flex flex-col gap-1 rounded-3xl bg-[var(--v-soft)] p-1 text-[12px]">
-      {pages.map(({ key, to, label, icon: Icon }) => (
-        <Link
-          key={key}
-          to={to}
-          aria-current={active === key ? "page" : undefined}
-          className={`flex items-center gap-2 rounded-full px-3 py-1.5 ${
-            active === key ? "bg-[var(--v-ink)] text-white" : "text-[var(--v-ink)] hover:bg-white"
-          }`}
-        >
-          <Icon className="h-3.5 w-3.5" aria-hidden />
-          {label}
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 export function VerdictChip({ v }: { v: Verdict }) {
   const [label, cls] =
     v === "agrees"
-      ? ["Agrees", "bg-[#e3f4f1]"]
+      ? ["Agrees", "bg-[color:var(--kv-e3f4f1)]"]
       : v === "differs"
-        ? ["Differs", "bg-[#fbf0dc]"]
+        ? ["Differs", "bg-[color:var(--kv-fbf0dc)]"]
         : ["Not comparable", "bg-[var(--v-soft)] text-[var(--v-ink-2)]"];
   return (
     <span className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium ${cls}`}>

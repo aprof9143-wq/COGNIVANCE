@@ -1,6 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { hasSession } from "@/lib/session";
+import { createFileRoute } from "@tanstack/react-router";
+import { Gated } from "@/components/app/Gated";
 import { NeuroDashboard } from "@/components/neuro/NeuroDashboard";
 
 export const Route = createFileRoute("/neurodegeneration")({
@@ -14,16 +13,13 @@ export const Route = createFileRoute("/neurodegeneration")({
       },
     ],
   }),
-  component: Neuro,
+  component: Page,
 });
 
-function Neuro() {
-  const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/neurodegeneration" } });
-    else setReady(true);
-  }, [navigate]);
-  if (!ready) return <div className="min-h-screen bg-[#0a0d12]" />;
-  return <NeuroDashboard />;
+function Page() {
+  return (
+    <Gated path="/neurodegeneration">
+      <NeuroDashboard />
+    </Gated>
+  );
 }

@@ -1,6 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { hasSession } from "@/lib/session";
+import { createFileRoute } from "@tanstack/react-router";
+import { Gated } from "@/components/app/Gated";
 import { TherapySimulator } from "@/components/vision/TherapySimulator";
 
 export const Route = createFileRoute("/vision_/therapy")({
@@ -14,16 +13,13 @@ export const Route = createFileRoute("/vision_/therapy")({
       },
     ],
   }),
-  component: Therapy,
+  component: Page,
 });
 
-function Therapy() {
-  const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/vision/therapy" } });
-    else setReady(true);
-  }, [navigate]);
-  if (!ready) return <div className="min-h-screen bg-[#eceef4]" />;
-  return <TherapySimulator />;
+function Page() {
+  return (
+    <Gated path="/vision/therapy">
+      <TherapySimulator />
+    </Gated>
+  );
 }

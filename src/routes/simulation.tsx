@@ -1,6 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { hasSession } from "@/lib/session";
+import { createFileRoute } from "@tanstack/react-router";
+import { Gated } from "@/components/app/Gated";
 import { SimulationWindow } from "@/components/sim/SimulationWindow";
 
 export const Route = createFileRoute("/simulation")({
@@ -14,18 +13,13 @@ export const Route = createFileRoute("/simulation")({
       },
     ],
   }),
-  component: Simulation,
+  component: Page,
 });
 
-function Simulation() {
-  const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/simulation" } });
-    else setReady(true);
-  }, [navigate]);
-
-  if (!ready) return <div className="min-h-screen bg-[#01040d]" />;
-  return <SimulationWindow />;
+function Page() {
+  return (
+    <Gated path="/simulation">
+      <SimulationWindow />
+    </Gated>
+  );
 }

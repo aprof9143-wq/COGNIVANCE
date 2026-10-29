@@ -91,8 +91,8 @@ export function NeuroDashboard() {
   const stamp = `${c.subjectCode.replace(/[^\w-]/g, "_")}-${new Date().toISOString().slice(0, 10)}`;
 
   return (
-    <div className="ws min-h-screen bg-[#00030b] text-[#e6efff]">
-      <header className="flex flex-wrap items-center gap-3 border-b border-[#16305e] bg-[#01071a] px-4 py-2.5">
+    <div className="ws min-h-screen bg-[color:var(--k-00030b)] text-[color:var(--k-e6efff)]">
+      <header className="flex flex-wrap items-center gap-3 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-4 py-2.5">
         <Link to="/research" className="btn">
           <ArrowLeft className="h-4 w-4" /> Research console
         </Link>
@@ -101,7 +101,7 @@ export function NeuroDashboard() {
         </Link>
         <div className="leading-tight">
           <h1 className="text-[15px] font-semibold">Neurodegeneration tracking</h1>
-          <p className="text-[12px] text-[#8095bf]">
+          <p className="text-[12px] text-[color:var(--k-8095bf)]">
             Structural change tracking · symptom–network research map · no diagnosis or probability
           </p>
         </div>
@@ -154,9 +154,14 @@ export function NeuroDashboard() {
         </div>
       </header>
 
-      <div role="note" className="border-b border-[#5a4a1c] bg-[#1b160a] px-4 py-3">
-        <p className="max-w-5xl text-[14px] leading-relaxed text-[#f0dfae]">{SAFETY_STATEMENT}</p>
-        <p className="mt-1 text-[12px] text-[#c9b886]">
+      <div
+        role="note"
+        className="border-b border-[color:var(--k-5a4a1c)] bg-[color:var(--k-1b160a)] px-4 py-3"
+      >
+        <p className="max-w-5xl text-[14px] leading-relaxed text-[color:var(--k-f0dfae)]">
+          {SAFETY_STATEMENT}
+        </p>
+        <p className="mt-1 text-[12px] text-[color:var(--k-c9b886)]">
           {DISCLAIMER} This module computes no Alzheimer’s diagnosis, probability, severity or
           “neuron degeneration” score. Regional volume loss is structural change, not a neuron
           count. The case stays in this browser tab and is not saved unless exported; what the
@@ -166,7 +171,7 @@ export function NeuroDashboard() {
       </div>
 
       <nav
-        className="flex flex-wrap gap-1 border-b border-[#16305e] bg-[#01071a] px-4 py-2"
+        className="flex flex-wrap gap-1 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-4 py-2"
         role="tablist"
       >
         {TABS.map(([id, label]) => (
@@ -237,25 +242,29 @@ function Summary({ c }: { c: CaseFile }) {
     >
       <div className="grid gap-4 md:grid-cols-3">
         <div>
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">Symptoms (by domain)</p>
+          <p className="text-[12px] font-semibold text-[color:var(--k-c4d2ee)]">
+            Symptoms (by domain)
+          </p>
           {present.length ? (
             <ul className="mt-1 text-[13px]">
               {present.map((s) => (
                 <li key={s.id}>
                   {DOMAIN_LABEL[s.domain]} — {s.severity ?? "severity unrated"}, {s.progression}
                   {s.onset ? `, since ${s.onset}` : ""}{" "}
-                  <span className="text-[12px] text-[#8095bf]">
+                  <span className="text-[12px] text-[color:var(--k-8095bf)]">
                     ({s.source === "clinician" ? "clinician observation" : `${s.source} report`})
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-[13px] text-[#a9bbdc]">None recorded.</p>
+            <p className="mt-1 text-[13px] text-[color:var(--k-a9bbdc)]">None recorded.</p>
           )}
         </div>
         <div>
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">Functional impact</p>
+          <p className="text-[12px] font-semibold text-[color:var(--k-c4d2ee)]">
+            Functional impact
+          </p>
           <p className="mt-1 text-[13px]">
             {c.symptoms.some((s) => s.domain === "adl" && s.present)
               ? "Impaired activities of daily living recorded."
@@ -263,7 +272,9 @@ function Summary({ c }: { c: CaseFile }) {
           </p>
         </div>
         <div>
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">Latest cognitive scores</p>
+          <p className="text-[12px] font-semibold text-[color:var(--k-c4d2ee)]">
+            Latest cognitive scores
+          </p>
           {latestByInstrument.size ? (
             <ul className="mt-1 text-[13px]">
               {[...latestByInstrument.values()].map((a) => (
@@ -275,7 +286,7 @@ function Summary({ c }: { c: CaseFile }) {
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-[13px] text-[#a9bbdc]">None recorded.</p>
+            <p className="mt-1 text-[13px] text-[color:var(--k-a9bbdc)]">None recorded.</p>
           )}
         </div>
       </div>
@@ -320,7 +331,7 @@ function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
     >
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div className="min-w-0">
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">
+          <p className="text-[12px] font-semibold text-[color:var(--k-c4d2ee)]">
             Scans → visits ({plan.included.length})
           </p>
           {scans.length ? (
@@ -332,17 +343,17 @@ function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
                 return (
                   <li
                     key={scan.key}
-                    className="rounded border border-[#0e2247] bg-[#030b20] px-3 py-2 text-[13px]"
+                    className="rounded border border-[color:var(--k-0e2247)] bg-[color:var(--k-030b20)] px-3 py-2 text-[13px]"
                   >
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{scan.mri.label}</span>
                       {kindPill(scan.mri.kind)}
-                      <span className="font-mono text-[12px] text-[#a9bbdc]">
+                      <span className="font-mono text-[12px] text-[color:var(--k-a9bbdc)]">
                         {scan.mri.dims.join("×")} ·{" "}
                         {scan.mri.spacingMm.map((x) => x.toFixed(2)).join("×")} mm
                       </span>
                     </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[#a9bbdc]">
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--k-a9bbdc)]">
                       <span>Scan date</span>
                       <input
                         type="date"
@@ -351,7 +362,7 @@ function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
                         onChange={(e) => setScanDate(scan.key, e.target.value || null)}
                         aria-label="Scan date"
                       />
-                      <span className="text-[#8095bf]">
+                      <span className="text-[color:var(--k-8095bf)]">
                         {d.source === "file"
                           ? "from the file (month)"
                           : d.source === "entered"
@@ -359,31 +370,35 @@ function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
                             : "date loaded — enter the real scan date"}
                       </span>
                     </div>
-                    <p className="mt-1 text-[12px] text-[#a9bbdc]">
+                    <p className="mt-1 text-[12px] text-[color:var(--k-a9bbdc)]">
                       {regions
                         ? `${regions} FreeSurfer regions → regional volumes (QC pending)`
                         : "No FreeSurfer label map for this scan — load one for regional volumes."}{" "}
-                      <span className="text-[#8095bf]">· from the {from(scan.mri.origin)}</span>
+                      <span className="text-[color:var(--k-8095bf)]">
+                        · from the {from(scan.mri.origin)}
+                      </span>
                     </p>
-                    {reason ? <p className="mt-1 text-[12px] text-[#f0d68a]">{reason}</p> : null}
+                    {reason ? (
+                      <p className="mt-1 text-[12px] text-[color:var(--k-f0d68a)]">{reason}</p>
+                    ) : null}
                   </li>
                 );
               })}
             </ul>
           ) : (
-            <p className="mt-1 text-[13px] text-[#a9bbdc]">
+            <p className="mt-1 text-[13px] text-[color:var(--k-a9bbdc)]">
               No MRI loaded yet. Open the research console or the diagnostic viewer.
             </p>
           )}
           {hidden > 0 ? (
-            <p className="mt-2 text-[12px] text-[#8095bf]">
+            <p className="mt-2 text-[12px] text-[color:var(--k-8095bf)]">
               {hidden} template/demo scan{hidden > 1 ? "s" : ""} hidden while subject data is
               linked.
             </p>
           ) : null}
         </div>
         <div className="min-w-0">
-          <p className="text-[12px] font-semibold text-[#c4d2ee]">
+          <p className="text-[12px] font-semibold text-[color:var(--k-c4d2ee)]">
             EEG recordings ({plan.recordings.length})
           </p>
           {plan.recordings.length ? (
@@ -391,23 +406,23 @@ function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
               {plan.recordings.map(({ key, eeg }) => (
                 <li
                   key={key}
-                  className="rounded border border-[#0e2247] bg-[#030b20] px-3 py-2 text-[13px]"
+                  className="rounded border border-[color:var(--k-0e2247)] bg-[color:var(--k-030b20)] px-3 py-2 text-[13px]"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{eeg.label}</span> {kindPill(eeg.kind)}
                   </div>
-                  <ul className="mt-1 font-mono text-[12px] text-[#e6efff]">
+                  <ul className="mt-1 font-mono text-[12px] text-[color:var(--k-e6efff)]">
                     {eeg.markers.map((m) => (
                       <li key={m.id}>
                         {m.name}:{" "}
                         {m.value === null
                           ? "—"
                           : m.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}{" "}
-                        <span className="text-[#8095bf]">{m.unit}</span>
+                        <span className="text-[color:var(--k-8095bf)]">{m.unit}</span>
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-1 text-[12px] text-[#8095bf]">
+                  <p className="mt-1 text-[12px] text-[color:var(--k-8095bf)]">
                     {eeg.channels} channels · {Math.round(eeg.analysedSeconds)} s analysed · from
                     the {from(eeg.origin)}
                   </p>
@@ -415,11 +430,11 @@ function LinkedSources({ linked, c }: { linked: LinkedState; c: CaseFile }) {
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-[13px] text-[#a9bbdc]">No EEG loaded yet.</p>
+            <p className="mt-1 text-[13px] text-[color:var(--k-a9bbdc)]">No EEG loaded yet.</p>
           )}
         </div>
       </div>
-      <p className="mt-3 text-[12px] text-[#8095bf]">
+      <p className="mt-3 text-[12px] text-[color:var(--k-8095bf)]">
         In this case: {plan.included.length} linked visit{plan.included.length === 1 ? "" : "s"},{" "}
         {nMeasurements} regional measurements and {nMarkers} EEG measures — see Regional imaging,
         Longitudinal, 3D map and Ratings &amp; biomarkers. Symptoms and cognitive scores are

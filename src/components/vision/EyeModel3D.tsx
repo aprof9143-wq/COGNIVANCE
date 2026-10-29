@@ -678,7 +678,9 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
               }}
               onClick={() => onSelect(p.key)}
               className={`absolute left-0 top-0 whitespace-nowrap rounded-full px-2.5 py-1 text-left text-[11px] leading-tight shadow-[0_4px_16px_rgba(22,21,29,0.08)] transition-opacity ${
-                on ? "bg-[var(--v-accent)] text-white" : "bg-white/95 text-[var(--v-ink)]"
+                on
+                  ? "bg-[var(--v-accent)] text-white"
+                  : "bg-[color-mix(in_oklab,var(--v-card)_95%,transparent)] text-[var(--v-ink)]"
               } ${highlight.length && !on ? "opacity-50" : ""} ${on ? "" : "max-sm:hidden"}`}
             >
               <span className="block font-medium">{p.name}</span>

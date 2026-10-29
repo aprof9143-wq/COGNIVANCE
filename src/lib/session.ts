@@ -40,8 +40,12 @@ export function startDemo() {
   }
 }
 
-/** Pages behind the session gate. /auth returns you to the one you asked for. */
+/**
+ * Every feature of the platform sits behind this one gate (components/app/Gated).
+ * /auth returns you to the page you asked for, or to the workspace home.
+ */
 export const GATED_PAGES = [
+  "/app",
   "/research",
   "/viewer",
   "/simulation",
@@ -49,6 +53,8 @@ export const GATED_PAGES = [
   "/vision",
   "/vision/eye",
   "/vision/therapy",
+  "/nimble",
+  "/benchmarks",
 ] as const;
 export type GatedPage = (typeof GATED_PAGES)[number];
 

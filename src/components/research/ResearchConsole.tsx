@@ -596,25 +596,27 @@ export function ResearchConsole() {
 
   return (
     <div
-      className="min-h-screen bg-[#00030b] bg-[radial-gradient(ellipse_90%_50%_at_50%_-10%,#0b2459_0%,rgba(0,3,11,0)_60%),radial-gradient(ellipse_60%_40%_at_100%_100%,#07183d_0%,rgba(0,3,11,0)_70%)] text-[#e6efff]"
+      className="min-h-screen bg-[color:var(--k-00030b)] bg-[radial-gradient(ellipse_90%_50%_at_50%_-10%,var(--k-0b2459)_0%,rgba(0,3,11,0)_60%),radial-gradient(ellipse_60%_40%_at_100%_100%,var(--k-07183d)_0%,rgba(0,3,11,0)_70%)] text-[color:var(--k-e6efff)]"
       onDragOver={(e) => e.preventDefault()}
       onDrop={onDrop}
     >
       {/* ============================ HEADER ============================ */}
-      <header className="relative z-30 border-b border-[#16305e] bg-[#00030b]/85 backdrop-blur-xl md:sticky md:top-0">
-        <span className="pointer-events-none absolute inset-x-0 bottom-[-1px] h-px bg-gradient-to-r from-transparent via-[#7fd8ff]/60 to-transparent" />
+      <header className="relative z-30 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-00030b)]/85 backdrop-blur-xl md:sticky md:top-0">
+        <span className="pointer-events-none absolute inset-x-0 bottom-[-1px] h-px bg-gradient-to-r from-transparent via-[color:var(--k-7fd8ff)]/60 to-transparent" />
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5">
           <div className="flex items-center gap-3">
             <img src="/logo-mark.png" alt="Cognivance" className="h-8 w-auto" />
             <div className="leading-tight">
-              <p className="font-mono text-[0.62rem] font-semibold tracking-[0.22em] text-[#7fd8ff]">
+              <p className="font-mono text-[0.62rem] font-semibold tracking-[0.22em] text-[color:var(--k-7fd8ff)]">
                 NIMBLE / RESEARCH OS
               </p>
-              <p className="text-[0.72rem] text-[#8095bf]">Multimodal neural workstation</p>
+              <p className="text-[0.72rem] text-[color:var(--k-8095bf)]">
+                Multimodal neural workstation
+              </p>
             </div>
           </div>
 
-          <div className="hidden h-8 w-px bg-[#16305e] md:block" />
+          <div className="hidden h-8 w-px bg-[color:var(--k-16305e)] md:block" />
 
           <div className="hidden flex-wrap items-center gap-2 md:flex">
             <StatusChip on label="MRI" detail={volumeLabel(volumeSource)} />
@@ -627,7 +629,7 @@ export function ResearchConsole() {
           </div>
 
           <div className="ml-auto flex flex-wrap items-center gap-2">
-            <span className="mr-2 hidden font-mono text-[0.72rem] tracking-[0.06em] text-[#8095bf] 2xl:inline">
+            <span className="mr-2 hidden font-mono text-[0.72rem] tracking-[0.06em] text-[color:var(--k-8095bf)] 2xl:inline">
               {clock}
             </span>
             <Link to="/viewer" className={NAV_BUTTON}>
@@ -644,7 +646,7 @@ export function ResearchConsole() {
             <button
               type="button"
               onClick={signOut}
-              className="flex items-center gap-1.5 rounded-md border border-[#16305e] px-2.5 py-1.5 text-[0.72rem] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff]"
+              className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
             >
               <LogOut className="h-3.5 w-3.5" /> Sign out
             </button>
@@ -653,13 +655,13 @@ export function ResearchConsole() {
       </header>
 
       {error ? (
-        <div className="mx-3 mt-3 flex items-start gap-3 rounded-md border border-[#e5484d]/40 bg-[#e5484d]/[0.07] px-4 py-2.5 text-[0.82rem] text-[#ffc9cb]">
-          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5484d]" />
+        <div className="mx-3 mt-3 flex items-start gap-3 rounded-md border border-[color:var(--k-e5484d)]/40 bg-[color:var(--k-e5484d)]/[0.07] px-4 py-2.5 text-[0.82rem] text-[color:var(--k-ffc9cb)]">
+          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--k-e5484d)]" />
           <span className="flex-1">{error}</span>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-[#ffc9cb]/70 hover:text-white"
+            className="text-[color:var(--k-ffc9cb)]/70 hover:text-white"
           >
             Dismiss
           </button>
@@ -705,7 +707,7 @@ export function ResearchConsole() {
               <button
                 type="button"
                 onClick={resetAll}
-                className="mt-1 flex items-center justify-center gap-2 rounded-md border border-[#16305e] px-3 py-2 text-[0.74rem] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff]"
+                className="mt-1 flex items-center justify-center gap-2 rounded-md border border-[color:var(--k-16305e)] px-3 py-2 text-[0.74rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
               >
                 <RotateCcw className="h-3.5 w-3.5" /> Reset to demo data
               </button>
@@ -768,7 +770,10 @@ export function ResearchConsole() {
           </Panel>
 
           <Panel title="MRI volume" meta={volumeLabel(volumeSource)}>
-            <p className="truncate font-mono text-[0.72rem] text-[#7fd8ff]" title={volumeName}>
+            <p
+              className="truncate font-mono text-[0.72rem] text-[color:var(--k-7fd8ff)]"
+              title={volumeName}
+            >
               {volumeName}
             </p>
             <dl className="mt-3 grid grid-cols-2 gap-1.5">
@@ -786,7 +791,10 @@ export function ResearchConsole() {
           </Panel>
 
           <Panel title="EEG recording" meta={recordingSource === "upload" ? "subject" : "phantom"}>
-            <p className="truncate font-mono text-[0.72rem] text-[#7fd8ff]" title={recordingName}>
+            <p
+              className="truncate font-mono text-[0.72rem] text-[color:var(--k-7fd8ff)]"
+              title={recordingName}
+            >
               {recordingName}
             </p>
             <dl className="mt-3 grid grid-cols-2 gap-1.5">
@@ -796,14 +804,14 @@ export function ResearchConsole() {
               <Stat k="Duration" v={`${recording.durationSeconds.toFixed(0)} s`} />
             </dl>
             {recording.durationSeconds > ANALYSIS_WINDOW_S ? (
-              <p className="mt-2 text-[0.66rem] leading-relaxed text-[#8095bf]">
+              <p className="mt-2 text-[0.66rem] leading-relaxed text-[color:var(--k-8095bf)]">
                 Spectra computed over the first {ANALYSIS_WINDOW_S} s.
               </p>
             ) : null}
           </Panel>
 
           <Panel title="Rendering" meta="gpu raymarch">
-            <p className="mb-1.5 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[#8095bf]">
+            <p className="mb-1.5 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[color:var(--k-8095bf)]">
               Mode
             </p>
             <Segmented
@@ -815,7 +823,7 @@ export function ResearchConsole() {
                 ["glass", "Glass"],
               ]}
             />
-            <p className="mb-1.5 mt-3 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[#8095bf]">
+            <p className="mb-1.5 mt-3 font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[color:var(--k-8095bf)]">
               Palette
             </p>
             <Segmented
@@ -880,7 +888,7 @@ export function ResearchConsole() {
             meta={`${volume.size.join("³ / ").split(" / ")[0]} texture · ${mapped.length} electrodes`}
             flush
           >
-            <div className="relative h-[clamp(28rem,62vh,46rem)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_45%,#0a1f4a_0%,#01071a_55%,#00030b_100%)]">
+            <div className="relative h-[clamp(28rem,62vh,46rem)] overflow-hidden bg-[radial-gradient(ellipse_at_50%_45%,var(--k-0a1f4a)_0%,var(--k-01071a)_55%,var(--k-00030b)_100%)]">
               <VolumeRenderer
                 volume={volume}
                 mode={mode}
@@ -908,8 +916,8 @@ export function ResearchConsole() {
               />
 
               {/* HUD overlays — read-outs, never interactive, so they don't block the orbit */}
-              <div className="pointer-events-none absolute left-4 top-3 flex flex-col gap-1 font-mono text-[0.62rem] tracking-[0.1em] text-[#8095bf]">
-                <span className="text-[#7fd8ff]">
+              <div className="pointer-events-none absolute left-4 top-3 flex flex-col gap-1 font-mono text-[0.62rem] tracking-[0.1em] text-[color:var(--k-8095bf)]">
+                <span className="text-[color:var(--k-7fd8ff)]">
                   {mode === "volume"
                     ? "DIRECT VOLUME"
                     : mode === "iso"
@@ -920,7 +928,9 @@ export function ResearchConsole() {
                 <span>{volume.extent.map((v) => v.toFixed(0)).join(" × ")} mm</span>
                 {/* The layer list needs room; on phones the Layers panel below carries it. */}
                 <span className="mt-2 hidden flex-col gap-1 sm:flex">
-                  <span className="text-[#5e719a]">LAYERS · ONE COORDINATE FRAME</span>
+                  <span className="text-[color:var(--k-5e719a)]">
+                    LAYERS · ONE COORDINATE FRAME
+                  </span>
                   <HudLayer on label="MRI" detail={volumeLabel(volumeSource)} colour="#7fd8ff" />
                   <HudLayer
                     on={showTracts}
@@ -967,7 +977,7 @@ export function ResearchConsole() {
               </div>
 
               {showLesion && lesion && lesionSource !== "upload" ? (
-                <div className="pointer-events-none absolute left-4 top-[3.3rem] rounded border border-[#ff4860]/50 bg-[#1a0508]/80 px-3 py-1.5 font-mono text-[0.6rem] tracking-[0.12em] text-[#ff9aa6] backdrop-blur lg:left-1/2 lg:top-3 lg:-translate-x-1/2">
+                <div className="pointer-events-none absolute left-4 top-[3.3rem] rounded border border-[color:var(--k-ff4860)]/50 bg-[color:var(--k-1a0508)]/80 px-3 py-1.5 font-mono text-[0.6rem] tracking-[0.12em] text-[color:var(--k-ff9aa6)] backdrop-blur lg:left-1/2 lg:top-3 lg:-translate-x-1/2">
                   <span className="lg:hidden">DEMO LESION · SYNTHETIC · NOT A FINDING</span>
                   <span className="hidden lg:inline">
                     DEMONSTRATION LESION · SYNTHETIC · NOT A FINDING
@@ -986,7 +996,7 @@ export function ResearchConsole() {
               ) : null}
 
               <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex flex-wrap items-end justify-between gap-3">
-                <p className="hidden max-w-[46ch] font-mono text-[0.6rem] leading-relaxed tracking-[0.06em] text-[#5e719a] sm:block">
+                <p className="hidden max-w-[46ch] font-mono text-[0.6rem] leading-relaxed tracking-[0.06em] text-[color:var(--k-5e719a)] sm:block">
                   DRAG TO ORBIT · SCROLL TO ZOOM · HOVER AN ELECTRODE · ELECTRODES PROJECTED ONTO
                   THIS SCALP — APPROXIMATE, NOT CO-REGISTERED ·{" "}
                   {tractSource === "bundled" && volumeSource === "template"
@@ -1000,8 +1010,8 @@ export function ResearchConsole() {
               </div>
 
               {busy ? (
-                <div className="absolute inset-0 grid place-items-center bg-[#00030b]/70 backdrop-blur-sm">
-                  <div className="flex items-center gap-3 font-mono text-[0.78rem] text-[#7fd8ff]">
+                <div className="absolute inset-0 grid place-items-center bg-[color:var(--k-00030b)]/70 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 font-mono text-[0.78rem] text-[color:var(--k-7fd8ff)]">
                     <Sparkles className="h-4 w-4 animate-pulse" /> {busy}
                   </div>
                 </div>
@@ -1039,7 +1049,7 @@ export function ResearchConsole() {
                     }}
                   />
                 </div>
-                <div className="border-t border-[#16305e] px-3 py-2">
+                <div className="border-t border-[color:var(--k-16305e)] px-3 py-2">
                   <input
                     id={`slice-${plane}`}
                     type="range"
@@ -1048,7 +1058,7 @@ export function ResearchConsole() {
                     step={0.005}
                     value={pos}
                     onChange={(e) => setPos(Number(e.target.value))}
-                    className="w-full accent-[#7fd8ff]"
+                    className="w-full accent-[color:var(--k-7fd8ff)]"
                     aria-label={`${plane} position`}
                   />
                 </div>
@@ -1064,14 +1074,14 @@ export function ResearchConsole() {
               <button
                 type="button"
                 onClick={() => setPlaying((v) => !v)}
-                className="flex items-center gap-1.5 rounded border border-[#16305e] px-2 py-1 font-mono text-[0.6rem] tracking-[0.1em] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff]"
+                className="flex items-center gap-1.5 rounded border border-[color:var(--k-16305e)] px-2 py-1 font-mono text-[0.6rem] tracking-[0.1em] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
               >
                 {playing ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                 {playing ? "PAUSE" : "PLAY"}
               </button>
             }
           >
-            <div className="h-[18rem] bg-[#01071a] px-2 py-2">
+            <div className="h-[18rem] bg-[color:var(--k-01071a)] px-2 py-2">
               <EegTraces
                 channels={channels}
                 sampleRate={sampleRate}
@@ -1146,8 +1156,8 @@ export function ResearchConsole() {
                   onClick={() => setBand(b.name)}
                   className={`rounded px-2 py-1 font-mono text-[0.62rem] uppercase tracking-[0.08em] transition ${
                     band === b.name
-                      ? "bg-[#7fd8ff] text-[#00030b]"
-                      : "border border-[#16305e] text-[#8095bf] hover:border-[#3d8bf5] hover:text-[#e6efff]"
+                      ? "bg-[color:var(--k-7fd8ff)] text-[color:var(--k-00030b)]"
+                      : "border border-[color:var(--k-16305e)] text-[color:var(--k-8095bf)] hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
                   }`}
                 >
                   {b.name}{" "}
@@ -1163,7 +1173,7 @@ export function ResearchConsole() {
           </Panel>
 
           <Panel title="Fusion readout" meta="same head · two modalities">
-            <p className="mb-3 text-[0.72rem] leading-relaxed text-[#8095bf]">
+            <p className="mb-3 text-[0.72rem] leading-relaxed text-[color:var(--k-8095bf)]">
               Hemispheric asymmetry asked of both modalities. Index = (L − R) / (L + R); zero is
               symmetric.
             </p>
@@ -1189,7 +1199,7 @@ export function ResearchConsole() {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-[0.74rem]">
                 <thead>
-                  <tr className="text-left font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#8095bf]">
+                  <tr className="text-left font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
                     <th className="pb-2 font-medium">Region</th>
                     <th className="pb-2 text-right font-medium">Ch</th>
                     <th className="pb-2 text-right font-medium">{band}</th>
@@ -1198,27 +1208,27 @@ export function ResearchConsole() {
                 </thead>
                 <tbody>
                   {regions.map((r) => (
-                    <tr key={r.region} className="border-t border-[#0e2247]">
-                      <td className="py-1.5 capitalize text-[#e6efff]">{r.region}</td>
-                      <td className="py-1.5 text-right font-mono tabular-nums text-[#8095bf]">
+                    <tr key={r.region} className="border-t border-[color:var(--k-0e2247)]">
+                      <td className="py-1.5 capitalize text-[color:var(--k-e6efff)]">{r.region}</td>
+                      <td className="py-1.5 text-right font-mono tabular-nums text-[color:var(--k-8095bf)]">
                         {r.channels}
                       </td>
                       <td className="py-1.5 text-right">
                         <span className="inline-flex items-center justify-end gap-2">
-                          <span className="h-1 w-12 overflow-hidden rounded-full bg-[#0e2247]">
+                          <span className="h-1 w-12 overflow-hidden rounded-full bg-[color:var(--k-0e2247)]">
                             <span
-                              className="block h-full rounded-full bg-[#7fd8ff]"
+                              className="block h-full rounded-full bg-[color:var(--k-7fd8ff)]"
                               style={{ width: `${Math.max(0, Math.min(100, r.bandShare * 100))}%` }}
                             />
                           </span>
-                          <span className="w-9 font-mono tabular-nums text-[#e6efff]">
+                          <span className="w-9 font-mono tabular-nums text-[color:var(--k-e6efff)]">
                             {Number.isFinite(r.bandShare)
                               ? `${(r.bandShare * 100).toFixed(0)}%`
                               : "—"}
                           </span>
                         </span>
                       </td>
-                      <td className="py-1.5 text-right font-mono tabular-nums text-[#e6efff]">
+                      <td className="py-1.5 text-right font-mono tabular-nums text-[color:var(--k-e6efff)]">
                         {Number.isFinite(r.thetaAlpha) ? r.thetaAlpha.toFixed(2) : "—"}
                       </td>
                     </tr>
@@ -1236,10 +1246,10 @@ export function ResearchConsole() {
 
           <NeuroPanel linked={linked} />
 
-          <p className="rounded-md border border-[#16305e] bg-[#01071a] px-3 py-2.5 text-[0.66rem] leading-relaxed text-[#8095bf]">
-            <span className="font-semibold text-[#e6efff]">Research use only.</span> Every figure
-            here is computed from the loaded files and is a measurement, not a diagnosis. Diagnostic
-            outputs are gated behind the published benchmarks.
+          <p className="rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-3 py-2.5 text-[0.66rem] leading-relaxed text-[color:var(--k-8095bf)]">
+            <span className="font-semibold text-[color:var(--k-e6efff)]">Research use only.</span>{" "}
+            Every figure here is computed from the loaded files and is a measurement, not a
+            diagnosis. Diagnostic outputs are gated behind the published benchmarks.
           </p>
         </aside>
 
@@ -1274,7 +1284,7 @@ export function ResearchConsole() {
           </Panel>
 
           <Panel title="Alzheimer's EEG biomarkers" meta="measured · no verdict">
-            <p className="mb-3 text-[0.72rem] leading-relaxed text-[#8095bf]">
+            <p className="mb-3 text-[0.72rem] leading-relaxed text-[color:var(--k-8095bf)]">
               Markers the literature reports altered in Alzheimer's, each computed from this
               recording. The arrow shows the direction associated with disease — it is not a flag on
               this subject.
@@ -1284,7 +1294,7 @@ export function ResearchConsole() {
                 <BiomarkerRow key={b.id} marker={b} />
               ))}
             </div>
-            <div className="mt-3 rounded border border-[#d9a441]/35 bg-[#d9a441]/[0.06] px-3 py-2 text-[0.66rem] leading-relaxed text-[#e8c98a]">
+            <div className="mt-3 rounded border border-[color:var(--k-d9a441)]/35 bg-[color:var(--k-d9a441)]/[0.06] px-3 py-2 text-[0.66rem] leading-relaxed text-[color:var(--k-e8c98a)]">
               <span className="font-semibold">No risk score is shown, by design.</span> Combining
               these into a prediction needs a model trained and validated on labelled cohorts. That
               gate has not been passed — see <span className="font-mono">/benchmarks</span>.
@@ -1293,7 +1303,7 @@ export function ResearchConsole() {
 
           <Panel title="Coherence matrix" meta={`${band} · ${coherence.segments} segments`}>
             <CoherenceGrid matrix={coherence} hovered={hovered} onHover={setHovered} />
-            <p className="mt-2 text-[0.64rem] leading-relaxed text-[#5e719a]">
+            <p className="mt-2 text-[0.64rem] leading-relaxed text-[color:var(--k-5e719a)]">
               Magnitude-squared coherence, power-weighted across the band. Scalp EEG against a
               common reference inflates coupling between neighbours through volume conduction — read
               strong local pairs with that in mind.
@@ -1308,7 +1318,7 @@ export function ResearchConsole() {
 /* ================================ PARTS ================================ */
 
 const NAV_BUTTON =
-  "flex items-center gap-1.5 rounded-md border border-[#16305e] bg-[#04102b]/60 px-2.5 py-1.5 text-[0.72rem] text-[#a9bbdc] transition hover:border-[#3d8bf5] hover:bg-[#0a1f45] hover:text-[#e6efff]";
+  "flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-04102b)]/60 px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-a9bbdc)] transition hover:border-[color:var(--k-3d8bf5)] hover:bg-[color:var(--k-0a1f45)] hover:text-[color:var(--k-e6efff)]";
 
 /**
  * What Neurodegeneration Tracking has received from the imaging pages, live:
@@ -1333,7 +1343,7 @@ function NeuroPanel({ linked }: { linked: LinkedState }) {
       action={
         <Link
           to="/neurodegeneration"
-          className="flex items-center gap-1 rounded border border-[#16305e] px-2 py-1 font-mono text-[0.6rem] tracking-[0.1em] text-[#7fd8ff] transition hover:border-[#3d8bf5]"
+          className="flex items-center gap-1 rounded border border-[color:var(--k-16305e)] px-2 py-1 font-mono text-[0.6rem] tracking-[0.1em] text-[color:var(--k-7fd8ff)] transition hover:border-[color:var(--k-3d8bf5)]"
         >
           OPEN <ArrowUpRight className="h-3 w-3" />
         </Link>
@@ -1347,7 +1357,7 @@ function NeuroPanel({ linked }: { linked: LinkedState }) {
       {current ? (
         <table className="mt-3 w-full border-collapse text-[0.72rem]">
           <thead>
-            <tr className="text-left font-mono text-[0.54rem] uppercase tracking-[0.12em] text-[#8095bf]">
+            <tr className="text-left font-mono text-[0.54rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
               <th className="pb-1.5 font-medium">Structure</th>
               <th className="pb-1.5 text-right font-medium">Left</th>
               <th className="pb-1.5 text-right font-medium">Right</th>
@@ -1355,10 +1365,13 @@ function NeuroPanel({ linked }: { linked: LinkedState }) {
           </thead>
           <tbody>
             {rows.map(([name, l, r]) => (
-              <tr key={name} className="border-t border-[#0e2247]">
-                <td className="py-1.5 text-[#e6efff]">{name}</td>
+              <tr key={name} className="border-t border-[color:var(--k-0e2247)]">
+                <td className="py-1.5 text-[color:var(--k-e6efff)]">{name}</td>
                 {[l, r].map((id) => (
-                  <td key={id} className="py-1.5 text-right font-mono tabular-nums text-[#e6efff]">
+                  <td
+                    key={id}
+                    className="py-1.5 text-right font-mono tabular-nums text-[color:var(--k-e6efff)]"
+                  >
                     {vol(id) !== undefined ? `${(vol(id)! / 1000).toFixed(2)} mL` : "—"}
                   </td>
                 ))}
@@ -1367,12 +1380,12 @@ function NeuroPanel({ linked }: { linked: LinkedState }) {
           </tbody>
         </table>
       ) : (
-        <p className="mt-2 text-[0.66rem] leading-relaxed text-[#8095bf]">
+        <p className="mt-2 text-[0.66rem] leading-relaxed text-[color:var(--k-8095bf)]">
           Load a FreeSurfer label map for this scan to add hippocampal, ventricular and other
           regional volumes.
         </p>
       )}
-      <p className="mt-2 text-[0.62rem] leading-relaxed text-[#5e719a]">
+      <p className="mt-2 text-[0.62rem] leading-relaxed text-[color:var(--k-5e719a)]">
         {kind === "template"
           ? "Volumes describe the MNI152 template (FreeSurfer aseg, TemplateFlow) — a population average, not a person. "
           : ""}
@@ -1397,19 +1410,19 @@ function Panel({
   action?: React.ReactNode;
 }) {
   return (
-    <section className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-[#16305e] bg-gradient-to-b from-[#071a3d]/85 to-[#030b20]/90 shadow-[0_22px_48px_-30px_rgba(30,99,196,0.75)] transition-colors hover:border-[#1f4a8a]">
-      <span className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#7fd8ff]/45 to-transparent" />
+    <section className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-[color:var(--k-16305e)] bg-gradient-to-b from-[color:var(--k-071a3d)]/85 to-[color:var(--k-030b20)]/90 shadow-[0_22px_48px_-30px_rgba(30,99,196,0.75)] transition-colors hover:border-[color:var(--k-1f4a8a)]">
+      <span className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--k-7fd8ff)]/45 to-transparent" />
       <Brackets />
-      <header className="flex items-center justify-between gap-3 border-b border-[#16305e] bg-gradient-to-r from-[#0b2150]/70 via-[#061733]/50 to-transparent px-3 py-2">
+      <header className="flex items-center justify-between gap-3 border-b border-[color:var(--k-16305e)] bg-gradient-to-r from-[color:var(--k-0b2150)]/70 via-[color:var(--k-061733)]/50 to-transparent px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="h-3 w-[2px] shrink-0 rounded-full bg-[#7fd8ff] shadow-[0_0_6px_#7fd8ff]" />
+          <span className="h-3 w-[2px] shrink-0 rounded-full bg-[color:var(--k-7fd8ff)] shadow-[0_0_6px_var(--k-7fd8ff)]" />
           <h2 className="truncate text-[0.74rem] font-semibold capitalize tracking-[-0.005em]">
             {title}
           </h2>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {meta ? (
-            <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#8095bf]">
+            <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
               {meta}
             </span>
           ) : null}
@@ -1422,16 +1435,16 @@ function Panel({
 }
 
 function Brackets() {
-  const c = "pointer-events-none absolute h-2.5 w-2.5 border-[#7fd8ff]/50";
+  const c = "pointer-events-none absolute h-2.5 w-2.5 border-[color:var(--k-7fd8ff)]/50";
   return (
     <>
       <span className={`${c} left-0 top-0 rounded-tl-xl border-l border-t`} />
       <span className={`${c} right-0 top-0 rounded-tr-xl border-r border-t`} />
       <span
-        className={`${c} bottom-0 left-0 rounded-bl-xl border-b border-l !border-[#7fd8ff]/20`}
+        className={`${c} bottom-0 left-0 rounded-bl-xl border-b border-l !border-[color:var(--k-7fd8ff)]/20`}
       />
       <span
-        className={`${c} bottom-0 right-0 rounded-br-xl border-b border-r !border-[#7fd8ff]/20`}
+        className={`${c} bottom-0 right-0 rounded-br-xl border-b border-r !border-[color:var(--k-7fd8ff)]/20`}
       />
     </>
   );
@@ -1478,16 +1491,16 @@ function UploadButton({
     <button
       type="button"
       onClick={onClick}
-      className="group flex items-center gap-3 rounded-md border border-[#1e63c4]/50 bg-[#1e63c4]/10 px-3 py-2.5 text-left transition hover:border-[#7fd8ff] hover:bg-[#1e63c4]/20"
+      className="group flex items-center gap-3 rounded-md border border-[color:var(--k-1e63c4)]/50 bg-[color:var(--k-1e63c4)]/10 px-3 py-2.5 text-left transition hover:border-[color:var(--k-7fd8ff)] hover:bg-[color:var(--k-1e63c4)]/20"
     >
-      <span className="grid h-8 w-8 shrink-0 place-items-center rounded bg-[#1e63c4]/25 text-[#7fd8ff]">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded bg-[color:var(--k-1e63c4)]/25 text-[color:var(--k-7fd8ff)]">
         {icon}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[0.8rem] font-medium">{label}</span>
-        <span className="block font-mono text-[0.6rem] text-[#8095bf]">{hint}</span>
+        <span className="block font-mono text-[0.6rem] text-[color:var(--k-8095bf)]">{hint}</span>
       </span>
-      <FileUp className="h-3.5 w-3.5 text-[#8095bf] transition group-hover:text-[#7fd8ff]" />
+      <FileUp className="h-3.5 w-3.5 text-[color:var(--k-8095bf)] transition group-hover:text-[color:var(--k-7fd8ff)]" />
     </button>
   );
 }
@@ -1495,13 +1508,13 @@ function UploadButton({
 function Stat({ k, v, wide }: { k: string; v: string; wide?: boolean }) {
   return (
     <div
-      className={`min-w-0 rounded border border-[#0e2247] bg-[#01071a] px-2 py-1.5 ${wide ? "col-span-2" : ""}`}
+      className={`min-w-0 rounded border border-[color:var(--k-0e2247)] bg-[color:var(--k-01071a)] px-2 py-1.5 ${wide ? "col-span-2" : ""}`}
     >
-      <dt className="truncate font-mono text-[0.54rem] uppercase tracking-[0.12em] text-[#8095bf]">
+      <dt className="truncate font-mono text-[0.54rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
         {k}
       </dt>
       <dd
-        className="mt-0.5 truncate font-mono text-[0.76rem] tabular-nums text-[#e6efff]"
+        className="mt-0.5 truncate font-mono text-[0.76rem] tabular-nums text-[color:var(--k-e6efff)]"
         title={v}
       >
         {v}
@@ -1520,7 +1533,7 @@ function Segmented({
   options: [string, string][];
 }) {
   return (
-    <div className="grid grid-cols-3 gap-1 rounded-md border border-[#16305e] bg-[#01071a] p-1">
+    <div className="grid grid-cols-3 gap-1 rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] p-1">
       {options.map(([v, label]) => (
         <button
           key={v}
@@ -1528,8 +1541,8 @@ function Segmented({
           onClick={() => onChange(v)}
           className={`rounded px-2 py-1.5 text-[0.7rem] font-medium transition ${
             value === v
-              ? "bg-[#1e63c4] text-white shadow-[0_0_10px_#1e63c455]"
-              : "text-[#8095bf] hover:text-[#e6efff]"
+              ? "bg-[color:var(--k-1e63c4)] text-white shadow-[0_0_10px_color-mix(in_oklab,var(--k-1e63c4)_33%,transparent)]"
+              : "text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
           }`}
         >
           {label}
@@ -1558,9 +1571,9 @@ function Slider({
 }) {
   return (
     <label htmlFor={id} className="block">
-      <span className="mb-1 flex justify-between font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[#8095bf]">
+      <span className="mb-1 flex justify-between font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[color:var(--k-8095bf)]">
         {label}
-        <span className="tabular-nums text-[#e6efff]">
+        <span className="tabular-nums text-[color:var(--k-e6efff)]">
           {Number.isInteger(step) ? value.toFixed(0) : value.toFixed(2)}
         </span>
       </span>
@@ -1572,7 +1585,7 @@ function Slider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-[#7fd8ff]"
+        className="w-full accent-[color:var(--k-7fd8ff)]"
       />
     </label>
   );
@@ -1586,8 +1599,8 @@ function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; labe
       aria-pressed={on}
       className={`flex items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-[0.7rem] transition ${
         on
-          ? "border-[#7fd8ff]/60 bg-[#7fd8ff]/10 text-[#7fd8ff]"
-          : "border-[#16305e] text-[#8095bf] hover:text-[#e6efff]"
+          ? "border-[color:var(--k-7fd8ff)]/60 bg-[color:var(--k-7fd8ff)]/10 text-[color:var(--k-7fd8ff)]"
+          : "border-[color:var(--k-16305e)] text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
       }`}
     >
       {label === "Rotate" ? (
@@ -1617,26 +1630,26 @@ function AsymmetryBar({
   return (
     <div className="mb-3">
       <div className="mb-1.5 flex items-center justify-between text-[0.72rem]">
-        <span className="flex items-center gap-1.5 text-[#e6efff]">
-          <span className="text-[#7fd8ff]">{icon}</span>
+        <span className="flex items-center gap-1.5 text-[color:var(--k-e6efff)]">
+          <span className="text-[color:var(--k-7fd8ff)]">{icon}</span>
           {label}
         </span>
-        <span className="font-mono tabular-nums text-[#e6efff]">
+        <span className="font-mono tabular-nums text-[color:var(--k-e6efff)]">
           {ok ? (value >= 0 ? "+" : "") + value.toFixed(3) : "—"}
         </span>
       </div>
-      <div className="relative h-2 rounded-full bg-[#0e2247]">
-        <span className="absolute left-1/2 top-[-3px] h-[14px] w-px bg-[#8095bf]/60" />
+      <div className="relative h-2 rounded-full bg-[color:var(--k-0e2247)]">
+        <span className="absolute left-1/2 top-[-3px] h-[14px] w-px bg-[color:var(--k-8095bf)]/60" />
         {ok ? (
           <span
-            className="absolute top-0 h-full rounded-full bg-gradient-to-r from-[#1e63c4] to-[#7fd8ff]"
+            className="absolute top-0 h-full rounded-full bg-gradient-to-r from-[color:var(--k-1e63c4)] to-[color:var(--k-7fd8ff)]"
             style={
               pct >= 0 ? { left: "50%", width: `${pct}%` } : { right: "50%", width: `${-pct}%` }
             }
           />
         ) : null}
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[0.54rem] uppercase tracking-[0.1em] text-[#5e719a]">
+      <div className="mt-1 flex justify-between font-mono text-[0.54rem] uppercase tracking-[0.1em] text-[color:var(--k-5e719a)]">
         <span>Right</span>
         <span>Left</span>
       </div>
@@ -1655,10 +1668,10 @@ function ElectrodeCard({
 }) {
   const pos = findElectrode(label);
   return (
-    <div className="pointer-events-none absolute right-4 top-3 w-[13.5rem] rounded-md border border-[#7fd8ff]/40 bg-[#00030b]/85 p-3 backdrop-blur">
+    <div className="pointer-events-none absolute right-4 top-3 w-[13.5rem] rounded-md border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-00030b)]/85 p-3 backdrop-blur">
       <div className="flex items-baseline justify-between">
         <span className="font-mono text-[1.05rem] font-semibold text-white">{label}</span>
-        <span className="font-mono text-[0.58rem] uppercase tracking-[0.1em] text-[#7fd8ff]">
+        <span className="font-mono text-[0.58rem] uppercase tracking-[0.1em] text-[color:var(--k-7fd8ff)]">
           {pos?.region} · {pos?.hemisphere}
         </span>
       </div>
@@ -1669,23 +1682,23 @@ function ElectrodeCard({
             return (
               <div key={b.name} className="flex items-center gap-2">
                 <span
-                  className={`w-10 font-mono text-[0.58rem] uppercase ${b.name === band ? "text-[#7fd8ff]" : "text-[#8095bf]"}`}
+                  className={`w-10 font-mono text-[0.58rem] uppercase ${b.name === band ? "text-[color:var(--k-7fd8ff)]" : "text-[color:var(--k-8095bf)]"}`}
                 >
                   {b.name}
                 </span>
-                <span className="h-1 flex-1 overflow-hidden rounded-full bg-[#0e2247]">
+                <span className="h-1 flex-1 overflow-hidden rounded-full bg-[color:var(--k-0e2247)]">
                   <span
-                    className={`block h-full rounded-full ${b.name === band ? "bg-[#7fd8ff]" : "bg-[#1e63c4]"}`}
+                    className={`block h-full rounded-full ${b.name === band ? "bg-[color:var(--k-7fd8ff)]" : "bg-[color:var(--k-1e63c4)]"}`}
                     style={{ width: `${Math.max(0, Math.min(100, v * 100))}%` }}
                   />
                 </span>
-                <span className="w-8 text-right font-mono text-[0.62rem] tabular-nums text-[#e6efff]">
+                <span className="w-8 text-right font-mono text-[0.62rem] tabular-nums text-[color:var(--k-e6efff)]">
                   {Number.isFinite(v) ? `${(v * 100).toFixed(0)}%` : "—"}
                 </span>
               </div>
             );
           })}
-          <p className="mt-1 font-mono text-[0.6rem] text-[#8095bf]">
+          <p className="mt-1 font-mono text-[0.6rem] text-[color:var(--k-8095bf)]">
             peak{" "}
             {Number.isFinite(spectrum.peakFrequency)
               ? `${spectrum.peakFrequency.toFixed(1)} Hz`
@@ -1694,7 +1707,9 @@ function ElectrodeCard({
           </p>
         </div>
       ) : (
-        <p className="mt-2 text-[0.66rem] text-[#8095bf]">Not present in this recording.</p>
+        <p className="mt-2 text-[0.66rem] text-[color:var(--k-8095bf)]">
+          Not present in this recording.
+        </p>
       )}
     </div>
   );
@@ -1702,12 +1717,12 @@ function ElectrodeCard({
 
 function BandLegend({ band }: { band: string }) {
   return (
-    <div className="flex items-center gap-2 rounded border border-[#16305e] bg-[#00030b]/70 px-2.5 py-1.5">
-      <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#8095bf]">
+    <div className="flex items-center gap-2 rounded border border-[color:var(--k-16305e)] bg-[color:var(--k-00030b)]/70 px-2.5 py-1.5">
+      <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
         {band} low
       </span>
-      <span className="h-1.5 w-24 rounded-full bg-gradient-to-r from-[#0b2a78] via-[#1e63c4] via-[#7fd8ff] to-white" />
-      <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#8095bf]">
+      <span className="h-1.5 w-24 rounded-full bg-gradient-to-r from-[color:var(--k-0b2a78)] via-[color:var(--k-1e63c4)] via-[color:var(--k-7fd8ff)] to-white" />
+      <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
         high
       </span>
     </div>
@@ -1743,8 +1758,10 @@ function HudLayer({
         className="h-1.5 w-1.5 rounded-full"
         style={{ background: colour, boxShadow: on ? `0 0 6px ${colour}` : "none" }}
       />
-      <span className="text-[#e6efff]">{label}</span>
-      <span className={warn ? "text-[#e8c98a]" : "text-[#8095bf]"}>· {detail}</span>
+      <span className="text-[color:var(--k-e6efff)]">{label}</span>
+      <span className={warn ? "text-[color:var(--k-e8c98a)]" : "text-[color:var(--k-8095bf)]"}>
+        · {detail}
+      </span>
     </span>
   );
 }
@@ -1752,15 +1769,15 @@ function HudLayer({
 /** The tractography colour convention, so a viewer never has to guess it. */
 function TractLegend() {
   return (
-    <div className="flex items-center gap-2.5 rounded border border-[#16305e] bg-[#00030b]/70 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-[0.1em] text-[#8095bf]">
+    <div className="flex items-center gap-2.5 rounded border border-[color:var(--k-16305e)] bg-[color:var(--k-00030b)]/70 px-2.5 py-1.5 font-mono text-[0.56rem] uppercase tracking-[0.1em] text-[color:var(--k-8095bf)]">
       <span className="flex items-center gap-1">
-        <span className="h-1.5 w-3 rounded-full bg-[#ff5a5a]" /> L–R
+        <span className="h-1.5 w-3 rounded-full bg-[color:var(--k-ff5a5a)]" /> L–R
       </span>
       <span className="flex items-center gap-1">
-        <span className="h-1.5 w-3 rounded-full bg-[#5aff8c]" /> A–P
+        <span className="h-1.5 w-3 rounded-full bg-[color:var(--k-5aff8c)]" /> A–P
       </span>
       <span className="flex items-center gap-1">
-        <span className="h-1.5 w-3 rounded-full bg-[#5a8cff]" /> S–I
+        <span className="h-1.5 w-3 rounded-full bg-[color:var(--k-5a8cff)]" /> S–I
       </span>
     </div>
   );
@@ -1788,8 +1805,10 @@ function LayerRow({
       disabled={disabled}
       aria-pressed={on}
       className={`flex items-center gap-2.5 rounded-md border px-2.5 py-2 text-left transition disabled:cursor-not-allowed disabled:opacity-40 ${
-        on ? "border-[#16305e] bg-[#061733]" : "border-[#0e2247] bg-transparent"
-      } hover:border-[#3d8bf5]`}
+        on
+          ? "border-[color:var(--k-16305e)] bg-[color:var(--k-061733)]"
+          : "border-[color:var(--k-0e2247)] bg-transparent"
+      } hover:border-[color:var(--k-3d8bf5)]`}
     >
       <span
         className="h-2.5 w-2.5 shrink-0 rounded-full transition"
@@ -1801,14 +1820,16 @@ function LayerRow({
       />
       <span className="min-w-0 flex-1">
         <span
-          className={`block text-[0.76rem] font-medium ${on ? "text-[#e6efff]" : "text-[#8095bf]"}`}
+          className={`block text-[0.76rem] font-medium ${on ? "text-[color:var(--k-e6efff)]" : "text-[color:var(--k-8095bf)]"}`}
         >
           {label}
         </span>
-        <span className="block font-mono text-[0.58rem] text-[#5e719a]">{detail}</span>
+        <span className="block font-mono text-[0.58rem] text-[color:var(--k-5e719a)]">
+          {detail}
+        </span>
       </span>
       <span
-        className={`font-mono text-[0.56rem] tracking-[0.1em] ${on ? "text-[#7fd8ff]" : "text-[#5e719a]"}`}
+        className={`font-mono text-[0.56rem] tracking-[0.1em] ${on ? "text-[color:var(--k-7fd8ff)]" : "text-[color:var(--k-5e719a)]"}`}
       >
         {on ? "ON" : "OFF"}
       </span>
@@ -1827,7 +1848,7 @@ function SceneSwitch({ scene, onChange }: { scene: Scene; onChange: (s: Scene) =
     <div
       role="radiogroup"
       aria-label="Scene"
-      className="absolute right-3 top-3 z-10 flex gap-1 rounded-md border border-[#16305e] bg-[#01071a]/80 p-1 backdrop-blur"
+      className="absolute right-3 top-3 z-10 flex gap-1 rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)]/80 p-1 backdrop-blur"
     >
       {SCENES.map((s) => (
         <button
@@ -1839,8 +1860,8 @@ function SceneSwitch({ scene, onChange }: { scene: Scene; onChange: (s: Scene) =
           onClick={() => onChange(s.id)}
           className={`rounded px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.12em] transition ${
             scene === s.id
-              ? "bg-[#1e63c4] text-white shadow-[0_0_14px_#1e63c4]"
-              : "text-[#8095bf] hover:text-[#e6efff]"
+              ? "bg-[color:var(--k-1e63c4)] text-white shadow-[0_0_14px_var(--k-1e63c4)]"
+              : "text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
           }`}
         >
           {s.label}
@@ -1865,15 +1886,15 @@ function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-start gap-2.5 py-2">
-      <span className="grid h-9 w-9 place-items-center rounded-md bg-[#ff4860]/10 text-[#ff8a98]">
+      <span className="grid h-9 w-9 place-items-center rounded-md bg-[color:var(--k-ff4860)]/10 text-[color:var(--k-ff8a98)]">
         {icon}
       </span>
-      <p className="text-[0.82rem] font-medium text-[#e6efff]">{title}</p>
-      <p className="text-[0.72rem] leading-relaxed text-[#8095bf]">{body}</p>
+      <p className="text-[0.82rem] font-medium text-[color:var(--k-e6efff)]">{title}</p>
+      <p className="text-[0.72rem] leading-relaxed text-[color:var(--k-8095bf)]">{body}</p>
       <button
         type="button"
         onClick={onAction}
-        className="mt-1 rounded-md border border-[#ff4860]/50 px-3 py-1.5 text-[0.72rem] text-[#ff9aa6] transition hover:bg-[#ff4860]/10"
+        className="mt-1 rounded-md border border-[color:var(--k-ff4860)]/50 px-3 py-1.5 text-[0.72rem] text-[color:var(--k-ff9aa6)] transition hover:bg-[color:var(--k-ff4860)]/10"
       >
         {action}
       </button>
@@ -1898,16 +1919,16 @@ function LesionPanel({
   const core = rows.filter(([l]) => l === 1 || l === 3 || l === 4).reduce((a, [, v]) => a + v, 0);
   return (
     <div>
-      <p className="truncate font-mono text-[0.7rem] text-[#ff9aa6]" title={name}>
+      <p className="truncate font-mono text-[0.7rem] text-[color:var(--k-ff9aa6)]" title={name}>
         {name}
       </p>
       {source !== "upload" ? (
-        <p className="mt-1.5 rounded border border-[#ff4860]/35 bg-[#ff4860]/[0.06] px-2.5 py-1.5 text-[0.64rem] leading-relaxed text-[#ffb3bc]">
+        <p className="mt-1.5 rounded border border-[color:var(--k-ff4860)]/35 bg-[color:var(--k-ff4860)]/[0.06] px-2.5 py-1.5 text-[0.64rem] leading-relaxed text-[color:var(--k-ffb3bc)]">
           Synthetic demonstration of the overlay. Not derived from any scan and not a finding.
         </p>
       ) : null}
       {warning ? (
-        <p className="mt-1.5 rounded border border-[#d9a441]/40 bg-[#d9a441]/[0.07] px-2.5 py-1.5 text-[0.64rem] leading-relaxed text-[#e8c98a]">
+        <p className="mt-1.5 rounded border border-[color:var(--k-d9a441)]/40 bg-[color:var(--k-d9a441)]/[0.07] px-2.5 py-1.5 text-[0.64rem] leading-relaxed text-[color:var(--k-e8c98a)]">
           {warning}
         </p>
       ) : null}
@@ -1919,21 +1940,21 @@ function LesionPanel({
           return (
             <div key={label}>
               <div className="flex items-baseline justify-between gap-2">
-                <span className="flex min-w-0 items-center gap-2 text-[0.74rem] text-[#e6efff]">
+                <span className="flex min-w-0 items-center gap-2 text-[0.74rem] text-[color:var(--k-e6efff)]">
                   <span
                     className="h-2 w-2 shrink-0 rounded-sm"
                     style={{ background: `rgb(${r},${g},${b})` }}
                   />
                   <span className="truncate">{cls?.name ?? `Label ${label}`}</span>
-                  <span className="font-mono text-[0.58rem] text-[#5e719a]">
+                  <span className="font-mono text-[0.58rem] text-[color:var(--k-5e719a)]">
                     {cls?.short ?? label}
                   </span>
                 </span>
-                <span className="font-mono text-[0.74rem] tabular-nums text-[#e6efff]">
+                <span className="font-mono text-[0.74rem] tabular-nums text-[color:var(--k-e6efff)]">
                   {cm3.toFixed(2)} cm³
                 </span>
               </div>
-              <div className="mt-1 h-1 overflow-hidden rounded-full bg-[#0e2247]">
+              <div className="mt-1 h-1 overflow-hidden rounded-full bg-[color:var(--k-0e2247)]">
                 <div
                   className="h-full rounded-full"
                   style={{
@@ -1951,7 +1972,7 @@ function LesionPanel({
         <Stat k="Whole tumour" v={`${total.toFixed(2)} cm³`} />
         <Stat k="Tumour core" v={`${core.toFixed(2)} cm³`} />
       </dl>
-      <p className="mt-2 text-[0.62rem] leading-relaxed text-[#5e719a]">
+      <p className="mt-2 text-[0.62rem] leading-relaxed text-[color:var(--k-5e719a)]">
         Volumes counted at the segmentation&apos;s native resolution. The reticle marks the largest
         labelled region.
       </p>
@@ -1962,20 +1983,22 @@ function LesionPanel({
 function BiomarkerRow({ marker }: { marker: import("./fusion").Biomarker }) {
   const up = marker.adDirection === "higher";
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-0.5 border-t border-[#0e2247] py-2.5 first:border-t-0">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-0.5 border-t border-[color:var(--k-0e2247)] py-2.5 first:border-t-0">
       <div className="min-w-0">
-        <p className="text-[0.78rem] font-medium text-[#e6efff]">{marker.name}</p>
-        <p className="text-[0.64rem] leading-relaxed text-[#8095bf]">{marker.meaning}</p>
+        <p className="text-[0.78rem] font-medium text-[color:var(--k-e6efff)]">{marker.name}</p>
+        <p className="text-[0.64rem] leading-relaxed text-[color:var(--k-8095bf)]">
+          {marker.meaning}
+        </p>
       </div>
       <div className="flex flex-col items-end">
         <span className="font-mono text-[1.02rem] font-semibold tabular-nums text-white">
           {marker.format(marker.value)}
         </span>
-        <span className="font-mono text-[0.56rem] text-[#5e719a]">{marker.unit}</span>
+        <span className="font-mono text-[0.56rem] text-[color:var(--k-5e719a)]">{marker.unit}</span>
       </div>
-      <p className="col-span-2 flex items-center gap-1.5 text-[0.62rem] text-[#5e719a]">
+      <p className="col-span-2 flex items-center gap-1.5 text-[0.62rem] text-[color:var(--k-5e719a)]">
         <span
-          className="inline-flex h-4 items-center gap-1 rounded border border-[#16305e] px-1.5 font-mono text-[0.56rem] text-[#8095bf]"
+          className="inline-flex h-4 items-center gap-1 rounded border border-[color:var(--k-16305e)] px-1.5 font-mono text-[0.56rem] text-[color:var(--k-8095bf)]"
           title="Direction the Alzheimer's literature associates with disease"
         >
           AD {up ? "↑" : "↓"}
@@ -2073,7 +2096,9 @@ function CoherenceGrid({
 
   if (!n)
     return (
-      <p className="text-[0.72rem] text-[#8095bf]">Not enough recording to estimate coherence.</p>
+      <p className="text-[0.72rem] text-[color:var(--k-8095bf)]">
+        Not enough recording to estimate coherence.
+      </p>
     );
   return (
     <div className="flex justify-center">

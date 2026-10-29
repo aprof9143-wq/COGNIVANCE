@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { SiteNav } from "@/components/SiteNav";
+import { Gated } from "@/components/app/Gated";
 
 /**
  * NIMBLE Benchmark Console.
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/benchmarks")({
       { property: "og:description", content: description },
     ],
   }),
-  component: Benchmarks,
+  component: Page,
 });
 
 /* ------------------------------------------------------------------ data */
@@ -387,6 +387,14 @@ function TargetBand({ t }: { t: Task }) {
 
 /* --------------------------------------------------------------- page */
 
+function Page() {
+  return (
+    <Gated path="/benchmarks">
+      <Benchmarks />
+    </Gated>
+  );
+}
+
 function Benchmarks() {
   const [clock, setClock] = useState("");
   const [selected, setSelected] = useState<Task>(tasks[0]!);
@@ -422,9 +430,7 @@ function Benchmarks() {
 
   return (
     <div className="min-h-screen bg-paper">
-      <SiteNav />
-
-      <main className="scope px-[clamp(0.75rem,2vw,1.75rem)] pb-10 pt-24">
+      <main className="scope px-[clamp(0.75rem,2vw,1.75rem)] pb-10 pt-6">
         <div className="mx-auto max-w-[1680px]">
           {/* ---------------- console header ---------------- */}
           <header className="relative overflow-hidden rounded-lg border border-foreground/12 bg-[linear-gradient(90deg,color-mix(in_oklab,var(--deep)_75%,transparent),transparent_60%)]">

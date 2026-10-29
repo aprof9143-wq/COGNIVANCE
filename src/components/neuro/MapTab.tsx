@@ -248,8 +248,8 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
           {error ? <Pill tone="error">{error}</Pill> : null}
         </div>
         <div className="mt-3 grid gap-3 lg:grid-cols-[18rem_minmax(0,1fr)]">
-          <div className="flex flex-col gap-2 text-[12px] text-[#a9bbdc]">
-            <p className="font-semibold text-[#c4d2ee]">Layers</p>
+          <div className="flex flex-col gap-2 text-[12px] text-[color:var(--k-a9bbdc)]">
+            <p className="font-semibold text-[color:var(--k-c4d2ee)]">Layers</p>
             <label className="flex items-center gap-2">
               <input type="radio" checked={metric === "z"} onChange={() => setMetric("z")} />{" "}
               Atrophy vs reference (z) <Tag kind="derived" />
@@ -324,12 +324,12 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
           </div>
           <div>
             {!t1 || !views || !win ? (
-              <p className="grid h-80 place-items-center rounded border border-[#16305e] bg-black text-[13px] text-[#a9bbdc]">
+              <p className="grid h-80 place-items-center rounded border border-[color:var(--k-16305e)] bg-black text-[13px] text-[color:var(--k-a9bbdc)]">
                 {busy ??
                   "Load the subject's T1 and its parcellation (e.g. FreeSurfer aparc+aseg in the same space)."}
               </p>
             ) : (
-              <div className="grid h-[34rem] grid-cols-2 grid-rows-2 gap-1 bg-[#16305e] p-px">
+              <div className="grid h-[34rem] grid-cols-2 grid-rows-2 gap-1 bg-[color:var(--k-16305e)] p-px">
                 {(["axial", "coronal", "sagittal"] as Plane[]).map((p) => (
                   <MprViewport
                     key={p}
@@ -393,7 +393,7 @@ export function MapTab({ rows }: { rows: RegionRow[] }) {
             )}
           </div>
         </div>
-        <p className="mt-2 text-[12px] text-[#8095bf]">
+        <p className="mt-2 text-[12px] text-[color:var(--k-8095bf)]">
           Regions are matched by FreeSurfer label ID. The parcellation must be in the T1's space;
           values come from the regional table (method, version and QC in the Evidence tab). Colour
           shows a regional measurement relative to the selected reference or over time — not

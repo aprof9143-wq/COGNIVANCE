@@ -78,8 +78,11 @@ export function ConceptVision() {
 
   return (
     <div>
-      <div className="flex gap-2 rounded-2xl bg-[#fbe6ee] p-3 text-[12px] text-[var(--v-ink)]">
-        <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-[#b0306a]" aria-hidden />
+      <div className="flex gap-2 rounded-2xl bg-[color:var(--kv-fbe6ee)] p-3 text-[12px] text-[var(--v-ink)]">
+        <TriangleAlert
+          className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--kv-b0306a)]"
+          aria-hidden
+        />
         <p>
           <span className="font-medium">A concept for presentation.</span> It shows what extra bands
           of light would reveal, translated into colours a screen can show. It is not a therapy, not
@@ -103,7 +106,7 @@ export function ConceptVision() {
             role="tab"
             aria-selected={mode === m.key}
             onClick={() => setMode(m.key)}
-            className={`flex-1 rounded-full px-3 py-1.5 ${mode === m.key ? "bg-[#b0306a] text-white" : ""}`}
+            className={`flex-1 rounded-full px-3 py-1.5 ${mode === m.key ? "bg-[color:var(--kv-b0306a)] text-white" : ""}`}
           >
             {m.label}
           </button>

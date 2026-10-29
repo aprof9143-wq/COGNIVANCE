@@ -164,7 +164,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
   return (
     <section aria-label="EEG" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="mr-2 text-[15px] font-semibold text-[#e6efff]">EEG</h2>
+        <h2 className="mr-2 text-[15px] font-semibold text-[color:var(--k-e6efff)]">EEG</h2>
         <button type="button" onClick={() => input.current?.click()} className="btn">
           <FileUp className="h-4 w-4" /> Load EDF
         </button>
@@ -193,7 +193,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
           }}
         />
         {recording ? (
-          <span className="text-[13px] text-[#a9bbdc]">
+          <span className="text-[13px] text-[color:var(--k-a9bbdc)]">
             {name} · {recording.eegSignals.length} channels · {mapped.length} on the 10-20 layout ·{" "}
             {duration.toFixed(0)} s
           </span>
@@ -203,14 +203,14 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
       </div>
 
       {!recording || !analysis ? (
-        <p className="rounded-md border border-[#16305e] bg-[#020a1f] px-4 py-6 text-center text-[13px] text-[#a9bbdc]">
+        <p className="rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-020a1f)] px-4 py-6 text-center text-[13px] text-[color:var(--k-a9bbdc)]">
           No EEG loaded. Load an EDF/EDF+ recording. Electrodes appear in the 3D view only if
           registered coordinates (BIDS electrodes.tsv) are also loaded.
         </p>
       ) : (
         <>
-          <div className="flex flex-wrap items-end gap-4 rounded-md border border-[#16305e] bg-[#020a1f] px-3 py-2">
-            <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
+          <div className="flex flex-wrap items-end gap-4 rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-020a1f)] px-3 py-2">
+            <label className="flex flex-col gap-1 text-[12px] text-[color:var(--k-a9bbdc)]">
               Band
               <select value={band} onChange={(e) => setBand(e.target.value)} className="field">
                 {BANDS.map((b) => (
@@ -220,7 +220,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
+            <label className="flex flex-col gap-1 text-[12px] text-[color:var(--k-a9bbdc)]">
               Analysis window start (s)
               <input
                 type="number"
@@ -231,7 +231,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 className="field w-28"
               />
             </label>
-            <label className="flex flex-col gap-1 text-[12px] text-[#a9bbdc]">
+            <label className="flex flex-col gap-1 text-[12px] text-[color:var(--k-a9bbdc)]">
               Length (s)
               <input
                 type="number"
@@ -242,7 +242,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 className="field w-24"
               />
             </label>
-            <span className="text-[12px] text-[#8095bf]">
+            <span className="text-[12px] text-[color:var(--k-8095bf)]">
               Welch PSD, 2 s Hann segments, 50 % overlap, over {s0.toFixed(0)}–
               {(s0 + len).toFixed(0)} s
             </span>
@@ -281,12 +281,12 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                       .join(",")})`,
                   }}
                 />
-                <div className="mt-1 flex justify-between text-[11px] text-[#8095bf]">
+                <div className="mt-1 flex justify-between text-[11px] text-[color:var(--k-8095bf)]">
                   <span>{(bandPower.lo * 100).toFixed(1)} %</span>
                   <span>{(bandPower.hi * 100).toFixed(1)} %</span>
                 </div>
               </div>
-              <p className="mt-2 text-[12px] leading-snug text-[#8095bf]">
+              <p className="mt-2 text-[12px] leading-snug text-[color:var(--k-8095bf)]">
                 Dots are measured electrodes; colour between them is inverse-distance interpolation
                 on a schematic 10-20 layout, for display only.
               </p>
@@ -314,7 +314,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 topK={topK}
                 setTopK={setTopK}
               />
-              <p className="mt-2 text-[12px] leading-snug text-[#8095bf]">
+              <p className="mt-2 text-[12px] leading-snug text-[color:var(--k-8095bf)]">
                 Magnitude-squared coherence, a statistical estimate of coupling, not a measured
                 connection. Scalp EEG against a common reference inflates coherence between
                 neighbours (volume conduction).
@@ -325,24 +325,26 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                 {markers.map((m) => (
                   <div
                     key={m.id}
-                    className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 border-t border-[#0e2247] py-2 first:border-t-0"
+                    className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 border-t border-[color:var(--k-0e2247)] py-2 first:border-t-0"
                   >
                     <div>
-                      <p className="text-[13px] text-[#e6efff]">{m.name}</p>
-                      <p className="text-[12px] text-[#8095bf]">{m.meaning}</p>
-                      <p className="text-[12px] text-[#8095bf]">
+                      <p className="text-[13px] text-[color:var(--k-e6efff)]">{m.name}</p>
+                      <p className="text-[12px] text-[color:var(--k-8095bf)]">{m.meaning}</p>
+                      <p className="text-[12px] text-[color:var(--k-8095bf)]">
                         Literature direction in Alzheimer's:{" "}
                         {m.adDirection === "higher" ? "higher" : "lower"}. {m.basis}
                       </p>
                     </div>
                     <p className="text-right font-mono text-[15px] text-white">
                       {m.format(m.value)}
-                      <span className="block text-[11px] text-[#8095bf]">{m.unit}</span>
+                      <span className="block text-[11px] text-[color:var(--k-8095bf)]">
+                        {m.unit}
+                      </span>
                     </p>
                   </div>
                 ))}
               </div>
-              <p className="mt-2 rounded border border-[#3a3320] bg-[#1a160c] px-3 py-2 text-[12px] leading-snug text-[#e6d7a8]">
+              <p className="mt-2 rounded border border-[color:var(--k-3a3320)] bg-[color:var(--k-1a160c)] px-3 py-2 text-[12px] leading-snug text-[color:var(--k-e6d7a8)]">
                 Finding is nonspecific. Drowsiness, medication, metabolic or toxic encephalopathy,
                 vascular disease, other neurodegenerative disease and recording artefact also slow
                 the EEG. No reference range or score is applied. Clinical correlation required.
@@ -368,11 +370,13 @@ function CoherenceTable({
 }) {
   if (!labels.length)
     return (
-      <p className="text-[13px] text-[#a9bbdc]">Not enough 10-20 channels to estimate coherence.</p>
+      <p className="text-[13px] text-[color:var(--k-a9bbdc)]">
+        Not enough 10-20 channels to estimate coherence.
+      </p>
     );
   return (
     <div>
-      <label className="mb-2 flex items-center gap-2 text-[12px] text-[#a9bbdc]">
+      <label className="mb-2 flex items-center gap-2 text-[12px] text-[color:var(--k-a9bbdc)]">
         Strongest pairs
         <input
           type="range"
@@ -384,7 +388,7 @@ function CoherenceTable({
         <span className="font-mono">{topK}</span>
       </label>
       <table className="w-full text-[12px]">
-        <thead className="text-left text-[#8095bf]">
+        <thead className="text-left text-[color:var(--k-8095bf)]">
           <tr>
             <th className="font-normal">Pair</th>
             <th className="font-normal">Coherence</th>
@@ -395,11 +399,11 @@ function CoherenceTable({
           {pairs.map((p) => {
             const [r, g, b] = viridis(p.value);
             return (
-              <tr key={`${p.a}-${p.b}`} className="border-t border-[#0e2247]">
-                <td className="py-1 font-mono text-[#e6efff]">
+              <tr key={`${p.a}-${p.b}`} className="border-t border-[color:var(--k-0e2247)]">
+                <td className="py-1 font-mono text-[color:var(--k-e6efff)]">
                   {p.a}–{p.b}
                 </td>
-                <td className="font-mono text-[#e6efff]">{p.value.toFixed(2)}</td>
+                <td className="font-mono text-[color:var(--k-e6efff)]">{p.value.toFixed(2)}</td>
                 <td>
                   <div
                     className="h-2 rounded"

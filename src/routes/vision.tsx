@@ -1,6 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { hasSession } from "@/lib/session";
+import { createFileRoute } from "@tanstack/react-router";
+import { Gated } from "@/components/app/Gated";
 import { VisionModule } from "@/components/vision/VisionModule";
 
 export const Route = createFileRoute("/vision")({
@@ -14,16 +13,13 @@ export const Route = createFileRoute("/vision")({
       },
     ],
   }),
-  component: Vision,
+  component: Page,
 });
 
-function Vision() {
-  const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/vision" } });
-    else setReady(true);
-  }, [navigate]);
-  if (!ready) return <div className="min-h-screen bg-[#eceef4]" />;
-  return <VisionModule />;
+function Page() {
+  return (
+    <Gated path="/vision">
+      <VisionModule />
+    </Gated>
+  );
 }
