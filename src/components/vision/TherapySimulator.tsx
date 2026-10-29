@@ -145,12 +145,12 @@ function AlleleSelect({
   onChange: (uid: string) => void;
 }) {
   return (
-    <label className="flex flex-col gap-1 text-[12px]">
+    <label className="flex min-w-0 flex-col gap-1 text-[12px]">
       <span className="font-medium text-[var(--v-ink-2)]">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-full border border-[var(--v-line)] bg-[var(--v-card)] px-3 py-1.5 text-[13px]"
+        className="w-full min-w-0 truncate rounded-full border border-[var(--v-line)] bg-[var(--v-card)] px-3 py-1.5 text-[13px]"
       >
         {options.map((v) => (
           <option key={v.uid} value={v.uid}>
@@ -255,8 +255,9 @@ export function TherapySimulator() {
       <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)]">
           {/* ------------------------------------------------ left */}
-          <div className="flex flex-col gap-3">
-            <Card>
+          {/* On phones the page opens on the simulation; the section index is for wide screens. */}
+          <div className="order-2 flex flex-col gap-3 lg:order-none">
+            <Card className="max-lg:hidden">
               <p className="text-[13px] font-semibold tracking-[-0.01em]">Gene therapy simulator</p>
               <p className="text-xs text-[var(--v-ink-3)]">On this page</p>
               <nav className="mt-4 flex flex-col gap-1 text-sm" aria-label="Sections">
@@ -291,7 +292,7 @@ export function TherapySimulator() {
           </div>
 
           {/* ------------------------------------------------ main */}
-          <div className="flex min-w-0 flex-col gap-3">
+          <div className="order-1 flex min-w-0 flex-col gap-3 lg:order-none">
             <Card id="journey">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>

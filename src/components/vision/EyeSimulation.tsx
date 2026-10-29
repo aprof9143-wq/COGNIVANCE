@@ -224,7 +224,7 @@ export function EyeSimulation() {
           {/* ------------------------------------------------ centre */}
           <Card
             id="eye"
-            className="relative order-1 flex min-h-[620px] flex-col overflow-hidden !p-0 lg:order-none"
+            className="relative order-1 flex min-h-[620px] flex-col overflow-hidden !p-0 lg:sticky lg:top-6 lg:order-none lg:h-[calc(100vh-3rem)] lg:self-start"
           >
             <div className="z-10 flex flex-wrap items-center justify-between gap-3 p-5 pb-0">
               <div>
