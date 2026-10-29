@@ -1,6 +1,6 @@
 /**
  * Per-source parser tests for Genome v1: Ensembl, UniProt, AlphaFold DB and
- * ClinVar. RPE65 uses the real captured snapshot (public/vision/snapshot/rpe65);
+ * ClinVar. RPE65 uses the real captured snapshot (data/genome/snapshot/rpe65);
  * RHO uses synthetic fixtures (./fixtures/rho.ts). No network access.
  */
 import { readFileSync } from "node:fs";

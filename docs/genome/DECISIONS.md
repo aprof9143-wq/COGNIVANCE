@@ -44,3 +44,41 @@ population" and decision 5 is "Input data and quality requirements", which are *
 | **Source** | Genome v1 brief, 2026-10-27. |
 | **Status** | Decided. No item is approved yet. |
 | **Current review states** | Set by the product owner on 2026-10-27. **UniProt and AlphaFold DB:** terms awaiting human review. **ClinVar:** reuse requires legal review. **NCBI data:** use blocked for the app until NCBI's required disclaimer and copyright notice are displayed to users (`appUse: blocked` in `licences.json`). |
+
+## GOV-1: what the web app may serve from each source
+
+| Field | Value |
+| --- | --- |
+| **Question** | May the web app publish raw source responses, and what may it show from sources whose terms are not settled? |
+| **Answer** | No raw responses are served. They live in `data/genome/snapshot/`, outside `public/`. The app serves a display copy holding only the fields it reads, and only from sources whose display is allowed. ClinVar is excluded entirely: it is not fetched, stored, displayed, exported or served, and its captured files were removed (recorded in `REDACTIONS.json`). |
+| **Source** | Product owner, 2026-10-29 (option "1a"). |
+| **Status** | Decided. Redistribution of every source still awaits review; earlier commits still hold the raw files (a legal question, see GOVERNANCE.md). |
+| **Implemented in** | `config/genome/licences.json` (`permissions`), `src/lib/genome/policy.ts`, `tools/vision-snapshot/policy.py`, `tools/genome-display/build_display.py`, `src/lib/vision/snapshot.ts`. |
+
+## GOV-2: how the product describes its clinical direction
+
+| Field | Value |
+| --- | --- |
+| **Question** | How should the landing and product pages describe in-silico trials and clinical use? |
+| **Answer** | As goals, not present capabilities. The pages say what is being built and that today the software is research software on public reference data. The "Live" labels were removed. Every Vision screen and every export carries one not-for-clinical-use statement, from `src/lib/genome/status.ts`. |
+| **Source** | Product owner, 2026-10-29. |
+| **Status** | Decided. |
+
+## GOV-3: Autism and Alzheimer's are outside Genome
+
+| Field | Value |
+| --- | --- |
+| **Question** | Should Genome show placeholders for Autism or Alzheimer's disease work? |
+| **Answer** | No. Genome covers inherited retinal disease only. No placeholder, gene, panel or target for Autism or Alzheimer's is added. Any such work would need its own intended use, sources and review, and would be research-only. Outside Genome, the research console and imaging workstation compute EEG measures that the Alzheimer's literature reports as altered, labelled "measured · no verdict"; they are not part of Genome and were not reviewed under this decision. |
+| **Source** | Product owner, 2026-10-29. |
+| **Status** | Decided. |
+
+## GOV-4: clinical use is computed, not configured
+
+| Field | Value |
+| --- | --- |
+| **Question** | What would make clinical mode available? |
+| **Answer** | Only verified evidence for every item in `config/genome/governance/release-gate.json` together with recorded approvals. Availability is computed by `src/lib/genome/release.ts`; the gate's `status` field and any setting are ignored. Today no evidence exists, so clinical use is unavailable. |
+| **Source** | Clinical-genomics governance brief, 2026-10-29. |
+| **Status** | Decided. No evidence or approval is recorded. |
+
