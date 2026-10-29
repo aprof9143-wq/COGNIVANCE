@@ -13,7 +13,7 @@ import { useEffect, useRef } from "react";
  * screen or in a background tab; with reduced motion it shows a still frame.
  */
 
-const CDS_URL = "/vision/snapshot/rpe65/ensembl_cds.json";
+const CDS_URL = "/vision/display/rpe65/ensembl_cds.json";
 // Opening of the same transcript, used until the snapshot has loaded.
 const FALLBACK =
   "ATGTCTATCCAGGTTGAGCATCCTGCTGGTGGTTACAAGAAACTGTTTGAAACTGTGGAGGAACTGTCCTCGCCGCTCACAGCTCATGTAACAGGCAGGATCCCCCTCTGGCTCACCGGCAGTCTCCTTCGATGTGGGCCAGGACTCTTTGAAGTTGGATCTGAGCCATTTTACCACCTG";

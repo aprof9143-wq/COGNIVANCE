@@ -10,7 +10,7 @@ import {
   isAuthoritative,
   parsePanel,
   parseRegistry,
-  snapshotDir,
+  displayDir,
 } from "./config";
 
 const gene = (symbol: string, n: number) => ({
@@ -54,9 +54,9 @@ describe("gene registry", () => {
   });
 
   it("gives every gene its own snapshot folder", () => {
-    const dirs = REGISTRY.genes.map((g) => snapshotDir(g.symbol));
+    const dirs = REGISTRY.genes.map((g) => displayDir(g.symbol));
     expect(new Set(dirs).size).toBe(dirs.length);
-    expect(snapshotDir("RPE65")).toBe("/vision/snapshot/rpe65/");
+    expect(displayDir("RPE65")).toBe("/vision/display/rpe65/");
   });
 });
 
@@ -127,8 +127,11 @@ describe("licence inventory and the commercial-pilot safeguard", () => {
   });
 
   it("allows research use and refuses commercial-pilot use of unapproved sources", () => {
-    expect(assertSourceAllowed("clinvar-eutils", "research").id).toBe("clinvar-eutils");
-    expect(() => assertSourceAllowed("clinvar-eutils", "commercial-pilot")).toThrow(
+    // A blocked item is refused in every mode, research included.
+    expect(() => assertSourceAllowed("clinvar-eutils", "research")).toThrow(/disclaimer/);
+    expect(assertSourceAllowed("ensembl-rest", "research").id).toBe("ensembl-rest");
+    expect(() => assertSourceAllowed("clinvar-eutils", "commercial-pilot")).toThrow(/disclaimer/);
+    expect(() => assertSourceAllowed("ensembl-rest", "commercial-pilot")).toThrow(
       /not approved for commercial-pilot use/,
     );
     expect(() => assertSourceAllowed("no-such-source", "research")).toThrow(/not in the licence/);

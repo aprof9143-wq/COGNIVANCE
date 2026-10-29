@@ -70,7 +70,13 @@ export type Sourced<T> =
       state: "conflict";
       reason: string;
       values: { value: T; provenance: Provenance }[];
-    };
+    }
+  /**
+   * Not shown because the source policy (lib/genome/policy.ts) refuses it. The
+   * value is never loaded, so there is nothing to leak; `reason` says why, in
+   * words safe to show.
+   */
+  | { state: "withheld"; sourceId: string; reason: string };
 
 export function sourced<T>(value: T, kind: EvidenceKind, provenance: Provenance): Sourced<T> {
   if (kind === "validated")
@@ -82,13 +88,17 @@ export function missing<T>(reason: string, provenance?: Provenance): Sourced<T> 
   return { state: "missing", reason, provenance };
 }
 
+export function withheld<T>(sourceId: string, reason: string): Sourced<T> {
+  return { state: "withheld", sourceId, reason };
+}
+
 export function valueOf<T>(s: Sourced<T>): T | undefined {
   return s.state === "value" ? s.value : undefined;
 }
 
-/** Map a present value; gaps and conflicts pass through unchanged. */
+/** Map a present value; gaps, conflicts and withheld values pass through unchanged. */
 export function mapSourced<T, U>(s: Sourced<T>, f: (v: T) => U): Sourced<U> {
   if (s.state === "value") return { ...s, value: f(s.value) };
-  if (s.state === "missing") return s;
+  if (s.state === "missing" || s.state === "withheld") return s;
   return { ...s, values: s.values.map((x) => ({ ...x, value: f(x.value) })) };
 }

@@ -24,7 +24,8 @@ import { identifierChecks, mappingStatus } from "./identifiers";
 import { rhoAlphaFold, rhoClinVarBatch, rhoEnsemblLookup, rhoUniProtSearch } from "./fixtures/rho";
 
 const PUBLIC = join(__dirname, "../../../public");
-const RPE65_DIR = join(PUBLIC, "vision/snapshot/rpe65");
+// Parser tests read the raw responses (not served); the loader tests read the display copy.
+const RPE65_DIR = join(__dirname, "../../../data/genome/snapshot/rpe65");
 const real = (name: string): unknown => {
   const buf = readFileSync(join(RPE65_DIR, name));
   return JSON.parse((name.endsWith(".gz") ? gunzipSync(buf) : buf).toString("utf8"));
@@ -240,13 +241,6 @@ describe("AlphaFold DB parser", () => {
 // ---------------------------------------------------------------- ClinVar
 
 describe("ClinVar parser", () => {
-  it("keeps RPE65-only records from the real snapshot", () => {
-    const batches = [0, 1, 2, 3, 4, 5, 6].map((i) => real(`clinvar_esummary_00${i}.json.gz`));
-    const set = parseClinVar(batches, "RPE65");
-    expect(set.total).toBe(set.variants.length + set.multiGene + set.unavailable);
-    expect(set.variants.every((v) => v.accession.startsWith("VCV"))).toBe(true);
-  });
-
   it("maps RHO (synthetic): single-gene kept, multi-gene counted, missing and error documents counted", () => {
     const set = parseClinVar([rhoClinVarBatch], "RHO");
     expect(set).toMatchObject({ total: 5, multiGene: 1, unavailable: 2 });
@@ -362,7 +356,21 @@ describe("per-gene snapshot loading and manifests", () => {
   it("refuses a snapshot whose manifest names another gene", async () => {
     const wrong: Fetcher = async (url) =>
       url.endsWith("manifest.json")
-        ? new Response(JSON.stringify({ gene: "RHO", taxonId: 9606, capturedAt: "x", files: [] }))
+        ? new Response(
+            JSON.stringify({
+              schemaVersion: 1,
+              kind: "display-only",
+              notice: "n",
+              gene: "RHO",
+              taxonId: 9606,
+              assembly: "GRCh38",
+              capturedAt: "x",
+              rawManifestSha256: "0",
+              inventoryVersion: "0",
+              files: [],
+              withheld: [],
+            }),
+          )
         : new Response(null, { status: 404 });
     await expect(loadSnapshot(wrong)).rejects.toThrow(/is for RHO, not RPE65/);
   });
@@ -393,5 +401,25 @@ describe("per-gene snapshot loading and manifests", () => {
     });
     expect(m.sources?.[0]).toMatchObject({ status: "failed", reason: "HTTP 500" });
     expect(m.complete).toBe(false);
+  });
+
+  it("reads version 3 manifests, where the source policy may withhold a step", () => {
+    const m = parseManifest(
+      JSON.parse(
+        readFileSync(join(RPE65_DIR, "manifest.json"), "utf8").replace(
+          '"schemaVersion": 2',
+          '"schemaVersion": 3',
+        ),
+      ),
+    );
+    expect(m.gene).toBe("RPE65");
+    expect(
+      parseManifest({
+        ...m,
+        sources: [
+          { step: "clinvar", licenceId: "clinvar-eutils", status: "withheld", reason: "policy" },
+        ],
+      }).sources?.[0]?.status,
+    ).toBe("withheld");
   });
 });

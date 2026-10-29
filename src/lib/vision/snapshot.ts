@@ -1,7 +1,17 @@
 /**
- * The captured RPE65 reference snapshot: raw responses from Ensembl, UniProt,
- * AlphaFold DB and ClinVar, saved unchanged by tools/vision-snapshot/capture.py
- * with a manifest of request URL, status, retrieval time, size and SHA-256.
+ * The captured reference snapshot, as the website may show it.
+ *
+ * tools/vision-snapshot/capture.py saves the raw responses, unchanged, in
+ * data/genome/snapshot/<gene>/ with a manifest of request URL, status,
+ * retrieval time, size and SHA-256. That folder is not served: no source's
+ * redistribution is permitted. tools/genome-display builds the display-only
+ * copy served from public/vision/display/<gene>/, which this module reads: only
+ * the fields the parsers below read, only from sources whose display the source
+ * policy permits, each file traced to the raw response it came from.
+ *
+ * The loader asks the source policy (lib/genome/policy.ts) before reading any
+ * file, and never requests a withheld source: ClinVar is withheld while its app
+ * use is blocked, so no ClinVar record is loaded or shown.
  *
  * The Vision pages read this first, so the evidence pipeline works the same
  * on any network and every number is reproducible; they can then check the
@@ -10,8 +20,9 @@
 
 import { z } from "zod";
 import { gunzip } from "@/lib/sim/anatomy";
-import { snapshotDir } from "@/lib/genome/config";
-import { missing, sourced, type Provenance, type Sourced } from "./evidence";
+import { displayDir } from "@/lib/genome/config";
+import { decide } from "@/lib/genome/policy";
+import { missing, sourced, withheld, type Provenance, type Sourced } from "./evidence";
 import {
   modelProvenance,
   parseAlphaFold,
@@ -23,8 +34,8 @@ import {
   type ProteinRecord,
 } from "./sources";
 
-/** RPE65's folder; every registered gene has its own (snapshotDir). */
-export const SNAPSHOT_BASE = snapshotDir("RPE65");
+/** RPE65's display folder; every registered gene has its own (displayDir). */
+export const SNAPSHOT_BASE = displayDir("RPE65");
 
 const ManifestFile = z.object({
   file: z.string(),
@@ -55,7 +66,7 @@ const Manifest = z.object({
       z.object({
         step: z.string(),
         licenceId: z.string(),
-        status: z.enum(["ok", "failed", "skipped"]),
+        status: z.enum(["ok", "failed", "skipped", "withheld"]),
         reason: z.string().optional(),
       }),
     )
@@ -64,6 +75,24 @@ const Manifest = z.object({
 });
 export const parseManifest = (raw: unknown) => Manifest.parse(raw);
 export type Manifest = z.infer<typeof Manifest>;
+
+/** The display copy's manifest (tools/genome-display/build_display.py). */
+const DisplayManifest = z.object({
+  schemaVersion: z.literal(1),
+  kind: z.literal("display-only"),
+  notice: z.string(),
+  gene: z.string(),
+  hgncId: z.string().nullish(),
+  taxonId: z.number(),
+  assembly: z.string(),
+  capturedAt: z.string(),
+  rawManifestSha256: z.string(),
+  inventoryVersion: z.string(),
+  files: z.array(ManifestFile.extend({ licenceId: z.string(), storedSha256: z.string() })),
+  withheld: z.array(z.object({ licenceId: z.string(), reason: z.string() })),
+});
+export const parseDisplayManifest = (raw: unknown) => DisplayManifest.parse(raw);
+export type DisplayManifest = z.infer<typeof DisplayManifest>;
 
 // ---------------------------------------------------------------- ClinVar
 
@@ -261,7 +290,7 @@ export type Sequences = {
 // ---------------------------------------------------------------- loader
 
 export type SnapshotRecord = {
-  manifest: Manifest;
+  manifest: DisplayManifest;
   gene: Sourced<GeneRecord>;
   protein: Sourced<ProteinRecord>;
   model: Sourced<ModelRecord>;
@@ -274,11 +303,15 @@ export type SnapshotRecord = {
 async function readFile(
   base: string,
   name: string,
-  m: Manifest,
+  m: DisplayManifest,
   fetcher: Fetcher,
 ): Promise<string> {
   const meta = m.files.find((f) => f.file === name);
   if (!meta) throw new Error(`${name} is not in the snapshot`);
+  // Checked again here, whatever the manifest says: a file from a source whose
+  // display is not permitted is never requested.
+  const d = decide(meta.licenceId, "display");
+  if (!d.allowed) throw new Error(d.reason);
   const res = await fetcher(base + name);
   if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
   const buf = await res.arrayBuffer();
@@ -286,7 +319,7 @@ async function readFile(
 }
 
 function prov(
-  m: Manifest,
+  m: DisplayManifest,
   name: string,
   source: string,
   extra: Partial<Provenance> = {},
@@ -296,7 +329,7 @@ function prov(
     source,
     url: f.url,
     retrievedAt: f.retrievedAt,
-    note: `Snapshot of the raw response (SHA-256 ${f.sha256.slice(0, 12)}…).`,
+    note: `From the snapshot of the raw response (SHA-256 ${f.sha256.slice(0, 12)}…), as displayed.`,
     ...extra,
   };
 }
@@ -310,10 +343,10 @@ async function attempt<T>(fn: () => Promise<Sourced<T>>): Promise<Sourced<T>> {
 }
 
 export async function loadSnapshot(fetcher: Fetcher, symbol = "RPE65"): Promise<SnapshotRecord> {
-  const base = snapshotDir(symbol);
+  const base = displayDir(symbol);
   const res = await fetcher(base + "manifest.json");
   if (!res.ok) throw new Error(`Snapshot manifest: HTTP ${res.status}`);
-  const m = Manifest.parse(await res.json());
+  const m = DisplayManifest.parse(await res.json());
   if (m.gene !== symbol)
     throw new Error(`The snapshot in ${base} is for ${m.gene}, not ${symbol}.`);
   const json = async (name: string) =>
@@ -372,6 +405,10 @@ export async function loadSnapshot(fetcher: Fetcher, symbol = "RPE65"): Promise<
   );
 
   const variants = attempt<VariantSet>(async () => {
+    // Asked first: while ClinVar's display is refused nothing below runs, so no
+    // ClinVar file is requested even if one were listed.
+    const policy = decide("clinvar-eutils", "display");
+    if (!policy.allowed) return withheld<VariantSet>("clinvar-eutils", policy.reason);
     const names = m.files
       .map((f) => f.file)
       .filter((n) => n.startsWith("clinvar_esummary_"))

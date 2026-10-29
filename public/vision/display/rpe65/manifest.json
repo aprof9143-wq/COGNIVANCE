@@ -1,0 +1,130 @@
+{
+  "assembly": "GRCh38",
+  "capturedAt": "2026-10-27T16:14:39+00:00",
+  "files": [
+    {
+      "bytes": 356561,
+      "displayBytes": 77213,
+      "file": "alphafold_model.pdb.gz",
+      "gzip": true,
+      "headers": {},
+      "licenceId": "alphafold-db",
+      "retrievedAt": "2026-10-27T16:15:00+00:00",
+      "sha256": "35685434f5b2d02810a1be9329f1cac16fd624f2822b609cdce208a1e275b40e",
+      "status": 200,
+      "storedSha256": "2ba440c877bf73b06fd2dd311fbcf517c37a46d29d4b5e67e52cd03a31e54c78",
+      "transform": "unchanged",
+      "url": "https://alphafold.ebi.ac.uk/files/AF-Q16518-F1-model_v6.pdb"
+    },
+    {
+      "bytes": 2777,
+      "displayBytes": 863,
+      "file": "alphafold_prediction.json",
+      "gzip": false,
+      "headers": {},
+      "licenceId": "alphafold-db",
+      "retrievedAt": "2026-10-27T16:15:00+00:00",
+      "sha256": "d73cdcb3ea14d9594974b31723f198ea09450370a63c81c30138bc3337d7ab72",
+      "status": 200,
+      "storedSha256": "784c45be7217453fcbbf834d6a827098690959b3d94686ce436f68543b33f9b4",
+      "transform": "fields-read-by-the-app",
+      "url": "https://alphafold.ebi.ac.uk/api/prediction/Q16518"
+    },
+    {
+      "bytes": 1702,
+      "displayBytes": 1645,
+      "file": "ensembl_cds.json",
+      "gzip": false,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "licenceId": "ensembl-rest",
+      "retrievedAt": "2026-10-27T16:14:49+00:00",
+      "sha256": "88a5b8d4513efbaa58901b82c9be6ebe3ef270d275bded62f38d67c7f035af46",
+      "status": 200,
+      "storedSha256": "279ee906b15031ac3815beff5199598bc48250705e8fbe6d8ad02cb147aab35d",
+      "transform": "fields-read-by-the-app",
+      "url": "https://rest.ensembl.org/sequence/id/ENST00000262340?type=cds;content-type=application/json"
+    },
+    {
+      "bytes": 22391,
+      "displayBytes": 22350,
+      "file": "ensembl_gene_region.json",
+      "gzip": false,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "licenceId": "ensembl-rest",
+      "retrievedAt": "2026-10-27T16:14:59+00:00",
+      "sha256": "b8e1de0b9b0adb4eb8484aae154cd0ac325c32bc1a6d3f3d0bbfbfdef45edbf5",
+      "status": 200,
+      "storedSha256": "5bfbe938df1da44097b7be8910ffef0349d556a17e3ea5817fd725705105f916",
+      "transform": "fields-read-by-the-app",
+      "url": "https://rest.ensembl.org/sequence/region/human/1:68428822..68451103:-1?content-type=application/json"
+    },
+    {
+      "bytes": 16540,
+      "displayBytes": 9124,
+      "file": "ensembl_lookup.json",
+      "gzip": false,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "licenceId": "ensembl-rest",
+      "retrievedAt": "2026-10-27T16:14:45+00:00",
+      "sha256": "ac21997a755f445aefae30092382ebb2225188e022635d86acccb32027824f77",
+      "status": 200,
+      "storedSha256": "071ddbe578993570962e357cb6343bf8c8c6529fb71b96ea0d6c71c399b62863",
+      "transform": "fields-read-by-the-app",
+      "url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/RPE65?content-type=application/json;expand=1"
+    },
+    {
+      "bytes": 18,
+      "displayBytes": 32,
+      "file": "ensembl_release.json",
+      "gzip": false,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "licenceId": "ensembl-rest",
+      "retrievedAt": "2026-10-27T16:14:46+00:00",
+      "sha256": "86e87c46ae1a424702676493d024d0508ce60f6c951b0b2803ce10269e09c20c",
+      "status": 200,
+      "storedSha256": "0814605fcfb0ff83bb26c70ff39b062f6d3fdf312a62f46d7d4717a938c852e5",
+      "transform": "fields-read-by-the-app",
+      "url": "https://rest.ensembl.org/info/data?content-type=application/json"
+    },
+    {
+      "bytes": 98338,
+      "displayBytes": 43196,
+      "file": "uniprot_search.json",
+      "gzip": false,
+      "headers": {
+        "Content-Type": "application/json",
+        "X-UniProt-Release": "2026_03",
+        "X-UniProt-Release-Date": "02-September-2026"
+      },
+      "licenceId": "uniprot-rest",
+      "retrievedAt": "2026-10-27T16:14:59+00:00",
+      "sha256": "d079aa23bb8ca4bffb8d237de52ee352c2e1074e1c567fdaca663c1d94dc4d29",
+      "status": 200,
+      "storedSha256": "ebe56e16ca2a7e0abd2f38ce47394205758b9cc1c52f466ed6586dce696ce68d",
+      "transform": "fields-read-by-the-app",
+      "url": "https://rest.uniprot.org/uniprotkb/search?query=gene_exact%3ARPE65+AND+organism_id%3A9606+AND+reviewed%3Atrue&format=json&size=5"
+    }
+  ],
+  "gene": "RPE65",
+  "hgncId": "HGNC:10294",
+  "inventoryVersion": "1.3.0",
+  "kind": "display-only",
+  "notice": "Display-only copy for the Cognivance Vision research pages: the fields the app shows, from sources whose display the source policy permits. Not a redistribution of the source databases; their raw responses are not served. Research software. Not a medical device, not clinically validated, and not for clinical decision-making.",
+  "rawManifestSha256": "36174fa94ab33978256e06c35e9b59037c790056c7cb39e084b3265de028fed1",
+  "schemaVersion": 1,
+  "taxonId": 9606,
+  "withheld": [
+    {
+      "licenceId": "clinvar-eutils",
+      "reason": "Blocked for the app (product owner, 2026-10-27) until NCBI's required disclaimer and copyright notice are displayed to users. NCBI's policies state that its Disclaimer and Copyright notice must be evident to users of a service built on its data. ClinVar reuse also requires legal review."
+    }
+  ]
+}

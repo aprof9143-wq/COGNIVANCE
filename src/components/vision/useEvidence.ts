@@ -3,7 +3,7 @@ import { missing, type Sourced } from "@/lib/vision/evidence";
 import { parsePdbBackbone, type Backbone } from "@/lib/vision/pdb";
 import {
   loadSnapshot,
-  type Manifest,
+  type DisplayManifest,
   type Sequences,
   type VariantSet,
 } from "@/lib/vision/snapshot";
@@ -19,7 +19,7 @@ export type Evidence = {
   record: VisionRecord | null;
   variants: Sourced<VariantSet> | null;
   sequences: Sourced<Sequences> | null;
-  manifest: Manifest | null;
+  manifest: DisplayManifest | null;
   /** The predicted model's coordinates, from wherever the record came from. */
   loadModelText: (() => Promise<string>) | null;
   /** Set when the snapshot could not be read and live data was used instead. */

@@ -1,6 +1,8 @@
 /**
- * The snapshot loader and parsers, run against the real captured responses in
- * public/vision/snapshot/rpe65 (see its manifest for sources and times).
+ * The snapshot loader and parsers, run against the served display copy of the
+ * real captured responses (public/vision/display/rpe65, built from
+ * data/genome/snapshot/rpe65; see their manifests for sources and times).
+ * ClinVar is withheld by the source policy, so no ClinVar record is loaded.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -97,34 +99,10 @@ describe("real Ensembl, UniProt and AlphaFold records", () => {
   });
 });
 
-describe("real ClinVar records", () => {
-  it("keeps RPE65-only records and counts the multi-gene ones apart", () => {
-    const v = valueOf(snap.variants)!;
-    expect(v.total).toBe(v.variants.length + v.multiGene);
-    expect(v.variants.length).toBeGreaterThan(1000);
-    expect(v.multiGene).toBeGreaterThan(0);
-  });
-
-  it("finds the classic expert-panel variants", () => {
-    const v = valueOf(snap.variants)!.variants;
-    const r91w = v.find((x) => x.protein?.short === "R91W")!;
-    expect(r91w).toMatchObject({ group: "pathogenic", cdna: "c.271C>T" });
-    expect(r91w.reviewStatus).toMatch(/expert panel/);
-    expect(v.find((x) => x.protein?.short === "Y368H")?.group).toBe("pathogenic");
-  });
-
-  it("places protein changes inside the protein and positions inside the gene", () => {
-    const g = valueOf(snap.gene)!;
-    const v = valueOf(snap.variants)!.variants;
-    for (const x of v) {
-      if (x.protein) expect(x.protein.pos).toBeGreaterThanOrEqual(1);
-      if (x.protein && /^[A-Z][a-z]{2}$/.test(x.protein.change))
-        expect(x.protein.pos).toBeLessThanOrEqual(533);
-    }
-    const inGene = v.filter(
-      (x) => x.grch38 && x.grch38.start >= g.start - 5000 && x.grch38.stop <= g.end + 5000,
-    );
-    expect(inGene.length / v.filter((x) => x.grch38).length).toBeGreaterThan(0.98);
+describe("ClinVar", () => {
+  it("is withheld by the source policy: no record is loaded", () => {
+    expect(snap.variants.state).toBe("withheld");
+    expect(valueOf(snap.variants)).toBeUndefined();
   });
 });
 
@@ -154,10 +132,11 @@ describe("parsing helpers", () => {
   });
 });
 
-describe("placing ClinVar substitutions on Ensembl's coding sequence (real data)", async () => {
+describe("placing coding substitutions on Ensembl's coding sequence (real Ensembl data)", async () => {
   const { parseCodingSnv, placeOnCds } = await import("./genome");
 
-  it("places R91W: c.271C>T turns codon 91 CGG into TGG, Arg into Trp", () => {
+  // The substitution is a hand-written test input, not a record loaded from any source.
+  it("places c.271C>T: codon 91 CGG becomes TGG, Arg becomes Trp", () => {
     const cds = valueOf(snap.sequences)!.cds;
     const p = placeOnCds(cds, parseCodingSnv("c.271C>T")!)!;
     expect(p).toMatchObject({
@@ -169,27 +148,6 @@ describe("placing ClinVar substitutions on Ensembl's coding sequence (real data)
       refAgrees: true,
     });
     expect(p.context[p.at]).toBe("C");
-  });
-
-  it("agrees with ClinVar for nearly every coding substitution", () => {
-    const cds = valueOf(snap.sequences)!.cds;
-    const snvs = valueOf(snap.variants)!.variants.filter(
-      (v) => parseCodingSnv(v.cdna) && v.protein,
-    );
-    expect(snvs.length).toBeGreaterThan(300);
-    let ok = 0;
-    for (const v of snvs) {
-      const p = placeOnCds(cds, parseCodingSnv(v.cdna)!);
-      const alt = v.protein!.short.slice(-1);
-      if (
-        p &&
-        p.refAgrees &&
-        p.codonIndex === v.protein!.pos &&
-        (p.aaAfter === alt || v.protein!.change === "=")
-      )
-        ok++;
-    }
-    expect(ok / snvs.length).toBeGreaterThan(0.99);
   });
 
   it("rejects what it cannot place", () => {
