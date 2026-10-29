@@ -32,7 +32,7 @@ const GROUPS = [
 ] as const;
 
 const STATUS_TINT: Record<string, string> = {
-  "Live data": "bg-[color-mix(in_oklab,var(--ok)_14%,transparent)] text-[var(--ok)]",
+  "Reference data": "bg-[color-mix(in_oklab,var(--ok)_14%,transparent)] text-[var(--ok)]",
   Model: "bg-primary/10 text-primary",
   "Demo data": "bg-foreground/[0.06] text-foreground/70",
   Protocol: "bg-[color-mix(in_oklab,var(--warn)_14%,transparent)] text-[var(--warn)]",

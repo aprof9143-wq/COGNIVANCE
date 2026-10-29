@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "inventoryVersion": "1.2.0",
+  "inventoryVersion": "1.3.0",
   "reviewedOn": "2026-10-27",
-  "note": "Machine-readable side of docs/genome/LICENCES.md. Software licences and data/service terms are recorded separately. Nothing here is a legal conclusion. 'commercialPilot' is 'approved' only after a named person has reviewed the current terms; until then every item is 'not-approved', and tools running in commercial-pilot mode refuse to use it.",
+  "note": "Machine-readable side of docs/genome/LICENCES.md. Software licences and data/service terms are recorded separately. Nothing here is a legal conclusion. 'commercialPilot' is 'approved' only after a named person has reviewed the current terms; until then every item is 'not-approved', and tools running in commercial-pilot mode refuse to use it. 'permissions' splits app use into separate decisions (fetch, store, display, redistribute) for research and demo use; only 'allowed' permits an action, and anything else, or a missing entry, denies it. 'clinicalUse' is 'not-approved' for every item: no clinical use is approved, and clinical use also needs the release gate in config/genome/governance/release-gate.json.",
   "items": [
     {
       "id": "ensembl-rest",
@@ -19,12 +19,22 @@
       ],
       "commercialUse": "unclear",
       "attribution": "EMBL-EBI expects attribution 'in publications, services or products'; confirm the wording Ensembl asks for.",
-      "redistribution": "Raw responses are redistributed in public/vision/snapshot/. Confirm this is permitted.",
+      "redistribution": "Raw responses are kept in data/genome/snapshot/ and are not served. The website serves a display-only copy (public/vision/display/): the fields the app shows. Confirm whether serving even that copy is permitted, and with what attribution.",
       "reviewStatus": "terms-read-pending-review",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
       "followUp": "A named reviewer to confirm that no third-party-constrained Ensembl data is used, and that the redirect to the archive site does not change the terms; record the approval or restriction here.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved",
+      "permissions": {
+        "basis": "Research and demo use only. Fetch, store and display rest on the product owner's app-use decision (appUse: not-restricted, 2026-10-27); the terms review itself is still terms-read-pending-review. Redistribution is not permitted until a named reviewer confirms the provider's terms allow it.",
+        "research": {
+          "fetch": "allowed",
+          "store": "allowed",
+          "display": "allowed",
+          "redistribute": "pending-review"
+        }
+      }
     },
     {
       "id": "uniprot-rest",
@@ -42,12 +52,22 @@
       ],
       "commercialUse": "unverified",
       "attribution": "If CC BY 4.0 is confirmed: attribution and a link to the licence are required.",
-      "redistribution": "Raw responses are redistributed in public/vision/snapshot/. Confirm attribution is displayed alongside.",
+      "redistribution": "Raw responses are kept in data/genome/snapshot/ and are not served. The website serves a display-only copy (public/vision/display/): the fields the app shows. Confirm whether serving even that copy is permitted, and that attribution is displayed alongside.",
       "reviewStatus": "awaiting-human-review",
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
       "followUp": "Awaiting human review (product owner, 2026-10-27): a person must read the current terms pages directly; the CI runner could not extract their text. Confirm the licence and required attribution text; confirm cross-referenced content (e.g. Reactome names) carries no separate terms.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved",
+      "permissions": {
+        "basis": "Research and demo use only. Fetch, store and display rest on the product owner's app-use decision (appUse: not-restricted, 2026-10-27); the terms review itself is still awaiting-human-review. Redistribution is not permitted until a named reviewer confirms the provider's terms allow it.",
+        "research": {
+          "fetch": "allowed",
+          "store": "allowed",
+          "display": "allowed",
+          "redistribute": "pending-review"
+        }
+      }
     },
     {
       "id": "alphafold-db",
@@ -65,12 +85,22 @@
       ],
       "commercialUse": "unverified",
       "attribution": "If CC BY 4.0 is confirmed: attribution and citation of the AlphaFold DB papers.",
-      "redistribution": "A model file is redistributed in public/vision/snapshot/. Confirm this is permitted.",
+      "redistribution": "Raw responses are kept in data/genome/snapshot/ and are not served. The website serves a display-only copy (public/vision/display/), which includes the model file unchanged because the 3D view renders it. Confirm this is permitted.",
       "reviewStatus": "awaiting-human-review",
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
       "followUp": "Awaiting human review (product owner, 2026-10-27): a person must read the current terms pages directly; the CI runner could not extract their text. Read the licence disclaimer PDF and FAQ; keep model parameters and AlphaMissense out of scope unless separately reviewed.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved",
+      "permissions": {
+        "basis": "Research and demo use only. Fetch, store and display rest on the product owner's app-use decision (appUse: not-restricted, 2026-10-27); the terms review itself is still awaiting-human-review. Redistribution is not permitted until a named reviewer confirms the provider's terms allow it.",
+        "research": {
+          "fetch": "allowed",
+          "store": "allowed",
+          "display": "allowed",
+          "redistribute": "pending-review"
+        }
+      }
     },
     {
       "id": "clinvar-eutils",
@@ -88,13 +118,23 @@
       ],
       "commercialUse": "unclear",
       "attribution": "NLM requests acknowledgment; NCBI's disclaimer and copyright notice must be evident to users of a service built on it.",
-      "redistribution": "Raw esummary batches are redistributed in public/vision/snapshot/. Needs legal review because of submitter content.",
+      "redistribution": "Not stored, served or displayed. The captured raw batches were removed from the working tree on 2026-10-29 (listed with their digests in data/genome/snapshot/rpe65/REDACTIONS.json); earlier commits still contain them. Legal review is required for reuse, redistribution and that history.",
       "reviewStatus": "requires-legal-review",
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
       "followUp": "Legal review of reuse and redistribution of submitter content (required). Display NCBI's disclaimer and copyright notice wherever ClinVar data is shown; NCBI data use stays blocked for the app until then. Confirm E-utilities rate limits and the tool/email parameters.",
       "appUse": "blocked",
-      "appUseCondition": "Blocked for the app (product owner, 2026-10-27) until NCBI's required disclaimer and copyright notice are displayed to users. NCBI's policies state that its Disclaimer and Copyright notice must be evident to users of a service built on its data. ClinVar reuse also requires legal review."
+      "appUseCondition": "Blocked for the app (product owner, 2026-10-27) until NCBI's required disclaimer and copyright notice are displayed to users. NCBI's policies state that its Disclaimer and Copyright notice must be evident to users of a service built on its data. ClinVar reuse also requires legal review.",
+      "clinicalUse": "not-approved",
+      "permissions": {
+        "basis": "App use blocked by the product owner, 2026-10-27, until NCBI's required disclaimer and copyright notice are displayed; reuse and redistribution of submitter content require legal review. Every action is denied.",
+        "research": {
+          "fetch": "denied",
+          "store": "denied",
+          "display": "denied",
+          "redistribute": "denied"
+        }
+      }
     },
     {
       "id": "hgnc-rest",
@@ -116,7 +156,17 @@
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
       "followUp": "Named reviewer sign-off; read the REST help page for rate limits.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved",
+      "permissions": {
+        "basis": "Research and demo use only. Fetch, store and display rest on the product owner's app-use decision (appUse: not-restricted, 2026-10-27); the terms review itself is still terms-read-pending-review. Redistribution is not permitted until a named reviewer confirms the provider's terms allow it.",
+        "research": {
+          "fetch": "allowed",
+          "store": "allowed",
+          "display": "allowed",
+          "redistribute": "pending-review"
+        }
+      }
     },
     {
       "id": "rcsb-pdb",
@@ -135,7 +185,17 @@
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
       "followUp": "Named reviewer sign-off.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved",
+      "permissions": {
+        "basis": "Research and demo use only. Fetch, store and display rest on the product owner's app-use decision (appUse: not-restricted, 2026-10-27); the terms review itself is still terms-read-pending-review. Redistribution is not permitted until a named reviewer confirms the provider's terms allow it.",
+        "research": {
+          "fetch": "allowed",
+          "store": "allowed",
+          "display": "allowed",
+          "redistribute": "pending-review"
+        }
+      }
     },
     {
       "id": "zod",
@@ -154,7 +214,8 @@
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
       "followUp": "Named reviewer sign-off; confirm notices are shipped with the build.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved"
     },
     {
       "id": "molstar",
@@ -173,7 +234,8 @@
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
       "followUp": "Named reviewer sign-off; confirm notices are shipped with the build.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved"
     },
     {
       "id": "python-stdlib",
@@ -192,7 +254,8 @@
       "termsCheckedOn": "2026-10-27",
       "commercialPilot": "not-approved",
       "followUp": "Named reviewer sign-off; low priority because nothing is distributed.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved"
     },
     {
       "id": "alphamissense",
@@ -211,7 +274,8 @@
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
       "followUp": "Review terms before any use; must not enter a commercial-pilot path until approved.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved"
     },
     {
       "id": "other-variant-predictors",
@@ -230,7 +294,8 @@
       "termsCheckedOn": null,
       "commercialPilot": "not-approved",
       "followUp": "Per-predictor review before any use.",
-      "appUse": "not-restricted"
+      "appUse": "not-restricted",
+      "clinicalUse": "not-approved"
     }
   ]
 }

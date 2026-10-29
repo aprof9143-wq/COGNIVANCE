@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "recordVersion": "1.0.0",
+  "note": "Change history for Genome v1, linking each change to the requirements it touches. Commits and pull requests hold the detail. There is no release yet, so every change has release: null.",
+  "changes": [
+    {
+      "id": "CHG-001",
+      "date": "2026-10-27",
+      "summary": "Genome v1 draft: gene registry and panels, per-gene snapshot capture with SHA-256 manifests, VCF header gate (GRCh38, VCF 4.2–4.5), licence inventory with a commercial-pilot safeguard.",
+      "requirements": ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "REQ-008", "REQ-009", "REQ-013"],
+      "reference": "docs/genome/GENOME_V1.md (draft for review, 2026-10-27)",
+      "release": null
+    },
+    {
+      "id": "CHG-002",
+      "date": "2026-10-29",
+      "summary": "Source governance: per-action source policy enforced in capture, display copy, loader, screens and export; raw responses moved out of public/; ClinVar withheld and its captured files removed (recorded in REDACTIONS.json); clinical release gate; governance records; status panel; registry-driven target.",
+      "requirements": [
+        "REQ-005",
+        "REQ-006",
+        "REQ-007",
+        "REQ-008",
+        "REQ-010",
+        "REQ-011",
+        "REQ-012",
+        "REQ-016",
+        "REQ-017"
+      ],
+      "reference": "branch claude/upbeat-fermat-m4vxbm",
+      "release": null
+    }
+  ]
+}

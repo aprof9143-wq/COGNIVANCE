@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "recordVersion": "1.0.0",
+  "effectiveFrom": "2026-10-29",
+  "note": "Genome v1 requirements, each traced to where it is implemented and the tests that verify it (src/lib/genome/governance.test.ts checks every file and test named here exists). Status is one of implemented, proposed, incomplete or requires-qualified-review. 'Implemented' means built and verified by these tests; it does not mean validated for any clinical purpose, and passing tests do not establish clinical validity, safety or regulatory compliance. No requirement has been released: there is no release yet.",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "statement": "Accept GRCh38 only. Reject any other or mixed reference build with a clear reason, and never guess a build from chromosome names.",
+      "source": "DECISIONS.md GV1-INPUT; GENOME_V1.md §6",
+      "status": "implemented",
+      "implementation": ["src/lib/genome/vcf.ts", "tools/vision-snapshot/capture.py"],
+      "verification": [
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "accepts GRCh38 named in ##reference, in several spellings"
+        },
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "rejects mixed evidence rather than picking a side"
+        },
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "does not guess a build from chromosome names alone"
+        },
+        {
+          "file": "tools/vision-snapshot/test_capture.py",
+          "test": "test_a_non_grch38_answer_is_refused"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-002",
+      "statement": "Check VCF headers only (versions 4.2 to 4.5). Read no variant records, reject compressed and non-VCF input, and never return sample names.",
+      "source": "GENOME_V1.md §6",
+      "status": "implemented",
+      "implementation": ["src/lib/genome/vcf.ts"],
+      "verification": [
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "rejects versions it does not recognise"
+        },
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "rejects files that are not VCF, or are compressed"
+        },
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "counts samples but never returns their names"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-003",
+      "statement": "No liftover, build conversion or version rewriting anywhere.",
+      "source": "DECISIONS.md GV1-INPUT; GENOME_V1.md §6",
+      "status": "implemented",
+      "implementation": ["src/lib/genome/vcf.ts", "src/lib/vision/snapshot.ts"],
+      "verification": [
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "does not guess a build from chromosome names alone"
+        },
+        {
+          "file": "src/lib/genome/sources.test.ts",
+          "test": "keeps the GRCh38 location only and never converts a GRCh37 one"
+        },
+        {
+          "file": "src/lib/genome/governance.test.ts",
+          "test": "contains no liftover or build conversion"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-004",
+      "statement": "Keep gene registration separate from panel membership. The first IRD panel stays proposed and non-authoritative while D5 is unresolved; RHO stays a test gene outside every panel.",
+      "source": "DECISIONS.md D5; GENOME_V1.md §2–3",
+      "status": "implemented",
+      "implementation": [
+        "src/lib/genome/config.ts",
+        "config/genome/genes.json",
+        "config/genome/panels/ird-first-panel.json"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genome/config.test.ts",
+          "test": "the first IRD panel is proposed, D5 unresolved, and not authoritative"
+        },
+        {
+          "file": "src/lib/genome/config.test.ts",
+          "test": "cannot be approved while its decision is unresolved"
+        },
+        {
+          "file": "src/lib/genome/config.test.ts",
+          "test": "the spec lists the product owner's ten proposed genes; only RPE65 is configured"
+        },
+        {
+          "file": "src/lib/genome/governance.test.ts",
+          "test": "keeps RHO a test gene outside every panel"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-005",
+      "statement": "Decide separately, per source, whether it may be fetched, stored, displayed or redistributed, for research, commercial-pilot or clinical use. Fail closed: only a recorded 'allowed' permits an action.",
+      "source": "Genome governance brief, 2026-10-29; DECISIONS.md GV1-LICENCE",
+      "status": "implemented",
+      "implementation": [
+        "src/lib/genome/policy.ts",
+        "tools/vision-snapshot/policy.py",
+        "config/genome/licences.json"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genome/policy.test.ts",
+          "test": "fails closed on unknown, missing, pending and undecided entries"
+        },
+        {
+          "file": "src/lib/genome/policy.test.ts",
+          "test": "denies redistribution of every source: none is confirmed"
+        },
+        {
+          "file": "tools/vision-snapshot/test_capture.py",
+          "test": "test_the_policy_fails_closed_for_missing_pending_and_unknown_entries"
+        },
+        {
+          "file": "tools/vision-snapshot/test_capture.py",
+          "test": "test_policy_decisions_match_the_inventory"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-006",
+      "statement": "Content from a source the policy refuses is never fetched, stored, displayed, exported or served. Show only the policy's explanation.",
+      "source": "LICENCES.md (ClinVar: requires legal review; NCBI notice: app use blocked)",
+      "status": "implemented",
+      "implementation": [
+        "tools/vision-snapshot/capture.py",
+        "tools/genome-display/build_display.py",
+        "src/lib/vision/snapshot.ts",
+        "src/lib/vision/export.ts",
+        "src/components/vision/VisionModule.tsx",
+        "src/components/vision/TherapySimulator.tsx",
+        "src/components/vision/ui.tsx"
+      ],
+      "verification": [
+        {
+          "file": "tools/vision-snapshot/test_capture.py",
+          "test": "test_clinvar_is_never_requested_and_is_recorded_as_withheld"
+        },
+        {
+          "file": "src/lib/genome/display.test.ts",
+          "test": "withholds ClinVar without requesting any ClinVar file"
+        },
+        {
+          "file": "src/lib/vision/export.test.ts",
+          "test": "carries the statement, the withheld list, and nothing from ClinVar"
+        },
+        {
+          "file": "tools/genome-display/test_build_display.py",
+          "test": "test_no_clinvar_file_or_request_url_is_served"
+        },
+        {
+          "file": "src/lib/genome/status.test.ts",
+          "test": "renders a withheld source as an accessible note with its reason"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-007",
+      "statement": "Do not serve raw source responses. Serve a display copy holding only the fields the app reads, from sources whose display is permitted.",
+      "source": "Genome governance brief, 2026-10-29 (decision 1a)",
+      "status": "implemented",
+      "implementation": [
+        "tools/genome-display/build_display.py",
+        "src/lib/genome/config.ts",
+        "src/lib/vision/snapshot.ts"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genome/display.test.ts",
+          "test": "holds, per file, exactly the fields the app's parsers read from the raw response"
+        },
+        {
+          "file": "tools/genome-display/test_build_display.py",
+          "test": "test_raw_snapshots_are_not_served"
+        },
+        {
+          "file": "tools/genome-display/test_build_display.py",
+          "test": "test_a_source_whose_display_is_refused_is_withheld_not_written"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-008",
+      "statement": "Record provenance for every value and file: source, URL, release, retrieval time, identifiers and SHA-256, in deterministic manifests; record any later redaction.",
+      "source": "GENOME_V1.md §5",
+      "status": "implemented",
+      "implementation": [
+        "tools/vision-snapshot/capture.py",
+        "tools/genome-display/build_display.py",
+        "src/lib/vision/evidence.ts",
+        "src/lib/genome/governance.ts"
+      ],
+      "verification": [
+        {
+          "file": "tools/vision-snapshot/test_capture.py",
+          "test": "test_manifest_is_deterministic_in_layout"
+        },
+        {
+          "file": "tools/vision-snapshot/test_capture.py",
+          "test": "test_digests_match_the_stored_files"
+        },
+        {
+          "file": "tools/genome-display/test_build_display.py",
+          "test": "test_the_committed_display_copy_is_current_and_deterministic"
+        },
+        {
+          "file": "tools/genome-display/test_build_display.py",
+          "test": "test_every_manifest_file_is_present_with_its_digest_or_recorded_as_redacted"
+        },
+        {
+          "file": "src/lib/genome/display.test.ts",
+          "test": "traces every display file to its raw response and its source"
+        },
+        {
+          "file": "src/lib/genome/governance.test.ts",
+          "test": "gives the same digest for the same records in any key order"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-009",
+      "statement": "Keep evidence categories apart: what a source reports, what this software computes, and what is a hypothesis. Nothing is labelled clinically validated without a validation record.",
+      "source": "src/lib/vision/evidence.ts; GENOME_V1.md §2",
+      "status": "implemented",
+      "implementation": ["src/lib/vision/evidence.ts", "src/lib/genome/identifiers.ts"],
+      "verification": [
+        {
+          "file": "src/lib/vision/vision.test.ts",
+          "test": "refuses to label anything clinically validated without a validation record"
+        },
+        {
+          "file": "src/lib/genome/sources.test.ts",
+          "test": "separates what ClinVar states from what is derived here"
+        },
+        {
+          "file": "src/lib/genome/sources.test.ts",
+          "test": "treats an unreported identifier as incomplete, not as agreement"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-010",
+      "statement": "Show a plain statement that the software is not for clinical decision-making on every Vision screen and in every export, from one source, with a status panel separating research, unvalidated, blocked, proposed and future work.",
+      "source": "Genome governance brief, 2026-10-29",
+      "status": "implemented",
+      "implementation": [
+        "src/lib/genome/status.ts",
+        "src/components/vision/StatusPanel.tsx",
+        "src/lib/vision/export.ts",
+        "config/genome/governance/product-status.json"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genome/status.test.ts",
+          "test": "shows the not-for-clinical-use statement in the status panel"
+        },
+        {
+          "file": "src/lib/genome/status.test.ts",
+          "test": "uses one statement across screens, exports and records"
+        },
+        {
+          "file": "src/lib/genome/status.test.ts",
+          "test": "groups every status item under exactly one of the five headings"
+        },
+        {
+          "file": "src/lib/vision/export.test.ts",
+          "test": "carries the statement, the withheld list, and nothing from ClinVar"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-011",
+      "statement": "Clinical mode, patient-specific interpretation and clinical claims stay unavailable unless every required item of evidence is verified and backed by a recorded approval. No configuration toggle alone can enable them.",
+      "source": "Genome governance brief, 2026-10-29",
+      "status": "implemented",
+      "implementation": [
+        "src/lib/genome/release.ts",
+        "config/genome/governance/release-gate.json",
+        "src/lib/genome/policy.ts"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genome/release.test.ts",
+          "test": "is unavailable today, with one unmet reason per required item"
+        },
+        {
+          "file": "src/lib/genome/release.test.ts",
+          "test": "cannot be opened by setting its status field"
+        },
+        {
+          "file": "src/lib/genome/release.test.ts",
+          "test": "refuses evidence marked verified without a recorded approval"
+        },
+        {
+          "file": "src/lib/genome/policy.test.ts",
+          "test": "denies clinical use of everything, and the release gate alone cannot open it"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-012",
+      "statement": "Process no patient data on the Genome and Vision pages: no genomic or clinical data upload, no patient identifiers, no sample names in output. The eye page's picture picker accepts images only, processed in the browser and never stored or sent.",
+      "source": "Genome governance brief, 2026-10-29; src/lib/vision/targets.ts decision 5",
+      "status": "implemented",
+      "implementation": [
+        "src/components/vision/VisionModule.tsx",
+        "src/components/vision/RetinalImage.tsx",
+        "src/lib/genome/vcf.ts"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genome/governance.test.ts",
+          "test": "offers no genomic or clinical data upload on the Genome and Vision pages"
+        },
+        {
+          "file": "src/lib/genome/vcf.test.ts",
+          "test": "counts samples but never returns their names"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-013",
+      "statement": "Use a source or component in a commercial pilot only once the licence inventory marks it approved after a named person's review.",
+      "source": "DECISIONS.md GV1-LICENCE",
+      "status": "implemented",
+      "implementation": [
+        "src/lib/genome/config.ts",
+        "src/lib/genome/policy.ts",
+        "tools/vision-snapshot/policy.py"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genome/config.test.ts",
+          "test": "approves nothing for commercial pilots until reviewed"
+        },
+        {
+          "file": "src/lib/genome/policy.test.ts",
+          "test": "denies commercial-pilot use of everything: nothing is approved"
+        },
+        {
+          "file": "tools/vision-snapshot/test_capture.py",
+          "test": "test_commercial_pilot_mode_fetches_nothing_unapproved"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-014",
+      "statement": "If cross-species comparison is added: keep direct source observations, computed mappings and hypotheses separate; record source, method, version, taxon, identifiers and caveats; never present orthology or pathway overlap as proof of causation or clinical relevance.",
+      "source": "Genome governance brief, 2026-10-29",
+      "status": "proposed",
+      "implementation": [],
+      "verification": [],
+      "note": "No cross-species comparison exists in the software.",
+      "release": null
+    },
+    {
+      "id": "REQ-015",
+      "statement": "A clinical intended use, regulatory determination, analytical and clinical validation, and quality release, before any clinical function.",
+      "source": "config/genome/governance/release-gate.json",
+      "status": "requires-qualified-review",
+      "implementation": [],
+      "verification": [],
+      "note": "Needs qualified clinical, regulatory, genomics, legal and quality reviewers. None has been appointed or consulted.",
+      "release": null
+    },
+    {
+      "id": "REQ-016",
+      "statement": "Before ClinVar can be shown: display NCBI's required disclaimer and copyright notice in the exact wording NCBI provides, and complete the legal review of ClinVar reuse.",
+      "source": "LICENCES.md (NCBI notice; ClinVar)",
+      "status": "requires-qualified-review",
+      "implementation": [],
+      "verification": [],
+      "note": "The notice's wording has not been verified from NCBI and is not reproduced in the app. A person must take it from NCBI's own pages; legal review must approve reuse.",
+      "release": null
+    },
+    {
+      "id": "REQ-017",
+      "statement": "Choose the Vision target from the gene registry rather than a hard-coded gene, offering only genes that are the current focus, have verified identifiers and have a display copy. This implies no panel approval.",
+      "source": "GENOME_V1.md §8 (hard-coded RPE65)",
+      "status": "implemented",
+      "implementation": ["src/lib/vision/targets.ts"],
+      "verification": [
+        {
+          "file": "src/lib/genome/governance.test.ts",
+          "test": "offers only current-focus, verified genes with a display copy as targets"
+        }
+      ],
+      "release": null
+    }
+  ]
+}

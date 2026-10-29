@@ -17,6 +17,7 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import capture  # noqa: E402
+import policy  # noqa: E402
 
 REGISTRY = json.loads((capture.CONFIG / "genes.json").read_text())
 LICENCES = json.loads((capture.CONFIG / "licences.json").read_text())
@@ -120,10 +121,13 @@ class CaptureTest(unittest.TestCase):
         self.assertEqual(code, 0)
         m, d = self.stored("RPE65")
         self.assertEqual((m["gene"], m["hgncId"], m["ensemblGeneId"]), ("RPE65", "HGNC:10294", "ENSG00000116745"))
-        self.assertEqual(m["schemaVersion"], 2)
+        self.assertEqual(m["schemaVersion"], 3)
         self.assertEqual(m["assembly"], "GRCh38")
         self.assertTrue(m["complete"])
-        self.assertTrue(all(s["status"] == "ok" for s in m["sources"]))
+        # Every permitted source succeeded; ClinVar is withheld by the source policy.
+        status = {s["step"]: s["status"] for s in m["sources"]}
+        self.assertEqual(status.pop("clinvar"), "withheld")
+        self.assertTrue(all(v == "ok" for v in status.values()), status)
         self.assertTrue(all(c["result"] == "agree" for c in m["identifierChecks"]))
         names = {f["file"] for f in m["files"]}
         self.assertTrue({"hgnc_symbol.json", "ensembl_lookup.json", "uniprot_search.json", "alphafold_model.pdb.gz"} <= names)
@@ -235,16 +239,16 @@ class CaptureTest(unittest.TestCase):
         self.assertEqual(status["alphafold_model"]["status"], "skipped")
 
     def test_partial_failure_written_with_allow_partial_is_explicit(self) -> None:
-        table = responses("RHO", **{"esearch.fcgi": capture.SourceError("connection reset")})
+        table = responses("RHO", **{"/sequence/region/": capture.SourceError("connection reset")})
         code, _, _ = self.run_capture("RHO", table, allow_partial=True)
         self.assertEqual(code, 0)
         m, _ = self.stored("RHO")
         self.assertFalse(m["complete"])
         status = {s["step"]: s for s in m["sources"]}
-        self.assertEqual(status["clinvar"]["status"], "failed")
-        self.assertIn("connection reset", status["clinvar"]["reason"])
+        self.assertEqual(status["ensembl_gene_region"]["status"], "failed")
+        self.assertIn("connection reset", status["ensembl_gene_region"]["reason"])
         self.assertEqual(status["ensembl_lookup"]["status"], "ok")
-        self.assertFalse(any(f["file"].startswith("clinvar") for f in m["files"]))
+        self.assertFalse(any(f["file"] == "ensembl_gene_region.json" for f in m["files"]))
 
     def test_an_unreachable_hgnc_is_recorded_and_other_checks_still_run(self) -> None:
         table = responses("RHO", **{"rest.genenames.org/fetch/symbol/": capture.SourceError("timed out")})
@@ -278,7 +282,67 @@ class CaptureTest(unittest.TestCase):
         self.assertEqual(code, 0)
         assert manifest is not None
         for s in manifest["sources"]:
-            self.assertEqual(s["status"], "ok" if s["licenceId"] == "ensembl-rest" else "skipped", s["step"])
+            self.assertEqual(s["status"], "ok" if s["licenceId"] == "ensembl-rest" else "withheld", s["step"])
+
+    # ---------------------------------------------------------------- source policy
+
+    def test_clinvar_is_never_requested_and_is_recorded_as_withheld(self) -> None:
+        log: list[str] = []
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            code, manifest = capture.capture_gene(
+                "RPE65", registry=REGISTRY, licences=LICENCES, out_root=self.out,
+                fetch=fake_fetch(responses("RPE65"), log), pause=0,
+            )
+        self.assertEqual(code, 0)
+        self.assertFalse(any("eutils.ncbi" in u for u in log), log)
+        assert manifest is not None
+        clinvar = next(s for s in manifest["sources"] if s["step"] == "clinvar")
+        self.assertEqual(clinvar["status"], "withheld")
+        self.assertEqual(clinvar["files"], [])
+        self.assertIn("source policy", clinvar["reason"])
+        m, d = self.stored("RPE65")
+        self.assertFalse(any("clinvar" in f["file"] for f in m["files"]))
+        self.assertFalse(any("clinvar" in p.name for p in d.iterdir()))
+
+    def test_the_policy_fails_closed_for_missing_pending_and_unknown_entries(self) -> None:
+        for change in ("drop-permissions", "store-pending", "drop-item"):
+            lic = copy.deepcopy(LICENCES)
+            if change == "drop-item":
+                lic["items"] = [i for i in lic["items"] if i["id"] != "uniprot-rest"]
+            for i in lic["items"]:
+                if i["id"] == "uniprot-rest" and change == "drop-permissions":
+                    del i["permissions"]
+                if i["id"] == "uniprot-rest" and change == "store-pending":
+                    i["permissions"]["research"]["store"] = "pending-review"
+            log: list[str] = []
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                _, manifest = capture.capture_gene(
+                    "RPE65", registry=REGISTRY, licences=lic, out_root=self.out,
+                    fetch=fake_fetch(responses("RPE65"), log), pause=0, allow_partial=True,
+                )
+            assert manifest is not None
+            status = {s["step"]: s["status"] for s in manifest["sources"]}
+            self.assertEqual(status["uniprot_search"], "withheld", change)
+            self.assertFalse(any("rest.uniprot.org" in u for u in log), change)
+
+    def test_policy_decisions_match_the_inventory(self) -> None:
+        self.assertEqual(policy.permitted(LICENCES, "ensembl-rest", "fetch"), (True, ""))
+        self.assertTrue(policy.permitted(LICENCES, "ensembl-rest", "display")[0])
+        for action in policy.ACTIONS:
+            ok, reason = policy.permitted(LICENCES, "clinvar-eutils", action)
+            self.assertFalse(ok, action)
+            self.assertIn("disclaimer", reason)
+        # Redistribution is not permitted for any source yet.
+        for i in LICENCES["items"]:
+            self.assertFalse(policy.permitted(LICENCES, i["id"], "redistribute")[0], i["id"])
+        # No source is approved for commercial-pilot use; libraries carry no data permissions.
+        for i in LICENCES["items"]:
+            self.assertFalse(policy.permitted(LICENCES, i["id"], "fetch", "commercial-pilot")[0], i["id"])
+        self.assertFalse(policy.permitted(LICENCES, "zod", "fetch")[0])
+        self.assertFalse(policy.permitted(LICENCES, "no-such-source", "fetch")[0])
+        self.assertFalse(policy.permitted(LICENCES, "ensembl-rest", "fetch", "clinical")[0])
+        self.assertFalse(policy.permitted(LICENCES, "ensembl-rest", "train")[0])
 
     # ---------------------------------------------------------------- CLI
 

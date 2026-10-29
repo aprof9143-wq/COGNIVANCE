@@ -32,7 +32,7 @@ import { MatrixTab } from "./MatrixTab";
 import { RatingsTab } from "./RatingsTab";
 
 export const SAFETY_STATEMENT =
-  "Research/educational decision-support tool. Imaging patterns and cognitive symptoms are not specific to Alzheimer’s disease. Results require review by qualified clinicians and must be interpreted alongside history, examination, laboratory biomarkers, and differential diagnosis.";
+  "Research and educational tool. Imaging patterns and cognitive symptoms are not specific to Alzheimer’s disease. Results require review by qualified clinicians and must be interpreted alongside history, examination, laboratory biomarkers, and differential diagnosis.";
 
 const TABS = [
   ["summary", "Clinical summary"],

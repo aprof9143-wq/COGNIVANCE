@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "recordVersion": "1.0.0",
+  "effectiveFrom": "2026-10-29",
+  "note": "Reviews the project needs, and reviews that have been completed. No review has been completed: 'completed' is empty. A completed review records the reviewer's name, role, date, outcome, rationale and where the signed record is kept.",
+  "required": [
+    {
+      "id": "REV-D5",
+      "subject": "First IRD panel gene list (decision D5)",
+      "reviewerRole": "qualified genomics and clinical reviewers",
+      "status": "not-started",
+      "blocks": ["ST-PANEL"]
+    },
+    {
+      "id": "REV-D4",
+      "subject": "Decision D4: its question is not yet stated",
+      "reviewerRole": "project owner",
+      "status": "not-started",
+      "blocks": []
+    },
+    {
+      "id": "REV-CLINVAR-LEGAL",
+      "subject": "Reuse and redistribution of ClinVar submitter content, including what earlier commits contain",
+      "reviewerRole": "legal reviewer",
+      "status": "not-started",
+      "blocks": ["ST-CLINVAR"]
+    },
+    {
+      "id": "REV-NCBI-NOTICE",
+      "subject": "NCBI's required disclaimer and copyright notice: exact wording, taken from NCBI's own pages, and where it must appear",
+      "reviewerRole": "legal reviewer",
+      "status": "not-started",
+      "blocks": ["ST-CLINVAR"]
+    },
+    {
+      "id": "REV-TERMS-UNIPROT-ALPHAFOLD",
+      "subject": "UniProt and AlphaFold DB terms (the CI runner could not read them)",
+      "reviewerRole": "person reading the providers' terms pages",
+      "status": "not-started",
+      "blocks": ["ST-COMMERCIAL"]
+    },
+    {
+      "id": "REV-REDISTRIBUTION",
+      "subject": "Whether serving the display copy of each source is permitted, with what attribution, and whether the raw responses served before 2026-10-29 need action",
+      "reviewerRole": "legal reviewer",
+      "status": "not-started",
+      "blocks": []
+    },
+    {
+      "id": "REV-CLINICAL-PATHWAY",
+      "subject": "Clinical intended use and regulatory determination",
+      "reviewerRole": "qualified clinical and regulatory reviewers",
+      "status": "not-started",
+      "blocks": ["ST-CLINICAL"]
+    }
+  ],
+  "completed": []
+}

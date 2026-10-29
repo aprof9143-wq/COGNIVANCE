@@ -28,7 +28,8 @@ import { GenomeTrack, ProteinTrack, VariantCard } from "./genome";
 import { MolViewer, type HoverInfo } from "./MolViewer";
 import { TherapyChart, VectorMap } from "./TherapyChart";
 import { useEvidence, useStructure } from "./useEvidence";
-import { Card, EvidenceTag, Gap, Spinner, VerdictChip } from "./ui";
+import { Card, EvidenceTag, Gap, Spinner, VerdictChip, Withheld } from "./ui";
+import { StatusLine } from "./StatusPanel";
 
 const HORIZONS = [
   { days: 365, label: "1 year" },
@@ -252,6 +253,9 @@ export function TherapySimulator() {
 
   return (
     <div className="vision-light min-h-screen px-3 py-3 font-sans sm:px-6 sm:py-6">
+      <div className="mx-auto max-w-[1440px]">
+        <StatusLine />
+      </div>
       <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)]">
           {/* ------------------------------------------------ left */}
@@ -338,9 +342,13 @@ export function TherapySimulator() {
                   value={
                     alleles.length === 2
                       ? `${alleles[0]!.protein!.short} / ${alleles[1]!.protein!.short}`
-                      : "—"
+                      : "2 copies"
                   }
-                  sub="Two disease-causing copies of RPE65 (ClinVar)"
+                  sub={
+                    alleles.length === 2
+                      ? "Two disease-causing copies of RPE65 (ClinVar)"
+                      : "Model assumption: both RPE65 copies non-functional"
+                  }
                   level={null}
                 />
                 <Stage
@@ -512,15 +520,32 @@ export function TherapySimulator() {
             <Card id="genotype">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-[19px] font-medium">Genotype and the protein it breaks</h2>
-                <EvidenceTag kind="reference" label="ClinVar · Ensembl" />
+                {ev.variants?.state === "value" ? (
+                  <EvidenceTag kind="reference" label="ClinVar · Ensembl" />
+                ) : (
+                  <EvidenceTag kind="hypothetical" label="Model assumption" />
+                )}
                 <EvidenceTag kind="computed" label="AlphaFold model" />
               </div>
-              <p className="text-xs text-[var(--v-ink-3)]">
-                RPE65 disease is recessive: both copies carry a disease-causing change. Choose any
-                two of the {missense.length.toLocaleString()} pathogenic single-letter changes
-                ClinVar records. The model above treats every genotype the same, with the residual
-                activity in the assumptions table.
-              </p>
+              {ev.variants?.state === "value" ? (
+                <p className="text-xs text-[var(--v-ink-3)]">
+                  RPE65 disease is recessive: both copies carry a disease-causing change. Choose any
+                  two of the {missense.length.toLocaleString()} pathogenic single-letter changes
+                  ClinVar records. The model above treats every genotype the same, with the residual
+                  activity in the assumptions table.
+                </p>
+              ) : (
+                <p className="text-xs text-[var(--v-ink-3)]">
+                  The model above assumes both copies of RPE65 are non-functional and treats every
+                  genotype the same, with the residual activity in the assumptions table. It does
+                  not use or show specific variants.
+                </p>
+              )}
+              {ev.variants?.state === "withheld" && (
+                <div className="mt-3">
+                  <Withheld what="Variant records" reason={ev.variants.reason} />
+                </div>
+              )}
               {ev.status === "loading" && (
                 <div className="mt-3">
                   <Spinner label="Reading the evidence snapshot…" />

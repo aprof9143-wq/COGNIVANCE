@@ -406,6 +406,21 @@ const AlphaFoldEntry = z.object({
   globalMetricValue: z.number().optional(),
 });
 
+/**
+ * The schema of each snapshot file the app reads, keyed by file name. zod keeps
+ * only declared fields, so `schema.parse(raw)` is exactly what the app uses;
+ * tools/genome-display builds the served display copy to match (checked by
+ * src/lib/genome/display.test.ts).
+ */
+export const DISPLAY_SCHEMAS: Record<string, z.ZodTypeAny> = {
+  "ensembl_lookup.json": EnsemblGene,
+  "ensembl_release.json": z.object({ releases: z.array(z.number()) }),
+  "ensembl_cds.json": z.object({ id: z.string(), seq: z.string() }),
+  "ensembl_gene_region.json": z.object({ id: z.string(), seq: z.string() }),
+  "uniprot_search.json": z.object({ results: z.array(UniProtEntry) }),
+  "alphafold_prediction.json": z.array(AlphaFoldEntry),
+};
+
 /** The model for `accession` from a raw AlphaFold DB prediction response, or null if none. */
 export function parseAlphaFold(raw: unknown, accession: string): ModelRecord | null {
   const mine = z

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "recordVersion": "1.0.0",
+  "effectiveFrom": "2026-10-29",
+  "softwareVersion": "unreleased",
+  "note": "What Genome v1 and the Vision pages do today, grouped for the status panel shown on each Vision page. 'Implemented, not validated' means the software exists and its tests pass; it does not mean it is correct for any clinical purpose. None of these items has clinical validation.",
+  "items": [
+    {
+      "id": "ST-RESEARCH-EVIDENCE",
+      "category": "research",
+      "name": "Reference evidence",
+      "description": "RPE65 gene, transcript, protein and predicted structure from Ensembl, UniProt and AlphaFold DB, each value with its source, release and retrieval time.",
+      "requirements": ["REQ-008", "REQ-009"]
+    },
+    {
+      "id": "ST-RESEARCH-MODELS",
+      "category": "research",
+      "name": "Labelled models",
+      "description": "The gene-therapy time course, the eye optics and the retina-to-cortex response, each labelled hypothetical, computed or schematic.",
+      "requirements": ["REQ-009"]
+    },
+    {
+      "id": "ST-VCF-HEADER",
+      "category": "implemented-unvalidated",
+      "name": "VCF header check",
+      "description": "Accepts VCF 4.2 to 4.5 headers that establish GRCh38 and rejects everything else. Reads no variant records; there is no upload screen.",
+      "requirements": ["REQ-001", "REQ-002", "REQ-003"]
+    },
+    {
+      "id": "ST-SOURCE-POLICY",
+      "category": "implemented-unvalidated",
+      "name": "Source policy",
+      "description": "Decides separately whether each source may be fetched, stored, displayed or redistributed, and refuses whatever is not recorded as allowed.",
+      "requirements": ["REQ-005", "REQ-006", "REQ-007"]
+    },
+    {
+      "id": "ST-CLINVAR",
+      "category": "blocked",
+      "name": "ClinVar variant records",
+      "description": "Withheld: app use is blocked until NCBI's required notices are in place, and reuse requires legal review.",
+      "requirements": ["REQ-006", "REQ-016"]
+    },
+    {
+      "id": "ST-COMMERCIAL",
+      "category": "blocked",
+      "name": "Commercial-pilot use",
+      "description": "No source or component is approved for commercial-pilot use.",
+      "requirements": ["REQ-013"]
+    },
+    {
+      "id": "ST-PANEL",
+      "category": "proposed",
+      "name": "First IRD gene panel",
+      "description": "Ten genes proposed by the product owner (decision D5), awaiting genomics and clinical review. Only RPE65 is configured, and the panel is not authoritative.",
+      "requirements": ["REQ-004"]
+    },
+    {
+      "id": "ST-CROSS-SPECIES",
+      "category": "proposed",
+      "name": "Cross-species comparison",
+      "description": "Not built. If added, source observations, computed mappings and hypotheses stay separate.",
+      "requirements": ["REQ-014"]
+    },
+    {
+      "id": "ST-CLINICAL",
+      "category": "future-clinical-readiness",
+      "name": "Clinical use",
+      "description": "Unavailable. It would need an approved clinical intended use, a regulatory determination, legal sign-off for every source, analytical and clinical validation, and a quality release, none of which exists.",
+      "requirements": ["REQ-011", "REQ-015"]
+    }
+  ]
+}

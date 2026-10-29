@@ -13,15 +13,19 @@ Usage:
 Genes must be in the registry (config/genome/genes.json). Before anything is
 written, the registry's identifiers are checked against what HGNC, Ensembl and
 UniProt report; a mismatch stops that gene's capture. Each gene gets its own
-folder, public/vision/snapshot/<symbol in lower case>/, holding:
+folder, data/genome/snapshot/<symbol in lower case>/, holding:
   manifest.json  one SHA-256 manifest per gene (format: docs/genome/GENOME_V1.md)
   SHA256SUMS     the same digests of the stored files, for `sha256sum -c`
-and the raw files. A folder already holding another gene's capture is never
-overwritten. Every source is recorded as ok, failed or skipped; a capture with
+and the raw files. That folder is not served by the website: no source's
+redistribution is permitted yet. A folder already holding another gene's
+capture is never overwritten. Every source is recorded as ok, failed, skipped
+(a dependency failed) or withheld (refused by the source policy); a capture with
 failures replaces nothing unless --allow-partial is given.
 
-In commercial-pilot mode, sources the licence inventory
-(config/genome/licences.json) does not mark approved are skipped, not fetched.
+Source policy (policy.py, read from config/genome/licences.json): a step runs
+only if its source may be both fetched and stored. Otherwise it is withheld and
+nothing is requested. ClinVar is withheld in every mode while its app use is
+blocked. In commercial-pilot mode, sources not marked approved are withheld too.
 
 Exit codes: 0 complete (or partial with --allow-partial), 1 partial and not
 written, 2 invalid or unknown symbol or identifier mismatch, 3 no source
@@ -49,13 +53,20 @@ import urllib.parse
 import urllib.request
 from typing import Any, Callable
 
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from policy import permitted  # noqa: E402
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "config" / "genome"
-OUT_ROOT = ROOT / "public" / "vision" / "snapshot"
+# Raw responses are kept out of public/: no source's redistribution is
+# permitted yet (config/genome/licences.json). tools/genome-display builds the
+# display-only copy the website serves.
+OUT_ROOT = ROOT / "data" / "genome" / "snapshot"
 UA = "Cognivance-vision-snapshot/2 (+https://github.com/aprof9143-wq/COGNIVANCE)"
 KEEP_HEADERS = ("Content-Type", "X-UniProt-Release", "X-UniProt-Release-Date", "Last-Modified", "ETag")
 SYMBOL = re.compile(r"^[A-Z0-9][A-Za-z0-9-]{0,29}$")
-MANIFEST_SCHEMA = 2
+# 3: a source step may be "withheld" by the source policy.
+MANIFEST_SCHEMA = 3
 
 ENSEMBL = "https://rest.ensembl.org"
 UNIPROT = "https://rest.uniprot.org"
@@ -148,7 +159,7 @@ class Capture:
         self.fetch = fetch
         self.mode = mode
         self.pause = pause
-        self.approved = {i["id"] for i in licences["items"] if i["commercialPilot"] == "approved"}
+        self.licences = licences
         self.stage = pathlib.Path(tempfile.mkdtemp(prefix=f"capture-{self.symbol}-"))
         self.files: list[dict] = []
         self.sources: list[dict] = []
@@ -172,8 +183,13 @@ class Capture:
 
     # ------------------------------------------------------------ bookkeeping
 
-    def allowed(self, step: str) -> bool:
-        return self.mode != "commercial-pilot" or LICENCE[step] in self.approved
+    def denied(self, step: str) -> str:
+        """Why the source policy refuses this step (it must be both fetched and stored), or ""."""
+        for action in ("fetch", "store"):
+            ok, reason = permitted(self.licences, LICENCE[step], action, self.mode)
+            if not ok:
+                return reason
+        return ""
 
     def record(self, step: str, status: str, reason: str = "", files: list[str] | None = None) -> None:
         entry: dict = {"step": step, "licenceId": LICENCE[step], "status": status, "files": files or []}
@@ -209,12 +225,14 @@ class Capture:
         return body
 
     def step(self, step: str, fn: Callable[[], Any], needs: str = "") -> Any:
-        """Run one source step; record ok, failed or skipped. Returns its result or None."""
+        """Run one source step; record ok, failed, skipped or withheld. Returns its result or None."""
+        refused = self.denied(step)
+        if refused:
+            # Nothing is requested from the source.
+            self.record(step, "withheld", f"Withheld by the source policy: {refused}")
+            return None
         if needs:
             self.skip(step, needs)
-            return None
-        if not self.allowed(step):
-            self.skip(step, f"Licence item {LICENCE[step]} is not approved for commercial-pilot use.")
             return None
         before = len(self.files)
         try:
@@ -358,6 +376,8 @@ class Capture:
 
         failed = [s for s in self.sources if s["status"] == "failed"]
         skipped = [s for s in self.sources if s["status"] == "skipped"]
+        # Complete means every step the policy permits succeeded; withheld steps
+        # were never meant to be captured.
         self.manifest["complete"] = not failed and not skipped
         self.manifest["identifierChecks"] = self.checks
         self.manifest["sources"] = self.sources
@@ -415,7 +435,7 @@ def capture_gene(
     cap = Capture(gene, registry, licences, fetch=fetch, mode=mode, pause=pause)
     try:
         manifest = cap.run()
-        if all(s["status"] == "skipped" for s in cap.sources):
+        if all(s["status"] in ("skipped", "withheld") for s in cap.sources):
             print(f"ERROR {symbol}: no source is allowed in {mode} mode; nothing written.", file=sys.stderr)
             return 3, manifest
         if not manifest["complete"] and not allow_partial:

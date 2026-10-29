@@ -1,17 +1,24 @@
 name: genome-tools
 
-# Offline unit tests for the Genome v1 capture tool and its configuration.
+# Offline unit tests for the Genome v1 capture tool, the display-copy builder,
+# the source policy and their configuration.
 # Path-filtered like core.yml, so unrelated changes do not run it.
 on:
   pull_request:
     paths:
       - "tools/vision-snapshot/**"
+      - "tools/genome-display/**"
+      - "data/genome/**"
+      - "public/vision/display/**"
       - "config/genome/**"
       - ".github/workflows/genome-tools.yml"
   push:
     branches: [main]
     paths:
       - "tools/vision-snapshot/**"
+      - "tools/genome-display/**"
+      - "data/genome/**"
+      - "public/vision/display/**"
       - "config/genome/**"
       - ".github/workflows/genome-tools.yml"
 
@@ -28,3 +35,5 @@ jobs:
           python-version: "3.12"
       - name: Capture tool tests (no network)
         run: python -m unittest discover -s tools/vision-snapshot -p "test_*.py" -v
+      - name: Display-copy builder tests (no network)
+        run: python -m unittest discover -s tools/genome-display -p "test_*.py" -v

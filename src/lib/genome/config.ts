@@ -55,6 +55,9 @@ const Panel = z.object({
 });
 export type Panel = z.infer<typeof Panel>;
 
+const Permission = z.enum(["allowed", "denied", "pending-review", "unknown"]);
+export type Permission = z.infer<typeof Permission>;
+
 const LicenceItem = z.object({
   id: z.string(),
   name: z.string(),
@@ -75,6 +78,24 @@ const LicenceItem = z.object({
   appUse: z.enum(["not-restricted", "blocked"]),
   /** What must happen before a blocked item may be used by the app. */
   appUseCondition: z.string().optional(),
+  /**
+   * App use split into separate decisions for research and demo use (see
+   * policy.ts). Only "allowed" permits an action; anything else, or a missing
+   * entry, denies it.
+   */
+  permissions: z
+    .object({
+      basis: z.string(),
+      research: z.object({
+        fetch: Permission,
+        store: Permission,
+        display: Permission,
+        redistribute: Permission,
+      }),
+    })
+    .optional(),
+  /** No clinical use is approved for any item; see release.ts for the gate it also needs. */
+  clinicalUse: z.enum(["approved", "not-approved"]),
   followUp: z.string(),
 });
 export type LicenceItem = z.infer<typeof LicenceItem>;
@@ -143,9 +164,14 @@ export function getGene(symbol: string, registry: Registry = REGISTRY): GeneEntr
 export const isAuthoritative = (p: Panel) =>
   p.reviewStatus === "approved" && p.decisionStatus === "resolved";
 
-/** Where a gene's captured snapshot is served; one folder per gene. */
-export const snapshotDir = (symbol: string) =>
-  `/vision/snapshot/${getGene(symbol).symbol.toLowerCase()}/`;
+/**
+ * Where a gene's display-only copy is served; one folder per gene. The raw
+ * snapshot (data/genome/snapshot/) is not served: tools/genome-display builds
+ * this copy from it, with only the fields the app shows, from sources whose
+ * display the source policy permits.
+ */
+export const displayDir = (symbol: string) =>
+  `/vision/display/${getGene(symbol).symbol.toLowerCase()}/`;
 
 /**
  * Why the app may not use an item, or null if nothing blocks it. A blocked item
@@ -162,12 +188,16 @@ export function appUseBlock(id: string, licences: Licences = LICENCES): string |
 export type UseMode = "research" | "commercial-pilot";
 
 /**
- * Refuse a source, library or predictor in commercial-pilot mode unless the
- * licence inventory marks it approved. Unknown ids are refused in every mode.
+ * Refuse a source, library or predictor that the app may not use: unknown ids
+ * and blocked items in every mode, and anything not approved in commercial-pilot
+ * mode. For a specific action (fetch, store, display, redistribute) use
+ * policy.ts, which also applies the per-action permissions.
  */
 export function assertSourceAllowed(id: string, mode: UseMode, licences: Licences = LICENCES) {
   const item = licences.items.find((i) => i.id === id);
   if (!item) throw new GenomeConfigError(`${id} is not in the licence inventory.`);
+  if (item.appUse === "blocked")
+    throw new GenomeConfigError(item.appUseCondition ?? `${item.name} is blocked for the app.`);
   if (mode === "commercial-pilot" && item.commercialPilot !== "approved")
     throw new GenomeConfigError(
       `${item.name} is not approved for commercial-pilot use (review status: ${item.reviewStatus}).`,

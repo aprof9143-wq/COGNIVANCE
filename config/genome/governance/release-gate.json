@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "gateVersion": "1.0.0",
+  "note": "What clinical mode would require before it could be offered. It is unavailable: no item below has evidence. The 'status' field is informational only; availability is computed from the evidence and approvals by src/lib/genome/release.ts, so editing 'status' alone cannot enable clinical mode. Each item names the kind of qualified reviewer it needs; none has been appointed or consulted. Nothing here asserts that any standard or regulation applies or is satisfied.",
+  "clinicalMode": {
+    "status": "unavailable",
+    "requiredEvidence": [
+      {
+        "id": "INTENDED-USE",
+        "description": "A clinical intended-use statement for a defined condition, population, user and setting, approved by the project owner and a qualified clinical reviewer.",
+        "reviewerRole": "qualified clinical reviewer",
+        "status": "missing"
+      },
+      {
+        "id": "REGULATORY-PATHWAY",
+        "description": "A documented determination of the regulatory status and pathway for that intended use, by a qualified regulatory reviewer. No pathway has been chosen.",
+        "reviewerRole": "qualified regulatory reviewer",
+        "status": "missing"
+      },
+      {
+        "id": "SOURCE-RIGHTS",
+        "description": "Legal sign-off that every data source and component used in the clinical path may be used for that purpose, recorded in config/genome/licences.json as clinicalUse: approved.",
+        "reviewerRole": "legal reviewer",
+        "status": "missing"
+      },
+      {
+        "id": "ANALYTICAL-VALIDATION",
+        "description": "An approved analytical validation protocol, dataset description, metrics, acceptance criteria and results for the clinical function.",
+        "reviewerRole": "qualified genomics reviewer",
+        "status": "missing"
+      },
+      {
+        "id": "CLINICAL-VALIDATION",
+        "description": "Clinical validation evidence for the intended use, with its protocol and acceptance criteria, approved by a qualified clinical reviewer.",
+        "reviewerRole": "qualified clinical reviewer",
+        "status": "missing"
+      },
+      {
+        "id": "QUALITY-RELEASE",
+        "description": "A release review under a documented quality and change-control process, with traceability from requirements to verified tests.",
+        "reviewerRole": "quality reviewer",
+        "status": "missing"
+      }
+    ],
+    "approvals": []
+  }
+}

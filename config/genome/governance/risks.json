@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "recordVersion": "1.0.0",
+  "effectiveFrom": "2026-10-29",
+  "note": "Issues and risks identified while building Genome v1, with the software mitigations in place and who owns them. A working register for later independent review; it is not a risk-management file under any standard, and listing a mitigation does not mean the risk is acceptable. No named owner has been recorded; 'project owner' stands until one is.",
+  "risks": [
+    {
+      "id": "RISK-001",
+      "issue": "Reference data, model output or a status label is read as clinical guidance for a person.",
+      "mitigation": "Not-for-clinical statement on every Vision screen and export; status panel; evidence kinds labelled; clinical mode gated.",
+      "requirements": ["REQ-009", "REQ-010", "REQ-011"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-002",
+      "issue": "Content from a source whose terms are unresolved is shown, stored or redistributed.",
+      "mitigation": "Per-action source policy, fail closed; raw responses not served; ClinVar withheld everywhere; snapshot workflow manual-only.",
+      "requirements": ["REQ-005", "REQ-006", "REQ-007"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review",
+      "residual": "Earlier commits still contain the removed ClinVar batches and the previously served raw responses; whether that history needs action is a legal question. Serving even the display copy is pending confirmation of each provider's terms."
+    },
+    {
+      "id": "RISK-003",
+      "issue": "The hypothetical gene-therapy model is read as a prediction for a patient.",
+      "mitigation": "Labelled hypothetical on every view; parameters stated as illustrative and unfitted; no genotype input; compared with the trial only on direction and timing.",
+      "requirements": ["REQ-009", "REQ-010"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-004",
+      "issue": "The proposed IRD gene list is treated as an authoritative or diagnostically complete panel.",
+      "mitigation": "Panel stays proposed and non-authoritative while D5 is unresolved; loaders refuse an approved panel with an unresolved decision; the list is recorded in the spec only.",
+      "requirements": ["REQ-004"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-005",
+      "issue": "Input on another reference build, or a malformed file, is accepted silently.",
+      "mitigation": "GRCh38-only header gate with explicit rejections; no liftover or conversion.",
+      "requirements": ["REQ-001", "REQ-002", "REQ-003"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-006",
+      "issue": "Identifiable information (sample names, patient data) is returned, logged or stored.",
+      "mitigation": "Sample names counted, never returned; no upload on Genome and Vision pages; manifests hold public reference metadata only.",
+      "requirements": ["REQ-002", "REQ-012"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-007",
+      "issue": "Clinical mode or clinical claims are enabled by a configuration change.",
+      "mitigation": "Availability is computed from verified evidence and recorded approvals, not from a toggle.",
+      "requirements": ["REQ-011"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review",
+      "residual": "A change that fabricates approval records would pass the software check; it relies on code review. Requiring the project owner's review for config/genome/ (for example in .github/CODEOWNERS) is proposed, not done."
+    },
+    {
+      "id": "RISK-008",
+      "issue": "A source changes after capture, so shown values differ from the current database.",
+      "mitigation": "Every value shows its release and retrieval time; a live check compares with the current sources.",
+      "requirements": ["REQ-008"],
+      "owner": "project owner",
+      "status": "open"
+    },
+    {
+      "id": "RISK-009",
+      "issue": "The served display copy drifts from the raw snapshot or from what the app reads.",
+      "mitigation": "Display copy rebuilt deterministically; tests check it is current and holds exactly the fields the parsers read.",
+      "requirements": ["REQ-007", "REQ-008"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    }
+  ]
+}

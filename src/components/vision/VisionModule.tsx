@@ -49,19 +49,21 @@ import {
 } from "@/lib/vision/sources";
 import { useEvidence, useStructure } from "./useEvidence";
 import { GenomeTrack, GroupFilter, ProteinTrack, VariantCard, countGroups } from "./genome";
+import { buildEvidenceExport } from "@/lib/vision/export";
 import { compareToReference, REFERENCE } from "@/lib/vision/reference";
 import { simulateTherapy } from "@/lib/vision/therapy";
 import type { Variant, VariantGroup } from "@/lib/vision/snapshot";
 import {
   DECISIONS,
-  LICENCES,
+  sourceTerms,
   PIPELINE,
   TARGETS,
   type DecisionStatus,
   type Target,
 } from "@/lib/vision/targets";
 import { MolViewer, type HoverInfo, type MolColour, type MolStyle } from "./MolViewer";
-import { Card, EvidenceTag, Gap, Spinner, VerdictChip } from "./ui";
+import { Card, EvidenceTag, Gap, Spinner, VerdictChip, Withheld } from "./ui";
+import { StatusLine, StatusPanel } from "./StatusPanel";
 import { PlddtChart } from "./PlddtChart";
 
 type Ready = Extract<Target, { status: "ready" }>;
@@ -186,12 +188,8 @@ export function VisionModule() {
   );
 
   const exportRecord = () => {
-    const out = {
-      module: "cognivance-vision-evidence",
-      schema: 1,
+    const out = buildEvidenceExport({
       exportedAt: new Date().toISOString(),
-      notice:
-        "Research software. Not a medical device; not clinically validated. Values are as each source reported them at retrieval.",
       target: { gene: target.geneSymbol, taxonId: target.taxonId, condition: target.condition },
       record,
       structure: source && {
@@ -202,7 +200,7 @@ export function VisionModule() {
       },
       crossChecks: checks,
       decisions: DECISIONS,
-    };
+    });
     const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -215,6 +213,9 @@ export function VisionModule() {
 
   return (
     <div className="vision-light min-h-screen px-3 py-3 font-sans sm:px-6 sm:py-6">
+      <div className="mx-auto max-w-[1440px]">
+        <StatusLine />
+      </div>
       <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)_330px]">
           {/* ------------------------------------------------ left */}
@@ -303,8 +304,8 @@ export function VisionModule() {
               </div>
               <p className="mt-1.5 text-[11px] text-[var(--v-ink-3)]">
                 {ev.mode === "snapshot" && ev.manifest
-                  ? `Raw responses captured ${new Date(ev.manifest.capturedAt).toLocaleDateString(undefined, { dateStyle: "medium" })} from Ensembl, UniProt, AlphaFold DB and ClinVar. Works offline; every value keeps its source.`
-                  : "Requested now from Ensembl, UniProt and AlphaFold DB. Variants still come from the snapshot."}
+                  ? `Captured ${new Date(ev.manifest.capturedAt).toLocaleDateString(undefined, { dateStyle: "medium" })} from Ensembl, UniProt and AlphaFold DB; shown from a display copy that keeps each value's source. Works offline. Variant records are withheld.`
+                  : "Requested now from Ensembl, UniProt and AlphaFold DB. Variant records are withheld."}
               </p>
               {ev.fallback && (
                 <p className="mt-1 text-[11px] text-[color:var(--kv-b57d12)]">{ev.fallback}</p>
@@ -335,7 +336,9 @@ export function VisionModule() {
                           ? "Loaded"
                           : src?.state === "conflict"
                             ? "Conflict"
-                            : "Gap";
+                            : src?.state === "withheld"
+                              ? "Withheld"
+                              : "Gap";
                   const Icon =
                     s.key === "gene"
                       ? Dna
@@ -897,17 +900,21 @@ export function VisionModule() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[19px] font-medium">Genomic variants</h2>
-                <EvidenceTag kind="reference" label="ClinVar" />
+                {ev.variants?.state === "value" && <EvidenceTag kind="reference" label="ClinVar" />}
               </div>
-              {variantSet ? (
+              {ev.variants?.state === "withheld" ? (
+                <p className="text-xs text-[var(--v-ink-3)]">
+                  Variant records come from ClinVar, which this app may not show yet.
+                </p>
+              ) : variantSet ? (
                 <p className="text-xs text-[var(--v-ink-3)]">
                   {variantSet.variants.length.toLocaleString()} variants recorded for RPE65 alone ·{" "}
                   {countGroups(variantSet.variants).pathogenic} pathogenic or likely pathogenic ·{" "}
                   {variantSet.multiGene} larger events spanning other genes too are counted, not
                   mapped.
                 </p>
-              ) : (
-                <p className="text-xs text-[var(--v-ink-3)]">Loading ClinVar…</p>
+              ) : ev.variants?.state === "missing" ? null : (
+                <p className="text-xs text-[var(--v-ink-3)]">Loading…</p>
               )}
               {ev.variants?.state === "value" && (
                 <div className="mt-0.5">
@@ -925,6 +932,11 @@ export function VisionModule() {
           {ev.variants?.state === "missing" && (
             <div className="mt-3">
               <Gap>{ev.variants.reason}</Gap>
+            </div>
+          )}
+          {ev.variants?.state === "withheld" && (
+            <div className="mt-3">
+              <Withheld what="Variant records" reason={ev.variants.reason} />
             </div>
           )}
           {variantSet && gene && protein && (
@@ -1048,9 +1060,9 @@ export function VisionModule() {
             <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-4 text-[13px] text-[var(--v-ink-2)]">
               <li>
                 <span className="font-medium text-[var(--v-ink)]">Why it could work: </span>
-                ClinVar lists the condition as recessive (
-                {selectedVariant?.conditions[0] ?? "RPE65-related retinopathy"}), so disease needs
-                both copies faulty; one working copy should restore the reset step.
+                the hypothesis assumes the condition is recessive, so disease needs both copies
+                faulty and one working copy could restore the reset step. That is an assumption of
+                this hypothesis, not a finding of this software.
               </li>
               <li>
                 <span className="font-medium text-[var(--v-ink)]">What limits it: </span>
@@ -1148,9 +1160,9 @@ export function VisionModule() {
                 clinically validated. Do not use it for diagnosis or treatment decisions.
               </li>
               <li>
-                Public reference data, requested live from your browser. Databases change between
-                releases; each value shows its release and retrieval time. Export the record to keep
-                what you saw.
+                Public reference data, from a captured snapshot by default or, with Live check,
+                requested from your browser. Databases change between releases; each value shows its
+                release and retrieval time. Export the record to keep what you saw.
               </li>
               <li>
                 Predicted structures are models. pLDDT is the model's confidence in itself, not a
@@ -1162,28 +1174,43 @@ export function VisionModule() {
                 illustrative parameters, not fitted to any trial.
               </li>
             </ul>
-            <p className="mt-4 text-xs font-medium text-[var(--v-ink-2)]">Source terms</p>
+            <p className="mt-4 text-xs font-medium text-[var(--v-ink-2)]">
+              Sources and their terms
+            </p>
             <ul className="mt-2 flex flex-col gap-1.5">
-              {LICENCES.map((l) => (
-                <li key={l.source} className="flex items-center justify-between gap-2 text-[13px]">
-                  <span>{l.source}</span>
-                  <a
-                    href={l.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-[var(--v-ink-2)] underline decoration-[var(--v-line)] underline-offset-2"
-                  >
-                    {l.terms}
-                    <ExternalLink className="h-3 w-3" aria-hidden />
-                  </a>
+              {sourceTerms().map((l) => (
+                <li key={l.id} className="flex items-baseline justify-between gap-3 text-[13px]">
+                  <span className="min-w-0">
+                    {l.source}
+                    <span className="text-[var(--v-ink-3)]">
+                      {" "}
+                      ({l.shown ? "shown" : "withheld"}; {l.review})
+                    </span>
+                  </span>
+                  {l.url && (
+                    <a
+                      href={l.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex shrink-0 items-center gap-1 text-[var(--v-ink-2)] underline decoration-[var(--v-line)] underline-offset-2"
+                    >
+                      Terms
+                      <ExternalLink className="h-3 w-3" aria-hidden />
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
             <p className="mt-3 text-[11px] text-[var(--v-ink-3)]">
-              As each provider publishes them. Confirm before redistributing any data.
+              From the licence inventory. No source's terms have been approved for commercial use,
+              and none may be redistributed until a reviewer confirms its terms allow it.
             </p>
           </Card>
         </div>
+
+        <Card className="mt-3">
+          <StatusPanel />
+        </Card>
       </div>
     </div>
   );

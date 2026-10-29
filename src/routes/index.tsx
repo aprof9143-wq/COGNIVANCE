@@ -57,22 +57,22 @@ const section = "scroll-mt-16 border-t border-border py-[clamp(4.5rem,9vw,8rem)]
 const AUDIENCE = [
   {
     t: "Gene and cell therapy developers",
-    d: "Run a construct against a genotype and follow its modelled effect from the vector to the visual cortex before committing to a study.",
+    d: "Explore, in a labelled hypothetical model, how a construct's effect could travel from the vector to the visual cortex, well before designing a study.",
   },
   {
     t: "Neurology and ophthalmology researchers",
-    d: "Join a cohort's genome, imaging and EEG in one coordinate frame, with every value traced to its source and release.",
+    d: "Bring imaging and EEG into one coordinate frame today, with genome data to follow, every value traced to its source and release.",
   },
   {
     t: "Trial designers and CROs",
-    d: "Pressure-test inclusion criteria and endpoints in silico, with an audit trail a reviewer can follow line by line.",
+    d: "In time, pressure-test inclusion criteria and endpoints in silico, with an audit trail a reviewer can follow line by line. Not available today.",
   },
 ];
 
 const STEPS = [
   {
     t: "Ingest",
-    d: "Genome, imaging and EEG enter through one acquisition contract. Public references (Ensembl, UniProt, AlphaFold DB, ClinVar) are captured with a SHA-256 manifest per gene.",
+    d: "Genome, imaging and EEG enter through one acquisition contract. Public references are captured with a SHA-256 manifest per gene, and a source policy decides what may be stored, shown or shared.",
   },
   {
     t: "Model",
@@ -195,7 +195,7 @@ function Landing() {
               className="rise inline-flex items-center gap-2 rounded-full border border-border bg-card/70 py-1 pl-1 pr-3 text-[12.5px] text-foreground/80 backdrop-blur transition-colors hover:border-foreground/25"
             >
               <span className="rounded-full bg-foreground px-2 py-0.5 text-[11px] font-medium text-background">
-                Live
+                Research preview
               </span>
               Genome v1: RPE65 from the gene to the visual cortex
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
@@ -204,15 +204,17 @@ function Landing() {
               className={`${head} rise mt-7 text-[clamp(2.8rem,5.6vw,5.2rem)] font-semibold leading-[0.95] tracking-[-0.055em] text-foreground`}
               style={{ animationDelay: "80ms" }}
             >
-              In-silico trials for the eye and the brain.
+              Building <span className="whitespace-nowrap">in-silico</span> trials for the eye and
+              the brain.
             </h1>
             <p
               className="rise mt-6 max-w-[50ch] text-[clamp(1rem,1.35vw,1.15rem)] leading-relaxed text-foreground/70"
               style={{ animationDelay: "160ms" }}
             >
-              We are building the vertical foundation model for the eye and the brain. Cognivance
-              joins a patient's genome, imaging and EEG into one simulation, so a gene therapy or an
-              implant can be tested from the gene to the visual cortex before it reaches a person.
+              We are building the vertical foundation model for the eye and the brain. The goal is
+              one simulation that joins a patient's genome, imaging and EEG, so that a gene therapy
+              or an implant can one day be tested from the gene to the visual cortex before it
+              reaches a person. Today it is research software, working on public reference data.
             </p>
             <div
               className="rise mt-8 flex flex-wrap items-center gap-3"
@@ -368,7 +370,7 @@ function Landing() {
       {/* ---------------------------------------------------------- who */}
       <section id="who" className={section}>
         <Container>
-          <H2>Built for the teams that decide what reaches a patient.</H2>
+          <H2>Building for the teams that decide what reaches a patient.</H2>
           <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
             {AUDIENCE.map((a) => (
               <div key={a.t} className="border-t border-foreground/80 pt-5">

@@ -49,6 +49,7 @@ import { RetinalImage } from "./RetinalImage";
 import { VisualCycle } from "./VisualCycle";
 import { ConceptVision } from "./ConceptVision";
 import { Card, EvidenceTag } from "./ui";
+import { StatusLine } from "./StatusPanel";
 
 const DISTANCES = [Infinity, 6000, 2000, 1000, 500, 330, 250, 200, 150, 120, 100];
 const RELAXED_POWER = power(LE_GRAND_RELAXED);
@@ -156,6 +157,9 @@ export function EyeSimulation() {
 
   return (
     <div className="vision-light min-h-screen px-3 py-3 font-sans sm:px-6 sm:py-6">
+      <div className="mx-auto max-w-[1440px]">
+        <StatusLine />
+      </div>
       <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)_330px]">
           {/* ------------------------------------------------ left */}
