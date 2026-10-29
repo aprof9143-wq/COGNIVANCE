@@ -49,6 +49,7 @@ import {
 } from "@/lib/vision/sources";
 import { useEvidence, useStructure } from "./useEvidence";
 import { GenomeTrack, GroupFilter, ProteinTrack, VariantCard, countGroups } from "./genome";
+import { buildEvidenceExport } from "@/lib/vision/export";
 import { compareToReference, REFERENCE } from "@/lib/vision/reference";
 import { simulateTherapy } from "@/lib/vision/therapy";
 import type { Variant, VariantGroup } from "@/lib/vision/snapshot";
@@ -61,7 +62,7 @@ import {
   type Target,
 } from "@/lib/vision/targets";
 import { MolViewer, type HoverInfo, type MolColour, type MolStyle } from "./MolViewer";
-import { Card, EvidenceTag, Gap, Spinner, VerdictChip } from "./ui";
+import { Card, EvidenceTag, Gap, Spinner, VerdictChip, Withheld } from "./ui";
 import { PlddtChart } from "./PlddtChart";
 
 type Ready = Extract<Target, { status: "ready" }>;
@@ -186,12 +187,8 @@ export function VisionModule() {
   );
 
   const exportRecord = () => {
-    const out = {
-      module: "cognivance-vision-evidence",
-      schema: 1,
+    const out = buildEvidenceExport({
       exportedAt: new Date().toISOString(),
-      notice:
-        "Research software. Not a medical device; not clinically validated. Values are as each source reported them at retrieval.",
       target: { gene: target.geneSymbol, taxonId: target.taxonId, condition: target.condition },
       record,
       structure: source && {
@@ -202,7 +199,7 @@ export function VisionModule() {
       },
       crossChecks: checks,
       decisions: DECISIONS,
-    };
+    });
     const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -303,8 +300,8 @@ export function VisionModule() {
               </div>
               <p className="mt-1.5 text-[11px] text-[var(--v-ink-3)]">
                 {ev.mode === "snapshot" && ev.manifest
-                  ? `Raw responses captured ${new Date(ev.manifest.capturedAt).toLocaleDateString(undefined, { dateStyle: "medium" })} from Ensembl, UniProt, AlphaFold DB and ClinVar. Works offline; every value keeps its source.`
-                  : "Requested now from Ensembl, UniProt and AlphaFold DB. Variants still come from the snapshot."}
+                  ? `Captured ${new Date(ev.manifest.capturedAt).toLocaleDateString(undefined, { dateStyle: "medium" })} from Ensembl, UniProt and AlphaFold DB; shown from a display copy that keeps each value's source. Works offline. Variant records are withheld.`
+                  : "Requested now from Ensembl, UniProt and AlphaFold DB. Variant records are withheld."}
               </p>
               {ev.fallback && (
                 <p className="mt-1 text-[11px] text-[color:var(--kv-b57d12)]">{ev.fallback}</p>
@@ -335,7 +332,9 @@ export function VisionModule() {
                           ? "Loaded"
                           : src?.state === "conflict"
                             ? "Conflict"
-                            : "Gap";
+                            : src?.state === "withheld"
+                              ? "Withheld"
+                              : "Gap";
                   const Icon =
                     s.key === "gene"
                       ? Dna
@@ -897,17 +896,21 @@ export function VisionModule() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-[19px] font-medium">Genomic variants</h2>
-                <EvidenceTag kind="reference" label="ClinVar" />
+                {ev.variants?.state === "value" && <EvidenceTag kind="reference" label="ClinVar" />}
               </div>
-              {variantSet ? (
+              {ev.variants?.state === "withheld" ? (
+                <p className="text-xs text-[var(--v-ink-3)]">
+                  Variant records come from ClinVar, which this app may not show yet.
+                </p>
+              ) : variantSet ? (
                 <p className="text-xs text-[var(--v-ink-3)]">
                   {variantSet.variants.length.toLocaleString()} variants recorded for RPE65 alone ·{" "}
                   {countGroups(variantSet.variants).pathogenic} pathogenic or likely pathogenic ·{" "}
                   {variantSet.multiGene} larger events spanning other genes too are counted, not
                   mapped.
                 </p>
-              ) : (
-                <p className="text-xs text-[var(--v-ink-3)]">Loading ClinVar…</p>
+              ) : ev.variants?.state === "missing" ? null : (
+                <p className="text-xs text-[var(--v-ink-3)]">Loading…</p>
               )}
               {ev.variants?.state === "value" && (
                 <div className="mt-0.5">
@@ -925,6 +928,11 @@ export function VisionModule() {
           {ev.variants?.state === "missing" && (
             <div className="mt-3">
               <Gap>{ev.variants.reason}</Gap>
+            </div>
+          )}
+          {ev.variants?.state === "withheld" && (
+            <div className="mt-3">
+              <Withheld what="Variant records" reason={ev.variants.reason} />
             </div>
           )}
           {variantSet && gene && protein && (
@@ -1048,9 +1056,9 @@ export function VisionModule() {
             <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-4 text-[13px] text-[var(--v-ink-2)]">
               <li>
                 <span className="font-medium text-[var(--v-ink)]">Why it could work: </span>
-                ClinVar lists the condition as recessive (
-                {selectedVariant?.conditions[0] ?? "RPE65-related retinopathy"}), so disease needs
-                both copies faulty; one working copy should restore the reset step.
+                the hypothesis assumes the condition is recessive, so disease needs both copies
+                faulty and one working copy could restore the reset step. That is an assumption of
+                this hypothesis, not a finding of this software.
               </li>
               <li>
                 <span className="font-medium text-[var(--v-ink)]">What limits it: </span>

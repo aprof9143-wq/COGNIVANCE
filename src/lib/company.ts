@@ -79,7 +79,7 @@ export const MODULES: {
     group: "Genome & Vision",
     name: "Gene & protein evidence",
     blurb:
-      "RPE65 from gene to structure: Ensembl, UniProt, AlphaFold DB and ClinVar, every value traced to its source.",
+      "RPE65 from gene to structure: Ensembl, UniProt and AlphaFold DB, every value traced to its source.",
     status: "Live data",
   },
   {

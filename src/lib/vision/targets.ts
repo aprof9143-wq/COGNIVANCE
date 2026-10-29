@@ -101,7 +101,8 @@ export const DECISIONS: Decision[] = [
   { n: 14, question: "Desired clinical benchmark output", status: "open" },
 ];
 
-export type StageStatus = "live" | "not-built" | "needs-decision";
+/** "withheld": built, but its source is refused by the source policy (lib/genome/policy.ts). */
+export type StageStatus = "live" | "not-built" | "needs-decision" | "withheld";
 
 export type Stage = {
   key: string;
@@ -119,7 +120,7 @@ export const PIPELINE: Stage[] = [
     key: "variant",
     label: "Genomic variants",
     source: "ClinVar",
-    status: "live",
+    status: "withheld",
     kind: "reference",
   },
   { key: "protein", label: "Protein", source: "UniProt", status: "live", kind: "reference" },

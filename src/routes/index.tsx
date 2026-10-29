@@ -72,7 +72,7 @@ const AUDIENCE = [
 const STEPS = [
   {
     t: "Ingest",
-    d: "Genome, imaging and EEG enter through one acquisition contract. Public references (Ensembl, UniProt, AlphaFold DB, ClinVar) are captured with a SHA-256 manifest per gene.",
+    d: "Genome, imaging and EEG enter through one acquisition contract. Public references are captured with a SHA-256 manifest per gene, and a source policy decides what may be stored, shown or shared.",
   },
   {
     t: "Model",

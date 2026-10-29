@@ -4,6 +4,7 @@
  * identifiers (TEST…). None of it is, or stands in for, a captured response
  * from Ensembl, UniProt or AlphaFold DB.
  */
+import { allowed } from "@/lib/genome/policy";
 import { describe, expect, it } from "vitest";
 import { mapSourced, missing, sourced, valueOf, type Provenance } from "./evidence";
 import { parsePdbBackbone, plddtBand, summarisePlddt } from "./pdb";
@@ -60,8 +61,13 @@ describe("targets and decisions", () => {
     expect(ready[0]).toMatchObject({ geneSymbol: "RPE65", taxonId: 9606 });
   });
 
-  it("runs every pipeline stage, and labels the modelled one hypothetical", () => {
-    expect(PIPELINE.every((s) => s.status === "live")).toBe(true);
+  it("runs every pipeline stage the source policy permits, and labels the modelled one hypothetical", () => {
+    // The variant stage's source (ClinVar) may not be displayed, so that stage is withheld.
+    expect(allowed("clinvar-eutils", "display")).toBe(false);
+    expect(PIPELINE.find((s) => s.key === "variant")!.status).toBe("withheld");
+    expect(PIPELINE.filter((s) => s.key !== "variant").every((s) => s.status === "live")).toBe(
+      true,
+    );
     expect(PIPELINE.find((s) => s.key === "hypothesis")!.kind).toBe("hypothetical");
   });
 });

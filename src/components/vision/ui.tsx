@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CircleDashed, RefreshCw } from "lucide-react";
+import { CircleDashed, Lock, RefreshCw } from "lucide-react";
 import { EVIDENCE, type EvidenceKind } from "@/lib/vision/evidence";
 import type { Verdict } from "@/lib/vision/reference";
 
@@ -48,6 +48,30 @@ export function Gap({ children }: { children: ReactNode }) {
     <div className="flex gap-2 rounded-2xl border border-dashed border-[var(--v-line)] bg-[var(--v-soft)] px-3 py-2.5 text-[13px] text-[var(--v-ink-2)]">
       <CircleDashed className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
       <span>{children}</span>
+    </div>
+  );
+}
+
+/**
+ * Content refused by the source policy. Says what is withheld and why, in the
+ * policy's own words; it never shows any of the withheld content.
+ */
+export function Withheld({ what, reason }: { what: string; reason: string }) {
+  return (
+    <div
+      role="note"
+      aria-label={`${what} withheld`}
+      className="flex gap-2.5 rounded-2xl border border-[var(--v-line)] bg-[var(--v-soft)] px-3.5 py-3 text-[13px] text-[var(--v-ink-2)]"
+    >
+      <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--v-ink)]" aria-hidden />
+      <div>
+        <p className="font-medium text-[var(--v-ink)]">{what} withheld by the source policy</p>
+        <p className="mt-0.5">{reason}</p>
+        <p className="mt-1 text-[12px] text-[var(--v-ink-3)]">
+          Nothing from this source is loaded or shown until the condition is met and recorded in the
+          licence inventory.
+        </p>
+      </div>
     </div>
   );
 }
