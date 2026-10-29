@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Download, FileUp, ScanLine } from "lucide-react";
+import { Brain, Download, FileUp, ScanLine, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   exportCaseFile,
@@ -19,6 +19,7 @@ import {
 } from "@/lib/neuro/linked";
 import { regionRows } from "@/lib/neuro/results";
 import { linkTemplateAseg } from "@/lib/neuro/templateAtlas";
+import { exampleCase, isExampleCase } from "@/lib/neuro/exampleCase";
 import { emptyCase, type CaseFile } from "@/lib/neuro/schema";
 import { DEFAULT_ASSOCIATIONS, DOMAIN_LABEL, type Association } from "@/lib/neuro/symptomMap";
 import { DISCLAIMER, Panel, Pill } from "@/components/workstation/ui";
@@ -94,10 +95,10 @@ export function NeuroDashboard() {
     <div className="ws min-h-screen bg-[color:var(--k-00030b)] text-[color:var(--k-e6efff)]">
       <header className="flex flex-wrap items-center gap-3 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-4 py-2.5">
         <Link to="/research" className="btn">
-          <ArrowLeft className="h-4 w-4" /> Research console
+          <Brain className="h-4 w-4" /> Research console
         </Link>
         <Link to="/viewer" className="btn">
-          <ScanLine className="h-4 w-4" /> Diagnostic viewer
+          <ScanLine className="h-4 w-4" /> Imaging workstation
         </Link>
         <div className="leading-tight">
           <h1 className="text-[15px] font-semibold">Neurodegeneration tracking</h1>
@@ -106,6 +107,18 @@ export function NeuroDashboard() {
           </p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          {isExampleCase(c) ? null : (
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                setC(applyLinked(exampleCase(), linked));
+                setMsg({ tone: "ok", text: "Synthetic example case loaded." });
+              }}
+            >
+              <Sparkles className="h-4 w-4" /> Load example case
+            </button>
+          )}
           <button type="button" className="btn" onClick={() => caseInput.current?.click()}>
             <FileUp className="h-4 w-4" /> Import case (JSON)
           </button>
@@ -158,17 +171,46 @@ export function NeuroDashboard() {
         role="note"
         className="border-b border-[color:var(--k-5a4a1c)] bg-[color:var(--k-1b160a)] px-4 py-3"
       >
-        <p className="max-w-5xl text-[14px] leading-relaxed text-[color:var(--k-f0dfae)]">
+        <p className="max-w-5xl text-[13px] leading-relaxed text-[color:var(--k-f0dfae)]">
           {SAFETY_STATEMENT}
         </p>
-        <p className="mt-1 text-[12px] text-[color:var(--k-c9b886)]">
-          {DISCLAIMER} This module computes no Alzheimer’s diagnosis, probability, severity or
-          “neuron degeneration” score. Regional volume loss is structural change, not a neuron
-          count. The case stays in this browser tab and is not saved unless exported; what the
-          research console and viewer have loaded is linked in automatically (summaries only, kept
-          in this browser).
-        </p>
+        <details className="mt-1 text-[12px] text-[color:var(--k-c9b886)]">
+          <summary className="cursor-pointer select-none">
+            What this module does not do, and where the data stays
+          </summary>
+          <p className="mt-1 max-w-5xl">
+            {DISCLAIMER} This module computes no Alzheimer’s diagnosis, probability, severity or
+            “neuron degeneration” score. Regional volume loss is structural change, not a neuron
+            count. The case stays in this browser tab and is not saved unless exported; what the
+            research console and viewer have loaded is linked in automatically (summaries only, kept
+            in this browser).
+          </p>
+        </details>
       </div>
+
+      {isExampleCase(c) ? (
+        <div
+          role="status"
+          className="flex flex-wrap items-center gap-3 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-0b2a5c)] px-4 py-2 text-[13px] text-[color:var(--k-e6f7ff)]"
+        >
+          <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+          <span className="min-w-0 flex-1">
+            <span className="font-semibold">Example case — synthetic numbers.</span> Not a person,
+            not a scan, not the output of any software; chosen by hand to show what the module does
+            with three yearly visits.
+          </span>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              setC(applyLinked(emptyCase(), linked));
+              setMsg(null);
+            }}
+          >
+            <X className="h-4 w-4" /> Clear example
+          </button>
+        </div>
+      ) : null}
 
       <nav
         className="flex flex-wrap gap-1 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-4 py-2"

@@ -218,7 +218,8 @@ export function VisionModule() {
       <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)_330px]">
           {/* ------------------------------------------------ left */}
-          <div className="flex flex-col gap-3">
+          {/* On phones the structure comes first, then its summary, then this index. */}
+          <div className="order-3 flex flex-col gap-3 lg:order-none">
             <Card>
               <p className="text-[13px] font-semibold tracking-[-0.01em]">Vision evidence</p>
               <p className="text-xs text-[var(--v-ink-3)]">On this page</p>
@@ -391,7 +392,7 @@ export function VisionModule() {
           {/* ------------------------------------------------ centre */}
           <Card
             id="structure"
-            className="relative flex min-h-[560px] flex-col overflow-hidden !p-0"
+            className="relative order-1 flex min-h-[560px] flex-col overflow-hidden !p-0 lg:order-none"
           >
             <div className="z-10 flex flex-wrap items-center justify-between gap-3 p-5 pb-0">
               <div>
@@ -651,7 +652,7 @@ export function VisionModule() {
           </Card>
 
           {/* ------------------------------------------------ right */}
-          <div className="flex flex-col gap-3">
+          <div className="order-2 flex flex-col gap-3 lg:order-none">
             <Card>
               <div className="flex items-center gap-3">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--v-accent-soft)] text-[var(--v-accent-ink)]">

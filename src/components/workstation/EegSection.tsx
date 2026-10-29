@@ -335,7 +335,7 @@ export function EegSection({ onDerived }: { onDerived: (d: EegDerived) => void }
                         {m.adDirection === "higher" ? "higher" : "lower"}. {m.basis}
                       </p>
                     </div>
-                    <p className="text-right font-mono text-[15px] text-white">
+                    <p className="text-right font-mono text-[15px] text-[color:var(--k-ffffff)]">
                       {m.format(m.value)}
                       <span className="block text-[11px] text-[color:var(--k-8095bf)]">
                         {m.unit}

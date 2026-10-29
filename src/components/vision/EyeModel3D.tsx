@@ -539,6 +539,18 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
       if (!tc?.shell || !tc.optics) return;
       const w = el.clientWidth;
       const h = el.clientHeight;
+      const s = Math.min(1, w / 900);
+      const placed: {
+        lab: HTMLElement;
+        line: SVGLineElement;
+        dot: SVGCircleElement;
+        ax: number;
+        ay: number;
+        lx: number;
+        ly: number;
+        hw: number;
+        hh: number;
+      }[] = [];
       for (const [k, a] of [...tc.shell.anchors, ...tc.optics.anchors]) {
         const lab = labelEls.current.get(k);
         const line = lineEls.current.get(k);
@@ -548,12 +560,38 @@ export function EyeModel3D({ result, distance, showLabels, showRays, highlight, 
         const ax = ((v.x + 1) / 2) * w;
         const ay = ((1 - v.y) / 2) * h;
         const [dx, dy] = LABEL_OFFSET[k];
-        const s = Math.min(1, w / 900);
         // Keep the whole label inside the frame, not just its centre.
         const hw = lab.offsetWidth / 2 + 6;
         const hh = lab.offsetHeight / 2 + 6;
-        const lx = Math.min(w - hw, Math.max(hw, ax + dx * s));
-        const ly = Math.min(h - hh, Math.max(hh, ay + dy * s));
+        placed.push({ lab, line, dot, ax, ay, lx: ax + dx * s, ly: ay + dy * s, hw, hh });
+      }
+      // Fixed offsets collide where parts sit close together (cornea, iris,
+      // lens) or once the eye is turned: push overlapping labels apart
+      // vertically, then clamp to the frame.
+      const visible = placed.filter((p) => p.lab.offsetWidth > 0);
+      for (let pass = 0; pass < 12; pass++) {
+        let moved = false;
+        for (let i = 0; i < visible.length; i++) {
+          for (let j = i + 1; j < visible.length; j++) {
+            const a = visible[i]!;
+            const b = visible[j]!;
+            const ox = a.hw + b.hw - 8 - Math.abs(a.lx - b.lx);
+            const oy = a.hh + b.hh - 8 - Math.abs(a.ly - b.ly);
+            if (ox <= 0 || oy <= 0) continue;
+            const push = oy / 2 + 1;
+            const down = a.ly <= b.ly ? 1 : -1;
+            a.ly -= push * down;
+            b.ly += push * down;
+            moved = true;
+          }
+        }
+        for (const p of visible) {
+          p.lx = Math.min(w - p.hw, Math.max(p.hw, p.lx));
+          p.ly = Math.min(h - p.hh, Math.max(p.hh, p.ly));
+        }
+        if (!moved) break;
+      }
+      for (const { lab, line, dot, ax, ay, lx, ly } of placed) {
         lab.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
         line.setAttribute("x1", String(ax));
         line.setAttribute("y1", String(ay));

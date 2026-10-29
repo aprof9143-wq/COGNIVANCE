@@ -1,7 +1,5 @@
-import { Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowLeft,
   Box,
   Brain,
   Cpu,
@@ -9,7 +7,6 @@ import {
   EyeOff,
   Gauge,
   Layers,
-  LogOut,
   Pause,
   Play,
   RotateCcw,
@@ -52,7 +49,6 @@ import {
 } from "@/lib/sim/subject";
 import type { SubjectReply, SubjectRequest } from "@/lib/sim/subject.worker";
 import { COMPONENTS } from "@/lib/sim/specs";
-import { endSession } from "@/lib/session";
 import {
   BeamPanel,
   BenchmarkPanel,
@@ -114,7 +110,6 @@ const EMPTY_HUD: Hud = {
 };
 
 export function SimulationWindow() {
-  const navigate = useNavigate();
   const hostRef = useRef<HTMLDivElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<SimScene | null>(null);
@@ -174,11 +169,6 @@ export function SimulationWindow() {
     };
   }, [subject]);
   const design = designs[diseaseKey] ?? baseDesign;
-
-  const signOut = () => {
-    endSession();
-    navigate({ to: "/auth" });
-  };
 
   /* --------------------------------------------------------- derived */
 
@@ -643,12 +633,6 @@ export function SimulationWindow() {
 
       {/* Header */}
       <header className="relative z-20 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-020818)]/90 px-4 py-2.5 backdrop-blur">
-        <Link
-          to="/research"
-          className="flex items-center gap-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Research OS
-        </Link>
         <div className="flex min-w-0 items-center gap-2">
           <span className="grid h-7 w-7 place-items-center rounded-md border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-0b2a5c)] shadow-[0_0_16px_rgba(127,216,255,0.35)]">
             <Box className="h-4 w-4 text-[color:var(--k-7fd8ff)]" />
@@ -735,13 +719,6 @@ export function SimulationWindow() {
           >
             <Upload className="h-3.5 w-3.5" /> {subjectStep ? `${subjectStep}…` : "Load subject"}
           </button>
-          <button
-            type="button"
-            onClick={signOut}
-            className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
-          >
-            <LogOut className="h-3.5 w-3.5" /> Sign out
-          </button>
         </div>
       </header>
 
@@ -805,7 +782,10 @@ export function SimulationWindow() {
 
             {/* left overlay: programme + status */}
             <div className="pointer-events-none absolute left-3 top-3 hidden max-w-[15rem] flex-col gap-1 md:flex">
-              {mode === "loop" || mode === "benchmark" ? null : (
+              {mode === "loop" ||
+              mode === "benchmark" ||
+              phase === "assembling" ||
+              subjectStep ? null : (
                 <p className="font-mono text-[0.56rem] uppercase tracking-[0.16em] text-[color:var(--k-5e719a)]">
                   {disease.implant}
                 </p>

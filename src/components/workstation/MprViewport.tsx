@@ -482,9 +482,7 @@ export function MprViewport(props: Props) {
         <span>
           {fmt(view.mmPerPixel, 3)} mm/px · {interpolation === "nearest" ? "raw pixels" : "linear"}
         </span>
-        {enhanced ? (
-          <span className="text-[color:var(--k-ffc400)]">Display enhancement active</span>
-        ) : null}
+        {enhanced ? <span className="text-[#ffc400]">Display enhancement active</span> : null}
       </Corner>
       <Corner className="bottom-1.5 left-2">
         {hv && hover ? (
@@ -512,17 +510,22 @@ export function MprViewport(props: Props) {
 function Marker({ className, children }: { className: string; children: React.ReactNode }) {
   return (
     <span
-      className={`pointer-events-none absolute font-mono text-[13px] font-semibold text-[color:var(--k-ffc400)] [text-shadow:0_0_3px_#000] ${className}`}
+      className={`pointer-events-none absolute font-mono text-[13px] font-semibold text-[#ffc400] [text-shadow:0_0_3px_#000] ${className}`}
     >
       {children}
     </span>
   );
 }
 
+/**
+ * Overlay text on the image. The image ground is black in both themes, so the
+ * colours are fixed. Each corner keeps to its half of the tile, so the left and
+ * right blocks never run into each other in the four-view layout.
+ */
 function Corner({ className, children }: { className: string; children: React.ReactNode }) {
   return (
     <div
-      className={`pointer-events-none absolute flex flex-col gap-0.5 font-mono text-[11px] leading-tight text-[color:var(--k-d5e2fa)] [text-shadow:0_0_3px_#000,0_0_2px_#000] ${className}`}
+      className={`pointer-events-none absolute flex max-w-[46%] flex-col gap-0.5 font-mono text-[11px] leading-tight text-[#d5e2fa] [text-shadow:0_0_3px_#000,0_0_2px_#000] [&>span]:max-w-full [&>span]:truncate ${className}`}
     >
       {children}
     </div>

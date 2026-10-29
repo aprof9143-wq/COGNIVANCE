@@ -14,7 +14,7 @@ export type Annotation = {
 };
 
 export const TOOL_LABELS: Record<Tool, string> = {
-  navigate: "Crosshair",
+  navigate: "Navigate",
   wl: "Window/level",
   pan: "Pan",
   zoom: "Zoom",

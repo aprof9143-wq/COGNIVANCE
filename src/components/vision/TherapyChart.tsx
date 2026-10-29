@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TherapyPoint } from "@/lib/vision/therapy";
 
 /** Validated categorical slots 1–3 (dataviz palette); the untreated line is a dashed grey reference. */
@@ -11,7 +11,9 @@ const SERIES = [
 
 const W = 760;
 const H = 300;
-const P = { l: 40, r: 168, t: 14, b: 30 };
+const P = { l: 44, r: 16, t: 18, b: 32 };
+/** Chart text, in screen pixels at any rendered width. */
+const TEXT_PX = 11;
 
 /** Fractions of healthy over time, with the current day marked and a crosshair on hover. */
 export function TherapyChart({
@@ -24,9 +26,29 @@ export function TherapyChart({
   onScrub: (d: number) => void;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+  // The drawing scales with its card; text is sized back up so it stays readable.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [k, setK] = useState(1);
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth) setK(Math.max(1, W / el.clientWidth));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const fs = TEXT_PX * k;
+  // Margins grow with the text so axis labels are never clipped.
+  const pad = {
+    l: Math.max(P.l, 3.6 * fs),
+    r: Math.max(P.r, 1.8 * fs),
+    t: Math.max(P.t, 1.2 * fs),
+    b: Math.max(P.b, 2.4 * fs),
+  };
   const days = series.length - 1;
-  const x = (d: number) => P.l + (d / days) * (W - P.l - P.r);
-  const y = (v: number) => P.t + (1 - v) * (H - P.t - P.b);
+  const x = (d: number) => pad.l + (d / days) * (W - pad.l - pad.r);
+  const y = (v: number) => pad.t + (1 - v) * (H - pad.t - pad.b);
   const path = (k: (typeof SERIES)[number]["key"]) =>
     series.map((p, i) => `${i ? "L" : "M"}${x(p.day).toFixed(1)},${y(p[k]).toFixed(1)}`).join("");
   const yearly = days > 400;
@@ -34,22 +56,17 @@ export function TherapyChart({
     ? Array.from({ length: Math.floor(days / 365) + 1 }, (_, i) => i * 365)
     : [0, 30, 90, 180, 270, 365];
   const h = hover !== null ? series[hover] : null;
-  const end = series[days]!;
-
-  // Direct labels at the right edge, nudged apart so they never overlap.
-  const ends = SERIES.map((s) => ({ ...s, y: y(end[s.key]) })).sort((a, b) => a.y - b.y);
-  for (let i = 1; i < ends.length; i++)
-    if (ends[i]!.y - ends[i - 1]!.y < 13) ends[i]!.y = ends[i - 1]!.y + 13;
 
   const toDay = (e: React.PointerEvent<SVGSVGElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     const px = ((e.clientX - r.left) / r.width) * W;
-    return Math.round(Math.min(days, Math.max(0, ((px - P.l) / (W - P.l - P.r)) * days)));
+    return Math.round(Math.min(days, Math.max(0, ((px - pad.l) / (W - pad.l - pad.r)) * days)));
   };
 
   return (
     <div className="relative">
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         className="h-auto w-full cursor-crosshair touch-none"
         role="img"
@@ -63,14 +80,20 @@ export function TherapyChart({
       >
         {[0, 0.25, 0.5, 0.75, 1].map((v) => (
           <g key={v}>
-            <line x1={P.l} x2={W - P.r} y1={y(v)} y2={y(v)} stroke="var(--v-line)" />
-            <text x={P.l - 6} y={y(v) + 3} fontSize="10" textAnchor="end" fill="var(--v-ink-3)">
+            <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke="var(--v-line)" />
+            <text
+              x={pad.l - 6}
+              y={y(v) + fs / 3}
+              fontSize={fs}
+              textAnchor="end"
+              fill="var(--v-ink-3)"
+            >
               {v * 100}%
             </text>
           </g>
         ))}
         {ticks.map((t) => (
-          <text key={t} x={x(t)} y={H - 10} fontSize="10" textAnchor="middle" fill="var(--v-ink-3)">
+          <text key={t} x={x(t)} y={H - 8} fontSize={fs} textAnchor="middle" fill="var(--v-ink-3)">
             {yearly ? `${t / 365} y` : `${t} d`}
           </text>
         ))}
@@ -88,13 +111,26 @@ export function TherapyChart({
         <line
           x1={x(day)}
           x2={x(day)}
-          y1={P.t}
-          y2={H - P.b}
+          y1={pad.t}
+          y2={H - pad.b}
           stroke="var(--v-ink)"
           strokeWidth="1.5"
         />
-        <rect x={x(day) - 18} y={P.t - 2} width={36} height={14} rx={7} fill="var(--v-ink)" />
-        <text x={x(day)} y={P.t + 8} fontSize="9" textAnchor="middle" fill="#fff">
+        <rect
+          x={x(day) - 2.2 * fs}
+          y={pad.t - 0.9 * fs}
+          width={4.4 * fs}
+          height={1.5 * fs}
+          rx={0.75 * fs}
+          fill="var(--v-ink)"
+        />
+        <text
+          x={x(day)}
+          y={pad.t + 0.2 * fs}
+          fontSize={0.9 * fs}
+          textAnchor="middle"
+          fill="var(--v-on-ink)"
+        >
           {yearly ? `${(day / 365).toFixed(1)}y` : `d${day}`}
         </text>
         {h && hover !== null && (
@@ -102,8 +138,8 @@ export function TherapyChart({
             <line
               x1={x(hover)}
               x2={x(hover)}
-              y1={P.t}
-              y2={H - P.b}
+              y1={pad.t}
+              y2={H - pad.b}
               stroke="var(--v-ink-3)"
               strokeDasharray="2 3"
             />
@@ -120,12 +156,6 @@ export function TherapyChart({
             ))}
           </g>
         )}
-        {ends.map((s) => (
-          <text key={s.key} x={W - P.r + 8} y={s.y + 3} fontSize="10" fill="var(--v-ink-2)">
-            <tspan fill={s.colour}>●</tspan>{" "}
-            {s.label.replace("Light response, ", "").replace(", treated area", "")}
-          </text>
-        ))}
       </svg>
       {h && (
         <div className="pointer-events-none absolute left-12 top-2 rounded-xl bg-[var(--v-ink)] px-3 py-2 text-[11px] text-[var(--v-on-ink)] shadow">

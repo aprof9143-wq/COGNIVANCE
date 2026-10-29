@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   Activity,
   ArrowUpRight,
@@ -7,7 +7,6 @@ import {
   Brain,
   FileUp,
   Layers,
-  LogOut,
   Microscope,
   Pause,
   Play,
@@ -67,7 +66,6 @@ import {
 } from "@/lib/neuro/linked";
 import { linkTemplateAseg } from "@/lib/neuro/templateAtlas";
 import { setLinkedFiles, setLinkedParcellation } from "@/lib/neuro/linkedFiles";
-import { endSession } from "@/lib/session";
 
 /** EEG analysed over at most this many seconds, so a long recording stays responsive. */
 const ANALYSIS_WINDOW_S = 300;
@@ -107,8 +105,6 @@ async function fetchTemplate(): Promise<NiftiVolume> {
 }
 
 export function ResearchConsole() {
-  const navigate = useNavigate();
-
   // -- data -----------------------------------------------------------------
   const [volume, setVolume] = useState<NiftiVolume>(() => phantomVolume(144));
   const [volumeName, setVolumeName] = useState("Synthetic phantom");
@@ -587,11 +583,6 @@ export function ResearchConsole() {
     }
   };
 
-  const signOut = () => {
-    endSession();
-    navigate({ to: "/" });
-  };
-
   const fused = volumeSource === "upload" && recordingSource === "upload";
 
   return (
@@ -605,10 +596,9 @@ export function ResearchConsole() {
         <span className="pointer-events-none absolute inset-x-0 bottom-[-1px] h-px bg-gradient-to-r from-transparent via-[color:var(--k-7fd8ff)]/60 to-transparent" />
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5">
           <div className="flex items-center gap-3">
-            <img src="/logo-mark.png" alt="Cognivance" className="h-8 w-auto" />
             <div className="leading-tight">
               <p className="font-mono text-[0.62rem] font-semibold tracking-[0.22em] text-[color:var(--k-7fd8ff)]">
-                NIMBLE / RESEARCH OS
+                RESEARCH CONSOLE
               </p>
               <p className="text-[0.72rem] text-[color:var(--k-8095bf)]">
                 Multimodal neural workstation
@@ -634,8 +624,8 @@ export function ResearchConsole() {
             </span>
             <Link to="/viewer" className={NAV_BUTTON}>
               <ScanLine className="h-3.5 w-3.5" />
-              <span className="sm:hidden">Viewer</span>
-              <span className="hidden sm:inline">Diagnostic viewer</span>
+              <span className="sm:hidden">Workstation</span>
+              <span className="hidden sm:inline">Imaging workstation</span>
             </Link>
             <Link to="/neurodegeneration" className={NAV_BUTTON}>
               <Microscope className="h-3.5 w-3.5" /> Neurodegeneration
@@ -643,13 +633,6 @@ export function ResearchConsole() {
             <Link to="/simulation" className={NAV_BUTTON}>
               <Box className="h-3.5 w-3.5" /> Simulation
             </Link>
-            <button
-              type="button"
-              onClick={signOut}
-              className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
-            >
-              <LogOut className="h-3.5 w-3.5" /> Sign out
-            </button>
           </div>
         </div>
       </header>
@@ -661,7 +644,7 @@ export function ResearchConsole() {
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-[color:var(--k-ffc9cb)]/70 hover:text-white"
+            className="text-[color:var(--k-ffc9cb)]/70 hover:text-[color:var(--k-ffffff)]"
           >
             Dismiss
           </button>
@@ -926,6 +909,11 @@ export function ResearchConsole() {
                   · {palette.toUpperCase()}
                 </span>
                 <span>{volume.extent.map((v) => v.toFixed(0)).join(" × ")} mm</span>
+                {showLesion && lesion && lesionSource !== "upload" ? (
+                  <span className="mt-1 self-start rounded border border-[color:var(--k-ff4860)]/50 bg-[color:var(--k-1a0508)]/80 px-2.5 py-1 text-[0.58rem] tracking-[0.12em] text-[color:var(--k-ff9aa6)] backdrop-blur">
+                    DEMO LESION · SYNTHETIC · NOT A FINDING
+                  </span>
+                ) : null}
                 {/* The layer list needs room; on phones the Layers panel below carries it. */}
                 <span className="mt-2 hidden flex-col gap-1 sm:flex">
                   <span className="text-[color:var(--k-5e719a)]">
@@ -976,15 +964,6 @@ export function ResearchConsole() {
                 </span>
               </div>
 
-              {showLesion && lesion && lesionSource !== "upload" ? (
-                <div className="pointer-events-none absolute left-4 top-[3.3rem] rounded border border-[color:var(--k-ff4860)]/50 bg-[color:var(--k-1a0508)]/80 px-3 py-1.5 font-mono text-[0.6rem] tracking-[0.12em] text-[color:var(--k-ff9aa6)] backdrop-blur lg:left-1/2 lg:top-3 lg:-translate-x-1/2">
-                  <span className="lg:hidden">DEMO LESION · SYNTHETIC · NOT A FINDING</span>
-                  <span className="hidden lg:inline">
-                    DEMONSTRATION LESION · SYNTHETIC · NOT A FINDING
-                  </span>
-                </div>
-              ) : null}
-
               <SceneSwitch scene={scene} onChange={applyScene} />
 
               {hovered ? (
@@ -995,14 +974,7 @@ export function ResearchConsole() {
                 />
               ) : null}
 
-              <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex flex-wrap items-end justify-between gap-3">
-                <p className="hidden max-w-[46ch] font-mono text-[0.6rem] leading-relaxed tracking-[0.06em] text-[color:var(--k-5e719a)] sm:block">
-                  DRAG TO ORBIT · SCROLL TO ZOOM · HOVER AN ELECTRODE · ELECTRODES PROJECTED ONTO
-                  THIS SCALP — APPROXIMATE, NOT CO-REGISTERED ·{" "}
-                  {tractSource === "bundled" && volumeSource === "template"
-                    ? "TRACTS AFFINELY REGISTERED TO THIS TEMPLATE"
-                    : "TRACTS FITTED TO THIS BRAIN"}
-                </p>
+              <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex flex-wrap items-end justify-end gap-3">
                 <div className="flex flex-col items-end gap-1.5">
                   {showTracts ? <TractLegend /> : null}
                   <BandLegend band={band} />
@@ -1017,6 +989,13 @@ export function ResearchConsole() {
                 </div>
               ) : null}
             </div>
+            <p className="px-3 pb-2.5 pt-2 font-mono text-[0.6rem] leading-relaxed tracking-[0.06em] text-[color:var(--k-5e719a)]">
+              DRAG TO ORBIT · SCROLL TO ZOOM · HOVER AN ELECTRODE. ELECTRODES PROJECTED ONTO THIS
+              SCALP — APPROXIMATE, NOT CO-REGISTERED ·{" "}
+              {tractSource === "bundled" && volumeSource === "template"
+                ? "TRACTS AFFINELY REGISTERED TO THIS TEMPLATE"
+                : "TRACTS FITTED TO THIS BRAIN"}
+            </p>
           </Panel>
 
           <div className="grid gap-3 md:grid-cols-3">
@@ -1670,7 +1649,9 @@ function ElectrodeCard({
   return (
     <div className="pointer-events-none absolute right-4 top-3 w-[13.5rem] rounded-md border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-00030b)]/85 p-3 backdrop-blur">
       <div className="flex items-baseline justify-between">
-        <span className="font-mono text-[1.05rem] font-semibold text-white">{label}</span>
+        <span className="font-mono text-[1.05rem] font-semibold text-[color:var(--k-ffffff)]">
+          {label}
+        </span>
         <span className="font-mono text-[0.58rem] uppercase tracking-[0.1em] text-[color:var(--k-7fd8ff)]">
           {pos?.region} · {pos?.hemisphere}
         </span>
@@ -1991,7 +1972,7 @@ function BiomarkerRow({ marker }: { marker: import("./fusion").Biomarker }) {
         </p>
       </div>
       <div className="flex flex-col items-end">
-        <span className="font-mono text-[1.02rem] font-semibold tabular-nums text-white">
+        <span className="font-mono text-[1.02rem] font-semibold tabular-nums text-[color:var(--k-ffffff)]">
           {marker.format(marker.value)}
         </span>
         <span className="font-mono text-[0.56rem] text-[color:var(--k-5e719a)]">{marker.unit}</span>

@@ -1,16 +1,4 @@
-import { Link } from "@tanstack/react-router";
-import {
-  Activity,
-  ArrowLeft,
-  Cable,
-  Cpu,
-  Pause,
-  Play,
-  RadioTower,
-  Unplug,
-  Waves,
-  Zap,
-} from "lucide-react";
+import { Activity, Cable, Cpu, Pause, Play, RadioTower, Unplug, Waves, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MONTAGE_1020 } from "@/lib/montage";
 import {
@@ -146,16 +134,9 @@ export function NimbleSimulator() {
     <div className="flex min-h-screen flex-col bg-[color:var(--k-00030b)] text-[color:var(--k-e6efff)]">
       {/* ------------------------------------------------------------ top bar */}
       <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)]/90 px-4 py-2.5 backdrop-blur">
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-[color:var(--k-8095bf)] transition hover:text-[color:var(--k-e6efff)]"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <img src="/logo-mark.png" alt="" className="h-7 w-7" />
-        </Link>
         <div className="leading-tight">
           <p className="font-mono text-[0.62rem] tracking-[0.28em] text-[color:var(--k-7fd8ff)]">
-            NIMBLE / HARDWARE SIMULATION
+            NIMBLE CORE · HARDWARE SIMULATION
           </p>
           <p className="text-[0.8rem] text-[color:var(--k-8095bf)]">
             One acquisition contract, every signal origin
@@ -264,7 +245,11 @@ export function NimbleSimulator() {
                     onClick={() => setSelected(c)}
                     className={`col-span-4 grid grid-cols-subgrid items-center rounded px-1 py-0.5 text-left transition ${pick ? "bg-[color:var(--k-7fd8ff)]/10" : "hover:bg-[color:var(--k-0a1f4a)]"}`}
                   >
-                    <span className={pick ? "text-white" : "text-[color:var(--k-8095bf)]"}>
+                    <span
+                      className={
+                        pick ? "text-[color:var(--k-ffffff)]" : "text-[color:var(--k-8095bf)]"
+                      }
+                    >
                       {e.label}
                     </span>
                     <span className="h-1.5 overflow-hidden rounded-full bg-[color:var(--k-0a1f4a)]">
@@ -394,7 +379,9 @@ export function NimbleSimulator() {
               <div className="mt-2 flex items-center justify-between rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-3 py-2 font-mono text-[0.66rem]">
                 <span className="text-[color:var(--k-8095bf)]">
                   PLANTED {plantedHere.freq.toFixed(2)} Hz · MEASURED{" "}
-                  <span className="text-white">{spectrum.peakFrequency.toFixed(2)} Hz</span>
+                  <span className="text-[color:var(--k-ffffff)]">
+                    {spectrum.peakFrequency.toFixed(2)} Hz
+                  </span>
                 </span>
                 {Math.abs(spectrum.peakFrequency - plantedHere.freq) <= 0.5 ? (
                   <span className="text-[color:var(--k-4ade80)]">PASS</span>
@@ -528,7 +515,7 @@ function Stat({ label, value, warn }: { label: string; value: string; warn?: boo
         {label}
       </p>
       <p
-        className={`mt-0.5 font-mono text-[0.9rem] ${warn ? "text-[color:var(--k-ff8a98)]" : "text-white"}`}
+        className={`mt-0.5 font-mono text-[0.9rem] ${warn ? "text-[color:var(--k-ff8a98)]" : "text-[color:var(--k-ffffff)]"}`}
       >
         {value}
       </p>
