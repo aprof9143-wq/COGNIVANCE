@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Gated } from "@/components/app/Gated";
 import { NimbleSimulator } from "@/components/nimble/NimbleSimulator";
 
 const title = "NIMBLE Hardware Simulation — Cognivance Labs";
@@ -14,5 +15,13 @@ export const Route = createFileRoute("/nimble")({
       { property: "og:description", content: description },
     ],
   }),
-  component: NimbleSimulator,
+  component: Page,
 });
+
+function Page() {
+  return (
+    <Gated path="/nimble">
+      <NimbleSimulator />
+    </Gated>
+  );
+}

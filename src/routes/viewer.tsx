@@ -1,6 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { hasSession } from "@/lib/session";
+import { createFileRoute } from "@tanstack/react-router";
+import { Gated } from "@/components/app/Gated";
 import { Workstation } from "@/components/workstation/Workstation";
 
 export const Route = createFileRoute("/viewer")({
@@ -14,18 +13,13 @@ export const Route = createFileRoute("/viewer")({
       },
     ],
   }),
-  component: Viewer,
+  component: Page,
 });
 
-function Viewer() {
-  const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    if (!hasSession()) navigate({ to: "/auth", search: { redirect: "/viewer" } });
-    else setReady(true);
-  }, [navigate]);
-
-  if (!ready) return <div className="min-h-screen bg-[#020405]" />;
-  return <Workstation />;
+function Page() {
+  return (
+    <Gated path="/viewer">
+      <Workstation />
+    </Gated>
+  );
 }
