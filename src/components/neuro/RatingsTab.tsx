@@ -69,11 +69,13 @@ export function RatingsTab({ c, set }: Props) {
         }
       >
         {!c.visits.length ? (
-          <p className="text-[13px] text-[#a9bbdc]">Add a visit (Imaging tab) before rating.</p>
+          <p className="text-[13px] text-[color:var(--k-a9bbdc)]">
+            Add a visit (Imaging tab) before rating.
+          </p>
         ) : null}
         {c.ratings.length ? (
           <table className="w-full text-[12px]">
-            <thead className="text-left text-[#8095bf]">
+            <thead className="text-left text-[color:var(--k-8095bf)]">
               <tr>
                 {[
                   "Visit",
@@ -100,7 +102,7 @@ export function RatingsTab({ c, set }: Props) {
                 return (
                   <tr
                     key={r.id}
-                    className={`border-t border-[#0e2247] ${r.kind === "automated-suggestion" ? "opacity-70" : ""}`}
+                    className={`border-t border-[color:var(--k-0e2247)] ${r.kind === "automated-suggestion" ? "opacity-70" : ""}`}
                   >
                     <td className="p-1">
                       <Select
@@ -134,7 +136,7 @@ export function RatingsTab({ c, set }: Props) {
                     </td>
                     <td className="p-1">
                       <input
-                        className={`field w-16 ${out ? "border-[#d03b3b]" : ""}`}
+                        className={`field w-16 ${out ? "border-[color:var(--k-d03b3b)]" : ""}`}
                         type="number"
                         min={s.min}
                         max={s.max}
@@ -142,7 +144,7 @@ export function RatingsTab({ c, set }: Props) {
                         value={r.score}
                         onChange={(e) => upR(r.id, { score: Math.round(Number(e.target.value)) })}
                       />
-                      <span className="ml-1 text-[11px] text-[#8095bf]">
+                      <span className="ml-1 text-[11px] text-[color:var(--k-8095bf)]">
                         {s.min}–{s.max}
                       </span>
                     </td>
@@ -186,7 +188,7 @@ export function RatingsTab({ c, set }: Props) {
                           set((x) => ({ ...x, ratings: x.ratings.filter((y) => y.id !== r.id) }))
                         }
                       >
-                        <Trash2 className="h-4 w-4 text-[#8095bf]" />
+                        <Trash2 className="h-4 w-4 text-[color:var(--k-8095bf)]" />
                       </button>
                     </td>
                   </tr>
@@ -195,14 +197,14 @@ export function RatingsTab({ c, set }: Props) {
             </tbody>
           </table>
         ) : (
-          <p className="text-[13px] text-[#a9bbdc]">No ratings.</p>
+          <p className="text-[13px] text-[color:var(--k-a9bbdc)]">No ratings.</p>
         )}
         {dis.length ? (
           <p className="mt-2">
             <Pill tone="warn">Rater disagreement: {dis.join(" · ")}</Pill>
           </p>
         ) : null}
-        <p className="mt-2 text-[12px] text-[#8095bf]">
+        <p className="mt-2 text-[12px] text-[color:var(--k-8095bf)]">
           No automated rating model is bundled, so no suggestions are generated. Atrophy and
           white-matter changes rise with age and are not disease-specific; interpret against
           age-specific references. No score is converted into a diagnosis. Reference images are not
@@ -252,7 +254,7 @@ export function RatingsTab({ c, set }: Props) {
         }
       >
         {!c.biomarkers.length ? (
-          <p className="text-[13px] text-[#a9bbdc]">
+          <p className="text-[13px] text-[color:var(--k-a9bbdc)]">
             No PET, CSF, blood, diffusion, perfusion or EEG biomarkers recorded. None is inferred.
           </p>
         ) : (
@@ -261,12 +263,14 @@ export function RatingsTab({ c, set }: Props) {
               const list = c.biomarkers.filter((b) => b.category === cat);
               if (!list.length) return null;
               return (
-                <div key={cat} className="rounded border border-[#0e2247] p-2">
-                  <p className="mb-2 text-[13px] font-semibold capitalize text-[#e6efff]">{cat}</p>
+                <div key={cat} className="rounded border border-[color:var(--k-0e2247)] p-2">
+                  <p className="mb-2 text-[13px] font-semibold capitalize text-[color:var(--k-e6efff)]">
+                    {cat}
+                  </p>
                   {list.map((b) => (
                     <div
                       key={b.id}
-                      className="mb-2 grid gap-2 border-b border-[#0e2247] pb-2 sm:grid-cols-3"
+                      className="mb-2 grid gap-2 border-b border-[color:var(--k-0e2247)] pb-2 sm:grid-cols-3"
                     >
                       <Field label="Modality">
                         <Select
@@ -364,7 +368,7 @@ export function RatingsTab({ c, set }: Props) {
                         />
                       </Field>
                       <div className="flex items-end justify-between sm:col-span-3">
-                        <span className="text-[12px] text-[#a9bbdc]">
+                        <span className="text-[12px] text-[color:var(--k-a9bbdc)]">
                           {b.quality === "fail" ? (
                             <Missing>Failed quality control</Missing>
                           ) : b.value === null ? (
@@ -393,7 +397,7 @@ export function RatingsTab({ c, set }: Props) {
                             }))
                           }
                         >
-                          <Trash2 className="h-4 w-4 text-[#8095bf]" />
+                          <Trash2 className="h-4 w-4 text-[color:var(--k-8095bf)]" />
                         </button>
                       </div>
                     </div>
@@ -403,7 +407,7 @@ export function RatingsTab({ c, set }: Props) {
             })}
           </div>
         )}
-        <p className="mt-2 text-[12px] text-[#8095bf]">
+        <p className="mt-2 text-[12px] text-[color:var(--k-8095bf)]">
           Amyloid, tau, neurodegeneration and vascular findings are shown separately and are never
           combined into an Alzheimer's score (framework:{" "}
           {CITATIONS.find((x) => x.id === "jack2018")!.text}).

@@ -656,32 +656,32 @@ export function SimulationWindow() {
   /* --------------------------------------------------------- render */
 
   return (
-    <div className="sim-window relative min-h-screen bg-[#01040d] text-[#e6efff]">
+    <div className="sim-window relative min-h-screen bg-[color:var(--k-01040d)] text-[color:var(--k-e6efff)]">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(48,94,190,0.16),transparent_60%)]" />
 
       {/* Header */}
-      <header className="relative z-20 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-[#16305e] bg-[#020818]/90 px-4 py-2.5 backdrop-blur">
+      <header className="relative z-20 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-020818)]/90 px-4 py-2.5 backdrop-blur">
         <Link
           to="/research"
-          className="flex items-center gap-1.5 text-[0.72rem] text-[#8095bf] hover:text-[#e6efff]"
+          className="flex items-center gap-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Research OS
         </Link>
         <div className="flex min-w-0 items-center gap-2">
-          <span className="grid h-7 w-7 place-items-center rounded-md border border-[#7fd8ff]/40 bg-[#0b2a5c] shadow-[0_0_16px_rgba(127,216,255,0.35)]">
-            <Box className="h-4 w-4 text-[#7fd8ff]" />
+          <span className="grid h-7 w-7 place-items-center rounded-md border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-0b2a5c)] shadow-[0_0_16px_rgba(127,216,255,0.35)]">
+            <Box className="h-4 w-4 text-[color:var(--k-7fd8ff)]" />
           </span>
           <div className="min-w-0">
             <h1 className="truncate text-[0.95rem] font-semibold tracking-[-0.01em]">
               CIRCUIT Simulation Window
             </h1>
-            <p className="truncate font-mono text-[0.56rem] uppercase tracking-[0.16em] text-[#8095bf]">
+            <p className="truncate font-mono text-[0.56rem] uppercase tracking-[0.16em] text-[color:var(--k-8095bf)]">
               NIMBLE · Synapse Atlas · PRISM · ECHO — closed-loop implant, in silico
             </p>
           </div>
         </div>
         <nav
-          className="flex rounded-lg border border-[#16305e] bg-[#030b20] p-0.5"
+          className="flex rounded-lg border border-[color:var(--k-16305e)] bg-[color:var(--k-030b20)] p-0.5"
           aria-label="Mode"
         >
           {(
@@ -701,8 +701,8 @@ export function SimulationWindow() {
               }}
               className={`rounded-md px-2.5 py-1 text-[0.7rem] transition ${
                 mode === m
-                  ? "bg-[#0b2a5c] text-[#e6f7ff] shadow-[inset_0_0_0_1px_rgba(127,216,255,0.45)]"
-                  : "text-[#8095bf] hover:text-[#e6efff]"
+                  ? "bg-[color:var(--k-0b2a5c)] text-[color:var(--k-e6f7ff)] shadow-[inset_0_0_0_1px_rgba(127,216,255,0.45)]"
+                  : "text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
               }`}
             >
               {label}
@@ -721,7 +721,7 @@ export function SimulationWindow() {
           {subjectError ? (
             <span
               title={subjectError}
-              className="max-w-[18rem] truncate text-[0.66rem] text-[#ffb3bc]"
+              className="max-w-[18rem] truncate text-[0.66rem] text-[color:var(--k-ffb3bc)]"
             >
               {subjectError}
             </span>
@@ -730,7 +730,7 @@ export function SimulationWindow() {
             <>
               <span
                 title={subjectSummary}
-                className="max-w-[14rem] truncate rounded-md border border-[#7fd8ff]/40 bg-[#0b2a5c] px-2.5 py-1.5 font-mono text-[0.62rem] text-[#e6f7ff]"
+                className="max-w-[14rem] truncate rounded-md border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-0b2a5c)] px-2.5 py-1.5 font-mono text-[0.62rem] text-[color:var(--k-e6f7ff)]"
               >
                 {subject.label} · MNI152
               </span>
@@ -738,7 +738,7 @@ export function SimulationWindow() {
                 type="button"
                 onClick={showTemplate}
                 disabled={subjectStep !== null}
-                className="rounded-md border border-[#16305e] px-2.5 py-1.5 text-[0.72rem] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff] disabled:opacity-40"
+                className="rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)] disabled:opacity-40"
               >
                 Template
               </button>
@@ -749,14 +749,14 @@ export function SimulationWindow() {
             onClick={() => fileRef.current?.click()}
             disabled={!anatomy || subjectStep !== null}
             title="T1 registered to MNI152 (NIfTI), plus optional aseg, brain mask and config.json"
-            className="flex items-center gap-1.5 rounded-md border border-[#16305e] px-2.5 py-1.5 text-[0.72rem] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff] disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)] disabled:opacity-40"
           >
             <Upload className="h-3.5 w-3.5" /> {subjectStep ? `${subjectStep}…` : "Load subject"}
           </button>
           <button
             type="button"
             onClick={signOut}
-            className="flex items-center gap-1.5 rounded-md border border-[#16305e] px-2.5 py-1.5 text-[0.72rem] text-[#8095bf] transition hover:border-[#3d8bf5] hover:text-[#e6efff]"
+            className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
           >
             <LogOut className="h-3.5 w-3.5" /> Sign out
           </button>
@@ -764,7 +764,7 @@ export function SimulationWindow() {
       </header>
 
       {/* Programme picker */}
-      <div className="relative z-10 flex gap-1.5 overflow-x-auto border-b border-[#0e2247] bg-[#020818]/70 px-4 py-2">
+      <div className="relative z-10 flex gap-1.5 overflow-x-auto border-b border-[color:var(--k-0e2247)] bg-[color:var(--k-020818)]/70 px-4 py-2">
         {DISEASES.map((d) => (
           <button
             key={d.key}
@@ -775,12 +775,12 @@ export function SimulationWindow() {
             }}
             className={`shrink-0 rounded-full border px-3 py-1 text-[0.7rem] transition ${
               d.key === diseaseKey
-                ? "border-[#7fd8ff]/70 bg-[#0b2a5c] text-[#e6f7ff]"
-                : "border-[#16305e] text-[#8095bf] hover:border-[#3d8bf5] hover:text-[#e6efff]"
+                ? "border-[color:var(--k-7fd8ff)]/70 bg-[color:var(--k-0b2a5c)] text-[color:var(--k-e6f7ff)]"
+                : "border-[color:var(--k-16305e)] text-[color:var(--k-8095bf)] hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
             }`}
           >
             {d.name}
-            <span className="ml-1.5 font-mono text-[0.56rem] text-[#5e719a]">
+            <span className="ml-1.5 font-mono text-[0.56rem] text-[color:var(--k-5e719a)]">
               {(subjectTargets ?? d.targets).join("+")}
             </span>
           </button>
@@ -797,7 +797,7 @@ export function SimulationWindow() {
 
         {/* Viewport */}
         <div className="order-1 flex min-w-0 flex-col gap-3 xl:order-2">
-          <div className="relative h-[62vh] min-h-[22rem] overflow-hidden rounded-xl border border-[#16305e] bg-[#01040d] xl:h-[calc(100vh-11.5rem)]">
+          <div className="relative h-[62vh] min-h-[22rem] overflow-hidden rounded-xl border border-[color:var(--k-16305e)] bg-[color:var(--k-01040d)] xl:h-[calc(100vh-11.5rem)]">
             <div ref={hostRef} className="absolute inset-0" />
             <div ref={labelsRef} className="pointer-events-none absolute inset-0 overflow-hidden" />
 
@@ -809,12 +809,12 @@ export function SimulationWindow() {
                 </div>
               ) : null}
               {subjectStep ? (
-                <div className="rounded-full border border-[#7fd8ff]/40 bg-[#01071a]/80 px-3 py-1 font-mono text-[0.62rem] tracking-[0.12em] text-[#7fd8ff] backdrop-blur">
+                <div className="rounded-full border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-01071a)]/80 px-3 py-1 font-mono text-[0.62rem] tracking-[0.12em] text-[color:var(--k-7fd8ff)] backdrop-blur">
                   SUBJECT ANATOMY · {subjectStep.toUpperCase()}
                 </div>
               ) : null}
               {phase === "assembling" ? (
-                <div className="rounded-full border border-[#7fd8ff]/40 bg-[#01071a]/80 px-3 py-1 font-mono text-[0.62rem] tracking-[0.12em] text-[#7fd8ff] backdrop-blur">
+                <div className="rounded-full border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-01071a)]/80 px-3 py-1 font-mono text-[0.62rem] tracking-[0.12em] text-[color:var(--k-7fd8ff)] backdrop-blur">
                   AUTO-ASSEMBLY · placing {revealed.size ? "and wiring" : ""}{" "}
                   {circuit.components.length} parts · {revealed.size}/{circuit.nets.length} nets
                 </div>
@@ -824,7 +824,7 @@ export function SimulationWindow() {
             {/* left overlay: programme + status */}
             <div className="pointer-events-none absolute left-3 top-3 hidden max-w-[15rem] flex-col gap-1 md:flex">
               {mode === "loop" || mode === "benchmark" ? null : (
-                <p className="font-mono text-[0.56rem] uppercase tracking-[0.16em] text-[#5e719a]">
+                <p className="font-mono text-[0.56rem] uppercase tracking-[0.16em] text-[color:var(--k-5e719a)]">
                   {disease.implant}
                 </p>
               )}
@@ -833,22 +833,22 @@ export function SimulationWindow() {
             {/* blocking states */}
             {phase === "loading" ? (
               <div className="absolute inset-0 grid place-items-center">
-                <p className="font-mono text-[0.7rem] tracking-[0.14em] text-[#8095bf]">
+                <p className="font-mono text-[0.7rem] tracking-[0.14em] text-[color:var(--k-8095bf)]">
                   LOADING MNI152 ANATOMY…
                 </p>
               </div>
             ) : null}
             {phase === "error" ? (
               <div className="absolute inset-0 grid place-items-center p-6 text-center">
-                <p className="max-w-md text-[0.8rem] text-[#ffb3bc]">{error}</p>
+                <p className="max-w-md text-[0.8rem] text-[color:var(--k-ffb3bc)]">{error}</p>
               </div>
             ) : null}
             {phase === "ready" && blocked.length ? (
-              <div className="absolute inset-x-3 bottom-16 mx-auto max-w-lg rounded-lg border border-[#ff4b5c]/50 bg-[#2a0710]/85 p-3 backdrop-blur">
-                <p className="flex items-center gap-2 text-[0.8rem] font-semibold text-[#ffb3bc]">
+              <div className="absolute inset-x-3 bottom-16 mx-auto max-w-lg rounded-lg border border-[color:var(--k-ff4b5c)]/50 bg-[color:var(--k-2a0710)]/85 p-3 backdrop-blur">
+                <p className="flex items-center gap-2 text-[0.8rem] font-semibold text-[color:var(--k-ffb3bc)]">
                   <ShieldAlert className="h-4 w-4" /> Simulation refused — design-rule errors
                 </p>
-                <ul className="mt-1 list-disc pl-5 text-[0.7rem] text-[#ffd0d6]">
+                <ul className="mt-1 list-disc pl-5 text-[0.7rem] text-[color:var(--k-ffd0d6)]">
                   {blocked.map((d) => (
                     <li key={d.message}>
                       <b>{d.rule}</b> {d.message}
@@ -858,8 +858,8 @@ export function SimulationWindow() {
               </div>
             ) : null}
             {phase === "ready" && circuit.ok && unreachable.length && mode !== "benchmark" ? (
-              <div className="absolute inset-x-3 bottom-16 mx-auto flex max-w-xl flex-wrap items-center gap-2 rounded-lg border border-[#d9a441]/50 bg-[#1f1505]/85 p-2.5 backdrop-blur">
-                <p className="min-w-0 flex-1 text-[0.7rem] text-[#f0d08a]">
+              <div className="absolute inset-x-3 bottom-16 mx-auto flex max-w-xl flex-wrap items-center gap-2 rounded-lg border border-[color:var(--k-d9a441)]/50 bg-[color:var(--k-1f1505)]/85 p-2.5 backdrop-blur">
+                <p className="min-w-0 flex-1 text-[0.7rem] text-[color:var(--k-f0d08a)]">
                   {isSpec ? "At the spec's 15 MHz, " : "With this design, "}
                   {unreachable.map((b) => regionName(b.region)).join(" and ")}{" "}
                   {unreachable.length > 1 ? "are" : "is"} out of reach: off-target pressure exceeds
@@ -869,7 +869,7 @@ export function SimulationWindow() {
                   type="button"
                   onClick={() => void runAutoDesign()}
                   disabled={autoProgress !== null}
-                  className="flex items-center gap-1.5 rounded-md border border-[#7fd8ff]/50 bg-[#0b2a5c] px-2.5 py-1.5 text-[0.7rem] text-[#e6f7ff] disabled:opacity-60"
+                  className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-7fd8ff)]/50 bg-[color:var(--k-0b2a5c)] px-2.5 py-1.5 text-[0.7rem] text-[color:var(--k-e6f7ff)] disabled:opacity-60"
                 >
                   <Sparkles className="h-3.5 w-3.5" />
                   {autoProgress !== null ? `${Math.round(autoProgress * 100)} %` : "Auto-design"}
@@ -878,7 +878,7 @@ export function SimulationWindow() {
             ) : null}
 
             {/* bottom toolbar */}
-            <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center justify-between gap-2 border-t border-[#16305e]/70 bg-[#01071a]/80 px-2 py-1.5 backdrop-blur">
+            <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--k-16305e)]/70 bg-[color:var(--k-01071a)]/80 px-2 py-1.5 backdrop-blur">
               <div className="flex flex-wrap items-center gap-1">
                 {VIEWS.map((v) => (
                   <button
@@ -887,8 +887,8 @@ export function SimulationWindow() {
                     onClick={() => setView(v.id)}
                     className={`flex items-center gap-1 rounded-md px-2 py-1 text-[0.66rem] transition ${
                       view === v.id
-                        ? "bg-[#0b2a5c] text-[#e6f7ff]"
-                        : "text-[#8095bf] hover:text-[#e6efff]"
+                        ? "bg-[color:var(--k-0b2a5c)] text-[color:var(--k-e6f7ff)]"
+                        : "text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
                     }`}
                   >
                     <v.icon className="h-3.5 w-3.5" />
@@ -898,7 +898,7 @@ export function SimulationWindow() {
                 <button
                   type="button"
                   onClick={() => setLabels((l) => !l)}
-                  className="flex items-center gap-1 rounded-md px-2 py-1 text-[0.66rem] text-[#8095bf] hover:text-[#e6efff]"
+                  className="flex items-center gap-1 rounded-md px-2 py-1 text-[0.66rem] text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
                   aria-label={labels ? "Hide labels" : "Show labels"}
                 >
                   {labels ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
@@ -907,7 +907,7 @@ export function SimulationWindow() {
                   type="button"
                   onClick={() => setAssemblyKey((k) => k + 1)}
                   disabled={phase !== "ready"}
-                  className="flex items-center gap-1 rounded-md px-2 py-1 text-[0.66rem] text-[#8095bf] hover:text-[#e6efff] disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-md px-2 py-1 text-[0.66rem] text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)] disabled:opacity-40"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Re-assemble</span>
@@ -921,7 +921,7 @@ export function SimulationWindow() {
                     if (mode === "assemble") setMode("loop");
                   }}
                   disabled={phase !== "ready" || !circuit.ok}
-                  className="flex items-center gap-1 rounded-md border border-[#16305e] px-2 py-1 text-[0.66rem] text-[#e6efff] disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-md border border-[color:var(--k-16305e)] px-2 py-1 text-[0.66rem] text-[color:var(--k-e6efff)] disabled:opacity-40"
                 >
                   {running && mode !== "assemble" ? (
                     <Pause className="h-3.5 w-3.5" />
@@ -930,7 +930,7 @@ export function SimulationWindow() {
                   )}
                   {running && mode !== "assemble" ? "Pause" : "Run loop"}
                 </button>
-                <Gauge className="ml-1 h-3.5 w-3.5 text-[#5e719a]" />
+                <Gauge className="ml-1 h-3.5 w-3.5 text-[color:var(--k-5e719a)]" />
                 {SPEEDS.map((s) => (
                   <button
                     key={s.id}
@@ -939,8 +939,8 @@ export function SimulationWindow() {
                     onClick={() => setSpeed(s.id)}
                     className={`rounded-md px-1.5 py-1 font-mono text-[0.6rem] ${
                       speed === s.id
-                        ? "bg-[#0b2a5c] text-[#e6f7ff]"
-                        : "text-[#8095bf] hover:text-[#e6efff]"
+                        ? "bg-[color:var(--k-0b2a5c)] text-[color:var(--k-e6f7ff)]"
+                        : "text-[color:var(--k-8095bf)] hover:text-[color:var(--k-e6efff)]"
                     }`}
                   >
                     {s.label}
@@ -951,12 +951,14 @@ export function SimulationWindow() {
 
             {/* loop counters */}
             {phase === "ready" && circuit.ok && mode !== "assemble" ? (
-              <div className="pointer-events-none absolute right-3 top-3 hidden flex-col items-end gap-0.5 font-mono text-[0.6rem] text-[#a9bbdc] md:flex">
+              <div className="pointer-events-none absolute right-3 top-3 hidden flex-col items-end gap-0.5 font-mono text-[0.6rem] text-[color:var(--k-a9bbdc)] md:flex">
                 <span>t = {hud.modelS.toFixed(2)} s model</span>
                 <span>loop #{hud.loops}</span>
-                <span className="text-[#9ff0cc]">{hud.verified} verified write-backs</span>
-                <span className="text-[#ffb3bc]">{hud.halts} halts</span>
-                <span className="text-[#5e719a]">0 unverified · by construction</span>
+                <span className="text-[color:var(--k-9ff0cc)]">
+                  {hud.verified} verified write-backs
+                </span>
+                <span className="text-[color:var(--k-ffb3bc)]">{hud.halts} halts</span>
+                <span className="text-[color:var(--k-5e719a)]">0 unverified · by construction</span>
               </div>
             ) : null}
           </div>
@@ -1018,15 +1020,16 @@ export function SimulationWindow() {
       </div>
 
       {/* Honesty strip */}
-      <footer className="relative z-10 border-t border-[#0e2247] bg-[#020818]/80 px-4 py-3 text-[0.64rem] leading-relaxed text-[#8095bf]">
+      <footer className="relative z-10 border-t border-[color:var(--k-0e2247)] bg-[color:var(--k-020818)]/80 px-4 py-3 text-[0.64rem] leading-relaxed text-[color:var(--k-8095bf)]">
         <p>
-          <b className="text-[#c4d2ee]">What this is:</b> a physics- and model-based simulation of
-          the CIRCUIT closed loop on MNI152 anatomy. Part values tagged SPEC are design targets from
-          the Simulation Window design document, not measurements of built hardware; ASSUMED values
-          are literature-typical and say where they come from. Acoustics are a Rayleigh sum over the
-          16 × 16 array with tissue attenuation; the brain is a 10-region Stuart–Landau network
-          (Deco et al. 2017) with Hebbian plasticity. PRISM is a deterministic rule gate — any
-          failing rule halts write-back. The simulation does not predict clinical outcomes.
+          <b className="text-[color:var(--k-c4d2ee)]">What this is:</b> a physics- and model-based
+          simulation of the CIRCUIT closed loop on MNI152 anatomy. Part values tagged SPEC are
+          design targets from the Simulation Window design document, not measurements of built
+          hardware; ASSUMED values are literature-typical and say where they come from. Acoustics
+          are a Rayleigh sum over the 16 × 16 array with tissue attenuation; the brain is a
+          10-region Stuart–Landau network (Deco et al. 2017) with Hebbian plasticity. PRISM is a
+          deterministic rule gate — any failing rule halts write-back. The simulation does not
+          predict clinical outcomes.
         </p>
       </footer>
     </div>

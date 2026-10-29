@@ -61,7 +61,7 @@ import {
   type Target,
 } from "@/lib/vision/targets";
 import { MolViewer, type HoverInfo, type MolColour, type MolStyle } from "./MolViewer";
-import { Card, EvidenceTag, Gap, Spinner, VerdictChip, VisionPages } from "./ui";
+import { Card, EvidenceTag, Gap, Spinner, VerdictChip } from "./ui";
 import { PlddtChart } from "./PlddtChart";
 
 type Ready = Extract<Target, { status: "ready" }>;
@@ -215,25 +215,13 @@ export function VisionModule() {
 
   return (
     <div className="vision-light min-h-screen px-3 py-3 font-sans sm:px-6 sm:py-6">
-      <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 backdrop-blur sm:p-3.5">
+      <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)_330px]">
           {/* ------------------------------------------------ left */}
           <div className="flex flex-col gap-3">
             <Card>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[15px] font-semibold tracking-[0.18em]">COGNIVANCE</p>
-                  <p className="text-xs text-[var(--v-ink-3)]">Vision evidence</p>
-                </div>
-                <Link
-                  to="/"
-                  aria-label="Back to Cognivance"
-                  className="grid h-10 w-10 place-items-center rounded-full bg-[var(--v-ink)] text-white"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Link>
-              </div>
-              <VisionPages active="evidence" />
+              <p className="text-[13px] font-semibold tracking-[-0.01em]">Vision evidence</p>
+              <p className="text-xs text-[var(--v-ink-3)]">On this page</p>
               <nav className="mt-4 flex flex-col gap-1 text-sm" aria-label="Sections">
                 {[
                   { href: "#structure", label: "Structure", icon: Box, active: true },
@@ -276,7 +264,7 @@ export function VisionModule() {
                   t.status === "ready" ? (
                     <span
                       key={t.key}
-                      className="rounded-full bg-[var(--v-ink)] px-3 py-1.5 text-xs font-medium text-white"
+                      className="rounded-full bg-[var(--v-ink)] px-3 py-1.5 text-xs font-medium text-[var(--v-on-ink)]"
                       aria-current="true"
                     >
                       {t.label}
@@ -306,7 +294,7 @@ export function VisionModule() {
                     key={k}
                     aria-pressed={ev.mode === k}
                     onClick={() => setDataMode(k)}
-                    className={`rounded-full px-2 py-1 ${ev.mode === k ? "bg-[var(--v-ink)] text-white" : ""}`}
+                    className={`rounded-full px-2 py-1 ${ev.mode === k ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]" : ""}`}
                   >
                     {label}
                   </button>
@@ -317,7 +305,9 @@ export function VisionModule() {
                   ? `Raw responses captured ${new Date(ev.manifest.capturedAt).toLocaleDateString(undefined, { dateStyle: "medium" })} from Ensembl, UniProt, AlphaFold DB and ClinVar. Works offline; every value keeps its source.`
                   : "Requested now from Ensembl, UniProt and AlphaFold DB. Variants still come from the snapshot."}
               </p>
-              {ev.fallback && <p className="mt-1 text-[11px] text-[#b57d12]">{ev.fallback}</p>}
+              {ev.fallback && (
+                <p className="mt-1 text-[11px] text-[color:var(--kv-b57d12)]">{ev.fallback}</p>
+              )}
             </Card>
 
             <Card className="flex-1">
@@ -381,7 +371,7 @@ export function VisionModule() {
                         </span>
                         {ok ? (
                           <Check
-                            className="h-3.5 w-3.5 shrink-0 text-[#0f8f7e]"
+                            className="h-3.5 w-3.5 shrink-0 text-[color:var(--kv-0f8f7e)]"
                             aria-label="working"
                           />
                         ) : (
@@ -476,7 +466,7 @@ export function VisionModule() {
                     key={k}
                     aria-pressed={molStyle === k}
                     onClick={() => setMolStyle(k)}
-                    className={`rounded-full px-3 py-1 ${molStyle === k ? "bg-[var(--v-ink)] text-white" : ""}`}
+                    className={`rounded-full px-3 py-1 ${molStyle === k ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]" : ""}`}
                   >
                     {label}
                   </button>
@@ -486,7 +476,7 @@ export function VisionModule() {
                 <summary className="cursor-pointer list-none rounded-full bg-[var(--v-soft)] px-3 py-1.5">
                   What am I looking at?
                 </summary>
-                <div className="absolute left-0 top-9 z-20 w-[300px] rounded-2xl bg-white p-3 text-[12px] text-[var(--v-ink-2)] shadow-[0_8px_30px_rgba(22,21,29,0.12)]">
+                <div className="absolute left-0 top-9 z-20 w-[300px] rounded-2xl bg-[var(--v-card)] p-3 text-[12px] text-[var(--v-ink-2)] shadow-[0_8px_30px_rgba(22,21,29,0.12)]">
                   <p>
                     <span className="font-medium text-[var(--v-ink)]">A protein</span> is a chain of
                     building blocks (amino acids) that folds into a shape. Its shape decides its
@@ -550,7 +540,7 @@ export function VisionModule() {
                 </div>
 
                 {hover && (
-                  <div className="pointer-events-none absolute left-5 top-3 rounded-full bg-[var(--v-ink)] px-3 py-1 text-xs text-white">
+                  <div className="pointer-events-none absolute left-5 top-3 rounded-full bg-[var(--v-ink)] px-3 py-1 text-xs text-[var(--v-on-ink)]">
                     {hover.name} {hover.seq} · chain {hover.chain}
                     {mode === "predicted" && Number.isFinite(hover.b) && (
                       <>
@@ -566,7 +556,7 @@ export function VisionModule() {
               {/* Below the model on phones; over its lower edge from sm up. */}
               <div className="flex flex-wrap items-end justify-between gap-3 px-4 pb-4 sm:pointer-events-none sm:absolute sm:inset-x-0 sm:bottom-0">
                 {backbone && source && (
-                  <div className="max-w-[290px] rounded-3xl sm:pointer-events-auto bg-white/90 p-4 shadow-[0_8px_30px_rgba(22,21,29,0.08)] backdrop-blur">
+                  <div className="max-w-[290px] rounded-3xl sm:pointer-events-auto bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] p-4 shadow-[0_8px_30px_rgba(22,21,29,0.08)] backdrop-blur">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-[17px] font-medium leading-tight">{source.label}</p>
                       <EvidenceTag kind={source.kind} />
@@ -620,7 +610,7 @@ export function VisionModule() {
                   </div>
                 )}
 
-                <div className="ml-auto grid grid-cols-2 gap-2 rounded-3xl bg-white/90 p-2 shadow-[0_8px_30px_rgba(22,21,29,0.08)] sm:pointer-events-auto">
+                <div className="ml-auto grid grid-cols-2 gap-2 rounded-3xl bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] p-2 shadow-[0_8px_30px_rgba(22,21,29,0.08)] sm:pointer-events-auto">
                   {[
                     {
                       label: "Reset view",
@@ -789,7 +779,7 @@ export function VisionModule() {
               <button
                 onClick={exportRecord}
                 disabled={!record}
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--v-ink)] px-4 py-2 text-xs font-medium text-white disabled:opacity-40"
+                className="inline-flex items-center gap-2 rounded-full bg-[var(--v-ink)] px-4 py-2 text-xs font-medium text-[var(--v-on-ink)] disabled:opacity-40"
               >
                 <Download className="h-3.5 w-3.5" aria-hidden />
                 Export record (JSON)
@@ -926,7 +916,7 @@ export function VisionModule() {
             </div>
             <Link
               to="/vision/therapy"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[var(--v-ink)] px-4 py-2 text-xs font-medium text-white"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[var(--v-ink)] px-4 py-2 text-xs font-medium text-[var(--v-on-ink)]"
             >
               Open the gene therapy simulator <ChevronRight className="h-3.5 w-3.5" />
             </Link>
@@ -1073,7 +1063,7 @@ export function VisionModule() {
             </ul>
             <Link
               to="/vision/therapy"
-              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--v-accent)] px-4 py-2 text-xs font-medium text-white"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--v-accent)] px-4 py-2 text-xs font-medium text-[var(--v-on-ink)]"
             >
               Simulate it <ChevronRight className="h-3.5 w-3.5" />
             </Link>
@@ -1239,7 +1229,7 @@ const STATUS_LABEL: Record<DecisionStatus, string> = {
 function StatusChip({ status }: { status: DecisionStatus }) {
   const cls =
     status === "decided"
-      ? "bg-[var(--v-ink)] text-white"
+      ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]"
       : status === "partial"
         ? "bg-[var(--v-accent-soft)] text-[var(--v-accent-ink)]"
         : "border border-dashed border-[var(--v-line)] text-[var(--v-ink-2)]";
@@ -1309,7 +1299,7 @@ function EvidenceGroup<T>({
         </>
       ) : s.state === "conflict" ? (
         <div className="mt-2 flex flex-col gap-2">
-          <div className="flex gap-2 rounded-2xl bg-[#fbf0dc] px-3 py-2.5 text-[13px]">
+          <div className="flex gap-2 rounded-2xl bg-[color:var(--kv-fbf0dc)] px-3 py-2.5 text-[13px]">
             <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
             {s.reason}
           </div>
@@ -1329,9 +1319,9 @@ function EvidenceGroup<T>({
 function CheckRow({ c }: { c: CheckResult }) {
   const [Icon, label, cls] =
     c.status === "agree"
-      ? [Check, "Agree", "bg-[#e3f4f1]"]
+      ? [Check, "Agree", "bg-[color:var(--kv-e3f4f1)]"]
       : c.status === "differ"
-        ? [TriangleAlert, "Differ", "bg-[#fbf0dc]"]
+        ? [TriangleAlert, "Differ", "bg-[color:var(--kv-fbf0dc)]"]
         : [Minus, "Not checked", "bg-[var(--v-soft)]"];
   return (
     <li className="rounded-2xl bg-[var(--v-soft)] px-3 py-2.5">

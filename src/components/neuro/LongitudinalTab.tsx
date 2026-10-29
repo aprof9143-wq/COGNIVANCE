@@ -99,7 +99,7 @@ export function LongitudinalTab({ c, set }: Props) {
     return (
       <Panel key={title} title={title} tag={lines.length > 1 ? "derived" : "entered"} note={unit}>
         {!has ? (
-          <p className="py-6 text-center text-[13px] text-[#a9bbdc]">
+          <p className="py-6 text-center text-[13px] text-[color:var(--k-a9bbdc)]">
             Insufficient data — no usable values.
           </p>
         ) : (
@@ -196,7 +196,7 @@ export function LongitudinalTab({ c, set }: Props) {
           );
         })}
       </div>
-      <p className="text-[12px] text-[#8095bf]">
+      <p className="text-[12px] text-[color:var(--k-8095bf)]">
         Longitudinal structural change. Whole-brain and other regional series appear when those
         measurements are imported. Changes across scanner or protocol changes (see the Imaging tab
         warnings) may not be biological.
@@ -230,7 +230,7 @@ export function LongitudinalTab({ c, set }: Props) {
         }
       >
         {!c.events.length ? (
-          <p className="text-[13px] text-[#a9bbdc]">No events.</p>
+          <p className="text-[13px] text-[color:var(--k-a9bbdc)]">No events.</p>
         ) : (
           c.events.map((e) => (
             <div
@@ -273,7 +273,7 @@ export function LongitudinalTab({ c, set }: Props) {
                   set((x) => ({ ...x, events: x.events.filter((y) => y.id !== e.id) }))
                 }
               >
-                <Trash2 className="h-4 w-4 text-[#8095bf]" />
+                <Trash2 className="h-4 w-4 text-[color:var(--k-8095bf)]" />
               </button>
             </div>
           ))

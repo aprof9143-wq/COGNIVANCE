@@ -143,38 +143,38 @@ export function NimbleSimulator() {
     );
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#00030b] text-[#e6efff]">
+    <div className="flex min-h-screen flex-col bg-[color:var(--k-00030b)] text-[color:var(--k-e6efff)]">
       {/* ------------------------------------------------------------ top bar */}
-      <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-[#16305e] bg-[#01071a]/90 px-4 py-2.5 backdrop-blur">
+      <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)]/90 px-4 py-2.5 backdrop-blur">
         <Link
           to="/"
-          className="flex items-center gap-2 text-[#8095bf] transition hover:text-[#e6efff]"
+          className="flex items-center gap-2 text-[color:var(--k-8095bf)] transition hover:text-[color:var(--k-e6efff)]"
         >
           <ArrowLeft className="h-4 w-4" />
           <img src="/logo-mark.png" alt="" className="h-7 w-7" />
         </Link>
         <div className="leading-tight">
-          <p className="font-mono text-[0.62rem] tracking-[0.28em] text-[#7fd8ff]">
+          <p className="font-mono text-[0.62rem] tracking-[0.28em] text-[color:var(--k-7fd8ff)]">
             NIMBLE / HARDWARE SIMULATION
           </p>
-          <p className="text-[0.8rem] text-[#8095bf]">
+          <p className="text-[0.8rem] text-[color:var(--k-8095bf)]">
             One acquisition contract, every signal origin
           </p>
         </div>
         {degraded ? (
           <span
             title={`A source tick overran its ${TICK_MS} ms cadence in the last few seconds.`}
-            className="rounded border border-[#ff4860]/60 bg-[#ff4860]/10 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] text-[#ff8a98] shadow-[0_0_18px_rgba(255,72,96,0.25)]"
+            className="rounded border border-[color:var(--k-ff4860)]/60 bg-[color:var(--k-ff4860)]/10 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] text-[color:var(--k-ff8a98)] shadow-[0_0_18px_rgba(255,72,96,0.25)]"
           >
             SIMULATION · DEGRADED
           </span>
         ) : (
-          <span className="rounded border border-[#ffb547]/60 bg-[#ffb547]/10 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] text-[#ffcf7a] shadow-[0_0_18px_rgba(255,181,71,0.25)]">
+          <span className="rounded border border-[color:var(--k-ffb547)]/60 bg-[color:var(--k-ffb547)]/10 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.2em] text-[color:var(--k-ffcf7a)] shadow-[0_0_18px_rgba(255,181,71,0.25)]">
             SIMULATION · NO HARDWARE CONNECTED
           </span>
         )}
-        <div className="ml-auto flex items-center gap-3 font-mono text-[0.66rem] text-[#8095bf]">
-          <span className="hidden text-[#5e719a] md:inline">
+        <div className="ml-auto flex items-center gap-3 font-mono text-[0.66rem] text-[color:var(--k-8095bf)]">
+          <span className="hidden text-[color:var(--k-5e719a)] md:inline">
             Wall-clock synchronized — {TICK_MS} ms display cadence
             {profile.available ? `, ${profile.sampleRate} Hz sample rate` : ""}
           </span>
@@ -184,7 +184,7 @@ export function NimbleSimulator() {
           <button
             type="button"
             onClick={() => setRunning((r) => !r)}
-            className="flex items-center gap-1.5 rounded-md border border-[#16305e] px-2.5 py-1 text-[#7fd8ff] transition hover:bg-[#7fd8ff]/10"
+            className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1 text-[color:var(--k-7fd8ff)] transition hover:bg-[color:var(--k-7fd8ff)]/10"
           >
             {running ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             {running ? "PAUSE" : "RUN"}
@@ -212,30 +212,30 @@ export function NimbleSimulator() {
                     }}
                     className={`group flex items-start gap-3 rounded-md border px-3 py-2.5 text-left transition ${
                       on
-                        ? "border-[#7fd8ff]/70 bg-[#7fd8ff]/10 shadow-[0_0_22px_rgba(127,216,255,0.15)]"
+                        ? "border-[color:var(--k-7fd8ff)]/70 bg-[color:var(--k-7fd8ff)]/10 shadow-[0_0_22px_rgba(127,216,255,0.15)]"
                         : p.available
-                          ? "border-[#16305e] hover:border-[#2a5aa8]"
-                          : "cursor-not-allowed border-dashed border-[#16305e] opacity-60"
+                          ? "border-[color:var(--k-16305e)] hover:border-[color:var(--k-2a5aa8)]"
+                          : "cursor-not-allowed border-dashed border-[color:var(--k-16305e)] opacity-60"
                     }`}
                   >
                     <span
-                      className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-md ${on ? "bg-[#7fd8ff]/20 text-[#7fd8ff]" : "bg-[#0a1f4a] text-[#8095bf]"}`}
+                      className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-md ${on ? "bg-[color:var(--k-7fd8ff)]/20 text-[color:var(--k-7fd8ff)]" : "bg-[color:var(--k-0a1f4a)] text-[color:var(--k-8095bf)]"}`}
                     >
                       <Icon className="h-4 w-4" />
                     </span>
                     <span className="min-w-0">
-                      <span className="flex items-center gap-2 text-[0.8rem] text-[#e6efff]">
+                      <span className="flex items-center gap-2 text-[0.8rem] text-[color:var(--k-e6efff)]">
                         {p.name}
                         {!p.available ? (
-                          <span className="rounded bg-[#16305e] px-1.5 py-0.5 font-mono text-[0.55rem] tracking-[0.12em] text-[#8095bf]">
+                          <span className="rounded bg-[color:var(--k-16305e)] px-1.5 py-0.5 font-mono text-[0.55rem] tracking-[0.12em] text-[color:var(--k-8095bf)]">
                             DESIGN TARGET
                           </span>
                         ) : null}
                       </span>
-                      <span className="mt-0.5 block font-mono text-[0.6rem] text-[#5e719a]">
+                      <span className="mt-0.5 block font-mono text-[0.6rem] text-[color:var(--k-5e719a)]">
                         {p.impl} · {p.sampleRate} Hz · {p.adcBits}-bit
                       </span>
-                      <span className="mt-1 block text-[0.66rem] leading-snug text-[#8095bf]">
+                      <span className="mt-1 block text-[0.66rem] leading-snug text-[color:var(--k-8095bf)]">
                         {p.detail}
                       </span>
                     </span>
@@ -243,9 +243,10 @@ export function NimbleSimulator() {
                 );
               })}
             </div>
-            <p className="mt-3 text-[0.66rem] leading-relaxed text-[#5e719a]">
+            <p className="mt-3 text-[0.66rem] leading-relaxed text-[color:var(--k-5e719a)]">
               Switching source changes only what sits behind the contract. The analysis on the right
-              reads the same <code className="text-[#7fd8ff]">read_chunk()</code> either way.
+              reads the same <code className="text-[color:var(--k-7fd8ff)]">read_chunk()</code>{" "}
+              either way.
             </p>
           </Panel>
 
@@ -261,10 +262,12 @@ export function NimbleSimulator() {
                     key={e.label}
                     type="button"
                     onClick={() => setSelected(c)}
-                    className={`col-span-4 grid grid-cols-subgrid items-center rounded px-1 py-0.5 text-left transition ${pick ? "bg-[#7fd8ff]/10" : "hover:bg-[#0a1f4a]"}`}
+                    className={`col-span-4 grid grid-cols-subgrid items-center rounded px-1 py-0.5 text-left transition ${pick ? "bg-[color:var(--k-7fd8ff)]/10" : "hover:bg-[color:var(--k-0a1f4a)]"}`}
                   >
-                    <span className={pick ? "text-white" : "text-[#8095bf]"}>{e.label}</span>
-                    <span className="h-1.5 overflow-hidden rounded-full bg-[#0a1f4a]">
+                    <span className={pick ? "text-white" : "text-[color:var(--k-8095bf)]"}>
+                      {e.label}
+                    </span>
+                    <span className="h-1.5 overflow-hidden rounded-full bg-[color:var(--k-0a1f4a)]">
                       <span
                         className="block h-full rounded-full transition-[width] duration-300"
                         style={{
@@ -274,10 +277,12 @@ export function NimbleSimulator() {
                         }}
                       />
                     </span>
-                    <span className={`text-right ${bad ? "text-[#ff8a98]" : "text-[#c8d6f0]"}`}>
+                    <span
+                      className={`text-right ${bad ? "text-[color:var(--k-ff8a98)]" : "text-[color:var(--k-c8d6f0)]"}`}
+                    >
                       {profile.available ? `${z.toFixed(z > 100 ? 0 : 1)}k` : "—"}
                     </span>
-                    <span className="text-right text-[#5e719a]">
+                    <span className="text-right text-[color:var(--k-5e719a)]">
                       {profile.available ? `${rms.toFixed(0)}µV` : ""}
                     </span>
                   </button>
@@ -289,34 +294,36 @@ export function NimbleSimulator() {
 
         {/* ----------------------------------------------------------- centre */}
         <section className="flex min-w-0 flex-col gap-3">
-          <div className="relative h-[clamp(24rem,52vh,38rem)] overflow-hidden rounded-lg border border-[#16305e] bg-[radial-gradient(ellipse_at_50%_48%,#0a2a66_0%,#03102e_45%,#00030b_100%)]">
+          <div className="relative h-[clamp(24rem,52vh,38rem)] overflow-hidden rounded-lg border border-[color:var(--k-16305e)] bg-[radial-gradient(ellipse_at_50%_48%,var(--k-0a2a66)_0%,var(--k-03102e)_45%,var(--k-00030b)_100%)]">
             <CoreView stream={stream} faults={faultsRef} selected={selectedRef} />
-            <div className="pointer-events-none absolute left-4 top-3 font-mono text-[0.62rem] tracking-[0.12em] text-[#8095bf]">
-              <p className="text-[#7fd8ff]">ACQUISITION CORE · {profile.impl.toUpperCase()}</p>
+            <div className="pointer-events-none absolute left-4 top-3 font-mono text-[0.62rem] tracking-[0.12em] text-[color:var(--k-8095bf)]">
+              <p className="text-[color:var(--k-7fd8ff)]">
+                ACQUISITION CORE · {profile.impl.toUpperCase()}
+              </p>
               <p>PACKETS → HAL BUS → PIPELINE</p>
               <p className="mt-1">
                 {s?.packets.toLocaleString() ?? 0} packets · {s?.lostPackets ?? 0} lost
               </p>
             </div>
-            <div className="pointer-events-none absolute right-4 top-3 text-right font-mono text-[0.62rem] tracking-[0.12em] text-[#8095bf]">
+            <div className="pointer-events-none absolute right-4 top-3 text-right font-mono text-[0.62rem] tracking-[0.12em] text-[color:var(--k-8095bf)]">
               <p>CAPABILITIES</p>
-              <p className="text-[#7fd8ff]">{`{${profile.capabilities.join(", ")}}`}</p>
+              <p className="text-[color:var(--k-7fd8ff)]">{`{${profile.capabilities.join(", ")}}`}</p>
             </div>
             {!profile.available ? (
-              <div className="absolute inset-0 grid place-items-center bg-[#00030b]/70 backdrop-blur-sm">
+              <div className="absolute inset-0 grid place-items-center bg-[color:var(--k-00030b)]/70 backdrop-blur-sm">
                 <div className="max-w-sm text-center">
-                  <Unplug className="mx-auto h-6 w-6 text-[#8095bf]" />
-                  <p className="mt-3 font-mono text-[0.72rem] tracking-[0.16em] text-[#e6efff]">
+                  <Unplug className="mx-auto h-6 w-6 text-[color:var(--k-8095bf)]" />
+                  <p className="mt-3 font-mono text-[0.72rem] tracking-[0.16em] text-[color:var(--k-e6efff)]">
                     IMPLANTSOURCE · NOT BUILT
                   </p>
-                  <p className="mt-2 text-[0.75rem] leading-relaxed text-[#8095bf]">
+                  <p className="mt-2 text-[0.75rem] leading-relaxed text-[color:var(--k-8095bf)]">
                     The implant is a design target. It will implement the same contract; until it
                     exists there is nothing honest to simulate for it, so nothing is.
                   </p>
                 </div>
               </div>
             ) : null}
-            <div className="pointer-events-none absolute bottom-3 left-4 flex gap-4 font-mono text-[0.58rem] tracking-[0.14em] text-[#5e719a]">
+            <div className="pointer-events-none absolute bottom-3 left-4 flex gap-4 font-mono text-[0.58rem] tracking-[0.14em] text-[color:var(--k-5e719a)]">
               <Legend colour="#7fd8ff" label="PACKET DELIVERED" />
               <Legend colour="#ff4860" label="PACKET LOST" />
               <Legend colour="#ffffff" label="SELECTED CHANNEL" />
@@ -360,15 +367,15 @@ export function NimbleSimulator() {
               />
             </div>
             <LatencyHistogram stream={stream} tick={tick} />
-            <div className="mt-2 flex items-center justify-between font-mono text-[0.6rem] text-[#5e719a]">
+            <div className="mt-2 flex items-center justify-between font-mono text-[0.6rem] text-[color:var(--k-5e719a)]">
               <span>BUFFER FILL</span>
-              <span className="text-[#c8d6f0]">
+              <span className="text-[color:var(--k-c8d6f0)]">
                 {profile.available ? `${Math.round((health?.bufferFill ?? 0) * 100)} %` : "—"}
               </span>
             </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#0a1f4a]">
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[color:var(--k-0a1f4a)]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#1e63c4] to-[#7fd8ff] transition-[width] duration-300"
+                className="h-full rounded-full bg-gradient-to-r from-[color:var(--k-1e63c4)] to-[color:var(--k-7fd8ff)] transition-[width] duration-300"
                 style={{ width: `${(profile.available ? (health?.bufferFill ?? 0) : 0) * 100}%` }}
               />
             </div>
@@ -384,15 +391,15 @@ export function NimbleSimulator() {
           <Panel title="Self-test" meta={`${MONTAGE_1020[selected]!.label} · planted vs measured`}>
             <SpectrumPlot spectrum={spectrum} />
             {spectrum && plantedHere ? (
-              <div className="mt-2 flex items-center justify-between rounded-md border border-[#16305e] bg-[#01071a] px-3 py-2 font-mono text-[0.66rem]">
-                <span className="text-[#8095bf]">
+              <div className="mt-2 flex items-center justify-between rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-3 py-2 font-mono text-[0.66rem]">
+                <span className="text-[color:var(--k-8095bf)]">
                   PLANTED {plantedHere.freq.toFixed(2)} Hz · MEASURED{" "}
                   <span className="text-white">{spectrum.peakFrequency.toFixed(2)} Hz</span>
                 </span>
                 {Math.abs(spectrum.peakFrequency - plantedHere.freq) <= 0.5 ? (
-                  <span className="text-[#4ade80]">PASS</span>
+                  <span className="text-[color:var(--k-4ade80)]">PASS</span>
                 ) : (
-                  <span className="text-[#ff8a98]">DIVERGED</span>
+                  <span className="text-[color:var(--k-ff8a98)]">DIVERGED</span>
                 )}
               </div>
             ) : null}
@@ -404,19 +411,21 @@ export function NimbleSimulator() {
                     key={b.name}
                     className="grid grid-cols-[3.2rem_minmax(0,1fr)_2.6rem] items-center gap-2 font-mono text-[0.6rem]"
                   >
-                    <span className="uppercase text-[#8095bf]">{b.name}</span>
-                    <span className="h-2 overflow-hidden rounded-sm bg-[#0a1f4a]">
+                    <span className="uppercase text-[color:var(--k-8095bf)]">{b.name}</span>
+                    <span className="h-2 overflow-hidden rounded-sm bg-[color:var(--k-0a1f4a)]">
                       <span
-                        className="block h-full bg-gradient-to-r from-[#1e63c4] via-[#63b0ff] to-[#b8f0ff] transition-[width] duration-300"
+                        className="block h-full bg-gradient-to-r from-[color:var(--k-1e63c4)] via-[color:var(--k-63b0ff)] to-[color:var(--k-b8f0ff)] transition-[width] duration-300"
                         style={{ width: `${v * 100}%` }}
                       />
                     </span>
-                    <span className="text-right text-[#c8d6f0]">{(v * 100).toFixed(0)}%</span>
+                    <span className="text-right text-[color:var(--k-c8d6f0)]">
+                      {(v * 100).toFixed(0)}%
+                    </span>
                   </div>
                 );
               })}
             </div>
-            <p className="mt-2 text-[0.64rem] leading-relaxed text-[#5e719a]">
+            <p className="mt-2 text-[0.64rem] leading-relaxed text-[color:var(--k-5e719a)]">
               Rhythms are planted at known frequencies; recovering them is how feature code is
               proved correct before it ever meets a patient recording.
             </p>
@@ -466,14 +475,14 @@ export function NimbleSimulator() {
       </main>
 
       {/* ---------------------------------------------------------- status bar */}
-      <footer className="grid gap-3 border-t border-[#16305e] bg-[#01071a] px-4 py-2.5 lg:grid-cols-[15rem_minmax(0,1fr)_auto]">
-        <div className="font-mono text-[0.6rem] leading-relaxed tracking-[0.12em] text-[#5e719a]">
-          <p className="text-[#7fd8ff]">HAL CONTRACT</p>
+      <footer className="grid gap-3 border-t border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-4 py-2.5 lg:grid-cols-[15rem_minmax(0,1fr)_auto]">
+        <div className="font-mono text-[0.6rem] leading-relaxed tracking-[0.12em] text-[color:var(--k-5e719a)]">
+          <p className="text-[color:var(--k-7fd8ff)]">HAL CONTRACT</p>
           <p>connect · read_chunk · health</p>
           <p>core/cognivance_core/abstraction</p>
         </div>
         <ContractLog stream={stream} tick={tick} />
-        <div className="self-center font-mono text-[0.6rem] tracking-[0.12em] text-[#ffcf7a]">
+        <div className="self-center font-mono text-[0.6rem] tracking-[0.12em] text-[color:var(--k-ffcf7a)]">
           ALL VALUES SIMULATED IN THIS BROWSER
         </div>
       </footer>
@@ -495,14 +504,14 @@ function Panel({
   flush?: boolean;
 }) {
   return (
-    <section className="relative flex min-w-0 flex-col overflow-hidden rounded-lg border border-[#16305e] bg-[#04102b]/70">
-      <header className="flex items-center justify-between gap-3 border-b border-[#16305e] px-3 py-2">
-        <h2 className="flex items-center gap-2 text-[0.78rem] font-semibold text-[#e6efff]">
-          <span className="h-3 w-0.5 rounded bg-[#7fd8ff] shadow-[0_0_8px_#7fd8ff]" />
+    <section className="relative flex min-w-0 flex-col overflow-hidden rounded-lg border border-[color:var(--k-16305e)] bg-[color:var(--k-04102b)]/70">
+      <header className="flex items-center justify-between gap-3 border-b border-[color:var(--k-16305e)] px-3 py-2">
+        <h2 className="flex items-center gap-2 text-[0.78rem] font-semibold text-[color:var(--k-e6efff)]">
+          <span className="h-3 w-0.5 rounded bg-[color:var(--k-7fd8ff)] shadow-[0_0_8px_var(--k-7fd8ff)]" />
           {title}
         </h2>
         {meta ? (
-          <span className="truncate font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[#5e719a]">
+          <span className="truncate font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[color:var(--k-5e719a)]">
             {meta}
           </span>
         ) : null}
@@ -514,9 +523,13 @@ function Panel({
 
 function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
-    <div className="rounded-md border border-[#16305e] bg-[#01071a] px-2.5 py-2">
-      <p className="font-mono text-[0.55rem] uppercase tracking-[0.14em] text-[#5e719a]">{label}</p>
-      <p className={`mt-0.5 font-mono text-[0.9rem] ${warn ? "text-[#ff8a98]" : "text-white"}`}>
+    <div className="rounded-md border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-2.5 py-2">
+      <p className="font-mono text-[0.55rem] uppercase tracking-[0.14em] text-[color:var(--k-5e719a)]">
+        {label}
+      </p>
+      <p
+        className={`mt-0.5 font-mono text-[0.9rem] ${warn ? "text-[color:var(--k-ff8a98)]" : "text-white"}`}
+      >
         {value}
       </p>
     </div>
@@ -540,32 +553,34 @@ function LoopLatency({
   const ms = (x: number) => (x < 10 ? x.toFixed(1) : x.toFixed(0));
   const cell = (v: number | undefined, limit: number) =>
     v === undefined ? (
-      <span className="text-right text-[#5e719a]">—</span>
+      <span className="text-right text-[color:var(--k-5e719a)]">—</span>
     ) : (
-      <span className={`text-right ${v > limit ? "text-[#ff8a98]" : "text-[#c8d6f0]"}`}>
+      <span
+        className={`text-right ${v > limit ? "text-[color:var(--k-ff8a98)]" : "text-[color:var(--k-c8d6f0)]"}`}
+      >
         {ms(v)} ms
       </span>
     );
   return (
-    <div className="mt-3 border-t border-[#16305e] pt-2 font-mono text-[0.6rem]">
-      <p className="text-[#5e719a]">MEASURED LOOP LATENCY — 60 S ROLLING WINDOW</p>
+    <div className="mt-3 border-t border-[color:var(--k-16305e)] pt-2 font-mono text-[0.6rem]">
+      <p className="text-[color:var(--k-5e719a)]">MEASURED LOOP LATENCY — 60 S ROLLING WINDOW</p>
       <div className="mt-1 grid grid-cols-[minmax(0,1fr)_4rem_4rem] gap-x-2 gap-y-0.5">
         <span />
-        <span className="text-right text-[#5e719a]">p50</span>
-        <span className="text-right text-[#5e719a]">p95</span>
+        <span className="text-right text-[color:var(--k-5e719a)]">p50</span>
+        <span className="text-right text-[color:var(--k-5e719a)]">p95</span>
         {rows.map(([label, q]) => (
           <div key={label} className="contents">
-            <span className="text-[#8095bf]">{label}</span>
+            <span className="text-[color:var(--k-8095bf)]">{label}</span>
             {cell(q?.p50, LATENCY_TARGETS.p50Ms)}
             {cell(q?.p95, LATENCY_TARGETS.p95Ms)}
           </div>
         ))}
       </div>
-      <p className="mt-1 text-[#5e719a]">
+      <p className="mt-1 text-[color:var(--k-5e719a)]">
         Targets: p50 &lt; {LATENCY_TARGETS.p50Ms} ms · p95 &lt; {LATENCY_TARGETS.p95Ms} ms
       </p>
       {dropped !== null ? (
-        <p className={dropped ? "text-[#ff8a98]" : "text-[#5e719a]"}>
+        <p className={dropped ? "text-[color:var(--k-ff8a98)]" : "text-[color:var(--k-5e719a)]"}>
           Dropped before display: {dropped.toLocaleString()} samples
         </p>
       ) : null}
@@ -608,15 +623,15 @@ function FaultButton({
       aria-pressed={on}
       className={`flex flex-col items-start gap-0.5 rounded-md border px-2.5 py-2 text-left transition disabled:opacity-40 ${
         on
-          ? "border-[#ff4860]/70 bg-[#ff4860]/10 text-[#ff9aa6]"
-          : "border-[#16305e] text-[#c8d6f0] hover:border-[#2a5aa8]"
+          ? "border-[color:var(--k-ff4860)]/70 bg-[color:var(--k-ff4860)]/10 text-[color:var(--k-ff9aa6)]"
+          : "border-[color:var(--k-16305e)] text-[color:var(--k-c8d6f0)] hover:border-[color:var(--k-2a5aa8)]"
       }`}
     >
       <span className="flex items-center gap-1.5 text-[0.72rem]">
         {icon}
         {label}
       </span>
-      <span className="font-mono text-[0.58rem] text-[#5e719a]">{detail}</span>
+      <span className="font-mono text-[0.58rem] text-[color:var(--k-5e719a)]">{detail}</span>
     </button>
   );
 }
@@ -634,9 +649,10 @@ function ContractLog({
       {lines.map((l, i) => (
         <p
           key={`${l.t}-${i}`}
-          className={`truncate ${l.tone === "warn" ? "text-[#ff8a98]" : l.tone === "ok" ? "text-[#4ade80]" : "text-[#8095bf]"}`}
+          className={`truncate ${l.tone === "warn" ? "text-[color:var(--k-ff8a98)]" : l.tone === "ok" ? "text-[color:var(--k-4ade80)]" : "text-[color:var(--k-8095bf)]"}`}
         >
-          <span className="text-[#34507f]">[{l.t.toFixed(1).padStart(6, " ")}s]</span> {l.text}
+          <span className="text-[color:var(--k-34507f)]">[{l.t.toFixed(1).padStart(6, " ")}s]</span>{" "}
+          {l.text}
         </p>
       ))}
     </div>

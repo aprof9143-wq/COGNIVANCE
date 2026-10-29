@@ -28,7 +28,7 @@ import { GenomeTrack, ProteinTrack, VariantCard } from "./genome";
 import { MolViewer, type HoverInfo } from "./MolViewer";
 import { TherapyChart, VectorMap } from "./TherapyChart";
 import { useEvidence, useStructure } from "./useEvidence";
-import { Card, EvidenceTag, Gap, Spinner, VerdictChip, VisionPages } from "./ui";
+import { Card, EvidenceTag, Gap, Spinner, VerdictChip } from "./ui";
 
 const HORIZONS = [
   { days: 365, label: "1 year" },
@@ -113,7 +113,10 @@ function Stage({
       <span className="mt-1 font-mono text-[22px] leading-none tracking-tight">{value}</span>
       <span className="mt-1 text-[11px] leading-snug text-[var(--v-ink-3)]">{sub}</span>
       {level !== null && (
-        <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-white" aria-hidden>
+        <span
+          className="mt-2 block h-1.5 overflow-hidden rounded-full bg-[var(--v-card)]"
+          aria-hidden
+        >
           <span
             className="block h-full rounded-full bg-[var(--v-accent)] transition-[width] duration-150"
             style={{ width: pct(Math.min(1, Math.max(0, level))) }}
@@ -122,7 +125,7 @@ function Stage({
       )}
       {!last && (
         <ChevronRight
-          className="absolute -right-3 top-1/2 z-10 hidden h-5 w-5 -translate-y-1/2 rounded-full bg-white p-0.5 text-[var(--v-ink-3)] shadow lg:block"
+          className="absolute -right-3 top-1/2 z-10 hidden h-5 w-5 -translate-y-1/2 rounded-full bg-[var(--v-card)] p-0.5 text-[var(--v-ink-3)] shadow lg:block"
           aria-hidden
         />
       )}
@@ -147,7 +150,7 @@ function AlleleSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-full border border-[var(--v-line)] bg-white px-3 py-1.5 text-[13px]"
+        className="rounded-full border border-[var(--v-line)] bg-[var(--v-card)] px-3 py-1.5 text-[13px]"
       >
         {options.map((v) => (
           <option key={v.uid} value={v.uid}>
@@ -249,25 +252,13 @@ export function TherapySimulator() {
 
   return (
     <div className="vision-light min-h-screen px-3 py-3 font-sans sm:px-6 sm:py-6">
-      <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 backdrop-blur sm:p-3.5">
+      <div className="mx-auto max-w-[1440px] rounded-[36px] bg-[var(--v-frame)] p-2.5 ring-1 ring-white/80 dark:ring-white/10 backdrop-blur sm:p-3.5">
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[250px_minmax(0,1fr)]">
           {/* ------------------------------------------------ left */}
           <div className="flex flex-col gap-3">
             <Card>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[15px] font-semibold tracking-[0.18em]">COGNIVANCE</p>
-                  <p className="text-xs text-[var(--v-ink-3)]">Gene therapy simulator</p>
-                </div>
-                <Link
-                  to="/"
-                  aria-label="Back to Cognivance"
-                  className="grid h-10 w-10 place-items-center rounded-full bg-[var(--v-ink)] text-white"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Link>
-              </div>
-              <VisionPages active="therapy" />
+              <p className="text-[13px] font-semibold tracking-[-0.01em]">Gene therapy simulator</p>
+              <p className="text-xs text-[var(--v-ink-3)]">On this page</p>
               <nav className="mt-4 flex flex-col gap-1 text-sm" aria-label="Sections">
                 {[
                   ["#journey", "Genome to cortex"],
@@ -328,7 +319,9 @@ export function TherapySimulator() {
                       }}
                       aria-pressed={horizon === h.days}
                       className={`rounded-full px-3 py-1.5 ${
-                        horizon === h.days ? "bg-[var(--v-ink)] text-white" : "hover:bg-white"
+                        horizon === h.days
+                          ? "bg-[var(--v-ink)] text-[var(--v-on-ink)]"
+                          : "hover:bg-[var(--v-card)]"
                       }`}
                     >
                       {h.label}
@@ -396,7 +389,7 @@ export function TherapySimulator() {
                   type="button"
                   onClick={() => setPlaying((p) => !p)}
                   aria-label={playing ? "Pause" : "Play"}
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--v-ink)] text-white"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--v-ink)] text-[var(--v-on-ink)]"
                 >
                   {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                 </button>
@@ -481,7 +474,7 @@ export function TherapySimulator() {
               </Card>
 
               <section
-                className="relative flex min-h-[540px] flex-col overflow-hidden rounded-[28px] bg-[#050a1e] text-white"
+                className="relative flex min-h-[540px] flex-col overflow-hidden rounded-[28px] bg-[color:var(--kv-050a1e)] text-white"
                 aria-label="Visual pathway from eye to cortex"
               >
                 <div className="relative z-10 flex flex-wrap items-start justify-between gap-2 p-5 pb-0">
@@ -492,7 +485,7 @@ export function TherapySimulator() {
                       follows the simulated signal at {when}.
                     </p>
                   </div>
-                  <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px]">
+                  <span className="rounded-full bg-[color-mix(in_oklab,var(--v-card)_10%,transparent)] px-2 py-0.5 text-[11px]">
                     Computed by a model
                   </span>
                 </div>
@@ -594,7 +587,7 @@ export function TherapySimulator() {
                       {alleles.map((a) => (
                         <span
                           key={a.uid}
-                          className="rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-medium shadow-sm"
+                          className="rounded-full bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] px-2 py-0.5 text-[11px] font-medium shadow-sm"
                         >
                           {a.protein!.short} · amino acid {a.protein!.pos}
                         </span>
@@ -609,7 +602,7 @@ export function TherapySimulator() {
                         )}
                       </div>
                     )}
-                    <p className="pointer-events-none absolute inset-x-3 bottom-3 rounded-2xl bg-white/90 px-3 py-2 text-[11px] text-[var(--v-ink-2)]">
+                    <p className="pointer-events-none absolute inset-x-3 bottom-3 rounded-2xl bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] px-3 py-2 text-[11px] text-[var(--v-ink-2)]">
                       {hover
                         ? `${hover.name} ${hover.seq} · prediction confidence ${hover.b.toFixed(0)}`
                         : "Both changed amino acids are selected. Colour is prediction confidence (pLDDT), not function."}

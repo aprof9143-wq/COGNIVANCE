@@ -39,16 +39,16 @@ export function SimPanel({
   flush?: boolean | undefined;
 }) {
   return (
-    <section className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-[#16305e] bg-gradient-to-b from-[#071a3d]/85 to-[#030b20]/90 shadow-[0_22px_48px_-30px_rgba(30,99,196,0.75)]">
-      <span className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[#7fd8ff]/45 to-transparent" />
-      <header className="flex items-center justify-between gap-2 border-b border-[#16305e] bg-gradient-to-r from-[#0b2150]/70 via-[#061733]/50 to-transparent px-3 py-2">
+    <section className="relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-[color:var(--k-16305e)] bg-gradient-to-b from-[color:var(--k-071a3d)]/85 to-[color:var(--k-030b20)]/90 shadow-[0_22px_48px_-30px_rgba(30,99,196,0.75)]">
+      <span className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--k-7fd8ff)]/45 to-transparent" />
+      <header className="flex items-center justify-between gap-2 border-b border-[color:var(--k-16305e)] bg-gradient-to-r from-[color:var(--k-0b2150)]/70 via-[color:var(--k-061733)]/50 to-transparent px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="h-3 w-[2px] shrink-0 rounded-full bg-[#7fd8ff] shadow-[0_0_6px_#7fd8ff]" />
+          <span className="h-3 w-[2px] shrink-0 rounded-full bg-[color:var(--k-7fd8ff)] shadow-[0_0_6px_var(--k-7fd8ff)]" />
           <h2 className="truncate text-[0.74rem] font-semibold tracking-[-0.005em]">{title}</h2>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {meta ? (
-            <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#8095bf]">
+            <span className="font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
               {meta}
             </span>
           ) : null}
@@ -66,11 +66,11 @@ export const Tag = ({
   kind: "spec" | "assumption" | "measured" | "physics" | "model";
 }) => {
   const style = {
-    spec: "border-[#3d8bf5]/60 text-[#9cc7ff]",
-    assumption: "border-[#d9a441]/60 text-[#f0d08a]",
-    measured: "border-[#41e0a2]/60 text-[#9ff0cc]",
-    physics: "border-[#c58cff]/60 text-[#dcc2ff]",
-    model: "border-[#8095bf]/60 text-[#c4d2ee]",
+    spec: "border-[color:var(--k-3d8bf5)]/60 text-[color:var(--k-9cc7ff)]",
+    assumption: "border-[color:var(--k-d9a441)]/60 text-[color:var(--k-f0d08a)]",
+    measured: "border-[color:var(--k-41e0a2)]/60 text-[color:var(--k-9ff0cc)]",
+    physics: "border-[color:var(--k-c58cff)]/60 text-[color:var(--k-dcc2ff)]",
+    model: "border-[color:var(--k-8095bf)]/60 text-[color:var(--k-c4d2ee)]",
   }[kind];
   const text = {
     spec: "SPEC",
@@ -107,13 +107,13 @@ export function LibraryPanel({
           if (!parts.length) return null;
           return (
             <div key={layer}>
-              <p className="mb-1 font-mono text-[0.54rem] uppercase tracking-[0.16em] text-[#5e719a]">
+              <p className="mb-1 font-mono text-[0.54rem] uppercase tracking-[0.16em] text-[color:var(--k-5e719a)]">
                 {LAYER_LABEL[layer]}
               </p>
               {parts.map((c) => (
                 <details
                   key={c.id}
-                  className="group mb-1 rounded-md border border-[#0e2247] bg-[#030b20]/80 open:border-[#1f4a8a]"
+                  className="group mb-1 rounded-md border border-[color:var(--k-0e2247)] bg-[color:var(--k-030b20)]/80 open:border-[color:var(--k-1f4a8a)]"
                 >
                   <summary className="flex cursor-pointer list-none items-center gap-2 px-2 py-1.5">
                     <input
@@ -122,18 +122,22 @@ export function LibraryPanel({
                       disabled={locked}
                       onChange={() => onToggle(c.id)}
                       onClick={(e) => e.stopPropagation()}
-                      className="accent-[#7fd8ff]"
+                      className="accent-[color:var(--k-7fd8ff)]"
                       aria-label={`Include ${c.name}`}
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[0.74rem] text-[#e6efff]">{c.name}</span>
-                      <span className="block font-mono text-[0.56rem] text-[#8095bf]">
+                      <span className="block truncate text-[0.74rem] text-[color:var(--k-e6efff)]">
+                        {c.name}
+                      </span>
+                      <span className="block font-mono text-[0.56rem] text-[color:var(--k-8095bf)]">
                         {c.part} · {c.program}
                       </span>
                     </span>
                   </summary>
-                  <div className="border-t border-[#0e2247] px-2 py-1.5">
-                    <p className="mb-1 text-[0.66rem] leading-snug text-[#a9bbdc]">{c.summary}</p>
+                  <div className="border-t border-[color:var(--k-0e2247)] px-2 py-1.5">
+                    <p className="mb-1 text-[0.66rem] leading-snug text-[color:var(--k-a9bbdc)]">
+                      {c.summary}
+                    </p>
                     <dl className="flex flex-col gap-1">
                       {c.values.map((v) => (
                         <div
@@ -141,8 +145,8 @@ export function LibraryPanel({
                           className="flex items-start justify-between gap-2 text-[0.66rem]"
                           title={v.source}
                         >
-                          <dt className="text-[#8095bf]">{v.key}</dt>
-                          <dd className="flex items-center gap-1 text-right text-[#e6efff]">
+                          <dt className="text-[color:var(--k-8095bf)]">{v.key}</dt>
+                          <dd className="flex items-center gap-1 text-right text-[color:var(--k-e6efff)]">
                             {v.value} <Tag kind={v.kind} />
                           </dd>
                         </div>
@@ -155,7 +159,7 @@ export function LibraryPanel({
           );
         })}
       </div>
-      <p className="mt-2 text-[0.6rem] leading-relaxed text-[#5e719a]">
+      <p className="mt-2 text-[0.6rem] leading-relaxed text-[color:var(--k-5e719a)]">
         SPEC = design target from the Simulation Window design document. ASSUMED = a value the
         document does not give, needed to run the physics. Untick a part to see the
         auto-connector&apos;s design-rule check react.
@@ -191,14 +195,14 @@ export function NetlistPanel({ circuit, revealed }: { circuit: Circuit; revealed
             {circuit.nets.map((n: Net) => (
               <tr
                 key={n.id}
-                className={`border-t border-[#0e2247] transition-opacity ${revealed.has(n.id) ? "opacity-100" : "opacity-20"}`}
+                className={`border-t border-[color:var(--k-0e2247)] transition-opacity ${revealed.has(n.id) ? "opacity-100" : "opacity-20"}`}
               >
-                <td className="py-1 pr-1 text-[#5e719a]">{n.id}</td>
-                <td className="py-1 text-[#e6efff]">
+                <td className="py-1 pr-1 text-[color:var(--k-5e719a)]">{n.id}</td>
+                <td className="py-1 text-[color:var(--k-e6efff)]">
                   {name(n.from.component)}.{n.from.port}
                 </td>
-                <td className="px-1 py-1 text-[#5e719a]">→</td>
-                <td className="py-1 text-[#e6efff]">
+                <td className="px-1 py-1 text-[color:var(--k-5e719a)]">→</td>
+                <td className="py-1 text-[color:var(--k-e6efff)]">
                   {name(n.to.component)}.{n.to.port}
                 </td>
                 <td
@@ -216,7 +220,7 @@ export function NetlistPanel({ circuit, revealed }: { circuit: Circuit; revealed
         {errors.map((d) => (
           <p
             key={d.message}
-            className="flex items-start gap-1.5 rounded border border-[#ff4b5c]/40 bg-[#ff4b5c]/[0.07] px-2 py-1 text-[0.64rem] text-[#ffb3bc]"
+            className="flex items-start gap-1.5 rounded border border-[color:var(--k-ff4b5c)]/40 bg-[color:var(--k-ff4b5c)]/[0.07] px-2 py-1 text-[0.64rem] text-[color:var(--k-ffb3bc)]"
           >
             <X className="mt-0.5 h-3 w-3 shrink-0" />{" "}
             <span>
@@ -227,7 +231,7 @@ export function NetlistPanel({ circuit, revealed }: { circuit: Circuit; revealed
         {warnings.map((d) => (
           <p
             key={d.message}
-            className="flex items-start gap-1.5 rounded border border-[#d9a441]/40 bg-[#d9a441]/[0.06] px-2 py-1 text-[0.64rem] text-[#f0d08a]"
+            className="flex items-start gap-1.5 rounded border border-[color:var(--k-d9a441)]/40 bg-[color:var(--k-d9a441)]/[0.06] px-2 py-1 text-[0.64rem] text-[color:var(--k-f0d08a)]"
           >
             <ShieldAlert className="mt-0.5 h-3 w-3 shrink-0" />{" "}
             <span>
@@ -236,25 +240,25 @@ export function NetlistPanel({ circuit, revealed }: { circuit: Circuit; revealed
           </p>
         ))}
         {!errors.length ? (
-          <p className="flex items-center gap-1.5 text-[0.64rem] text-[#9ff0cc]">
+          <p className="flex items-center gap-1.5 text-[0.64rem] text-[color:var(--k-9ff0cc)]">
             <Check className="h-3 w-3" /> ERC passed · write path gated by PRISM
           </p>
         ) : null}
       </div>
       <div className="mt-2">
-        <div className="mb-1 flex justify-between font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#8095bf]">
+        <div className="mb-1 flex justify-between font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
           <span>Power draw / harvest</span>
-          <span className="text-[#e6efff]">
+          <span className="text-[color:var(--k-e6efff)]">
             {fmt(circuit.power.drawMw, 1)} / {fmt(circuit.power.harvestMw, 1)} mW
           </span>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-[#0e2247]">
+        <div className="h-1.5 overflow-hidden rounded-full bg-[color:var(--k-0e2247)]">
           <div
-            className={`h-full rounded-full ${pct >= 100 ? "bg-[#d9a441]" : "bg-[#41e0a2]"}`}
+            className={`h-full rounded-full ${pct >= 100 ? "bg-[color:var(--k-d9a441)]" : "bg-[color:var(--k-41e0a2)]"}`}
             style={{ width: `${pct}%` }}
           />
         </div>
-        <p className="mt-1 text-[0.6rem] text-[#5e719a]">
+        <p className="mt-1 text-[0.6rem] text-[color:var(--k-5e719a)]">
           Write-back duty cycle limited to {fmt(circuit.power.dutyLimit * 100, 0)} % by the assumed
           harvest budget.
         </p>
@@ -293,10 +297,10 @@ export function DesignPanel({
       meta={isSpec ? "doc spec · 15 MHz" : (source ?? "auto-designed")}
     >
       <div className="grid grid-cols-2 gap-2">
-        <label className="flex flex-col gap-1 text-[0.6rem] uppercase tracking-[0.12em] text-[#8095bf]">
+        <label className="flex flex-col gap-1 text-[0.6rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
           Frequency
           <select
-            className="rounded border border-[#16305e] bg-[#01071a] px-2 py-1 text-[0.74rem] normal-case tracking-normal text-[#e6efff]"
+            className="rounded border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-2 py-1 text-[0.74rem] normal-case tracking-normal text-[color:var(--k-e6efff)]"
             value={fMhz}
             onChange={(e) => {
               const f = Number(e.target.value) * 1e6;
@@ -310,10 +314,10 @@ export function DesignPanel({
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-[0.6rem] uppercase tracking-[0.12em] text-[#8095bf]">
+        <label className="flex flex-col gap-1 text-[0.6rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
           Pitch
           <select
-            className="rounded border border-[#16305e] bg-[#01071a] px-2 py-1 text-[0.74rem] normal-case tracking-normal text-[#e6efff]"
+            className="rounded border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-2 py-1 text-[0.74rem] normal-case tracking-normal text-[color:var(--k-e6efff)]"
             value={PITCH_WAVELENGTHS.reduce((a, b) =>
               Math.abs(b - pitchLam) < Math.abs(a - pitchLam) ? b : a,
             )}
@@ -327,13 +331,13 @@ export function DesignPanel({
           </select>
         </label>
       </div>
-      <p className="mt-1 font-mono text-[0.58rem] text-[#8095bf]">
+      <p className="mt-1 font-mono text-[0.58rem] text-[color:var(--k-8095bf)]">
         λ {fmt(lam * 1000, 3)} mm · aperture {fmt(design.pitchM * design.elementsPerSide * 1000, 1)}{" "}
         mm · 16 × 16 elements
       </p>
       <table className="mt-2 w-full border-collapse text-[0.64rem]">
         <thead>
-          <tr className="text-left font-mono text-[0.52rem] uppercase tracking-[0.1em] text-[#5e719a]">
+          <tr className="text-left font-mono text-[0.52rem] uppercase tracking-[0.1em] text-[color:var(--k-5e719a)]">
             <th className="pb-1 font-medium">Target</th>
             <th className="pb-1 text-right font-medium">Depth</th>
             <th className="pb-1 text-right font-medium">Focus</th>
@@ -345,24 +349,24 @@ export function DesignPanel({
           {beams.map((b) => {
             const ok = deliverable(b);
             return (
-              <tr key={b.region} className="border-t border-[#0e2247]">
-                <td className="py-1 capitalize text-[#e6efff]">{b.region}</td>
-                <td className="py-1 text-right font-mono text-[#c4d2ee]">
+              <tr key={b.region} className="border-t border-[color:var(--k-0e2247)]">
+                <td className="py-1 capitalize text-[color:var(--k-e6efff)]">{b.region}</td>
+                <td className="py-1 text-right font-mono text-[color:var(--k-c4d2ee)]">
                   {fmt(b.metrics.depthMm, 1)} mm
                 </td>
-                <td className="py-1 text-right font-mono text-[#c4d2ee]">
+                <td className="py-1 text-right font-mono text-[color:var(--k-c4d2ee)]">
                   {fmt(b.metrics.focusMpa, 3)} MPa
                 </td>
                 <td
-                  className={`py-1 text-right font-mono ${ok ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                  className={`py-1 text-right font-mono ${ok ? "text-[color:var(--k-9ff0cc)]" : "text-[color:var(--k-ffb3bc)]"}`}
                 >
                   {fmt(b.metrics.offTargetFraction, 2)}×
                 </td>
                 <td className="py-1 text-right">
                   {ok ? (
-                    <Check className="ml-auto h-3 w-3 text-[#41e0a2]" />
+                    <Check className="ml-auto h-3 w-3 text-[color:var(--k-41e0a2)]" />
                   ) : (
-                    <X className="ml-auto h-3 w-3 text-[#ff4b5c]" />
+                    <X className="ml-auto h-3 w-3 text-[color:var(--k-ff4b5c)]" />
                   )}
                 </td>
               </tr>
@@ -374,7 +378,7 @@ export function DesignPanel({
         type="button"
         onClick={onAuto}
         disabled={autoProgress !== null}
-        className="mt-2 flex w-full items-center justify-center gap-2 rounded-md border border-[#7fd8ff]/50 bg-[#0b2a5c] px-3 py-2 text-[0.74rem] font-medium text-[#e6f7ff] transition hover:bg-[#123a7a] disabled:opacity-60"
+        className="mt-2 flex w-full items-center justify-center gap-2 rounded-md border border-[color:var(--k-7fd8ff)]/50 bg-[color:var(--k-0b2a5c)] px-3 py-2 text-[0.74rem] font-medium text-[color:var(--k-e6f7ff)] transition hover:bg-[color:var(--k-123a7a)] disabled:opacity-60"
       >
         <Sparkles className="h-3.5 w-3.5" />
         {autoProgress !== null
@@ -382,9 +386,11 @@ export function DesignPanel({
           : "Auto-design array for this programme"}
       </button>
       {autoNote ? (
-        <p className="mt-1.5 text-[0.62rem] leading-relaxed text-[#a9bbdc]">{autoNote}</p>
+        <p className="mt-1.5 text-[0.62rem] leading-relaxed text-[color:var(--k-a9bbdc)]">
+          {autoNote}
+        </p>
       ) : null}
-      <p className="mt-1.5 text-[0.6rem] leading-relaxed text-[#5e719a]">
+      <p className="mt-1.5 text-[0.6rem] leading-relaxed text-[color:var(--k-5e719a)]">
         Brain attenuates ≈ 0.6 dB/cm/MHz: 9 dB/cm at the spec&apos;s 15 MHz. A target counts as
         reachable when no point outside its focus exceeds half the focal pressure (PRISM S4).
       </p>
@@ -427,21 +433,21 @@ export function PipelineStrip({ stage, ev }: { stage: string | null; ev: LoopEve
               >
                 {s.sub}
               </p>
-              <p className="flex items-center gap-1 whitespace-nowrap text-[0.68rem] font-semibold text-[#e6efff]">
+              <p className="flex items-center gap-1 whitespace-nowrap text-[0.68rem] font-semibold text-[color:var(--k-e6efff)]">
                 {gate && ev ? (
                   halted ? (
-                    <ShieldAlert className="h-3 w-3 text-[#ff4b5c]" />
+                    <ShieldAlert className="h-3 w-3 text-[color:var(--k-ff4b5c)]" />
                   ) : (
-                    <ShieldCheck className="h-3 w-3 text-[#41e0a2]" />
+                    <ShieldCheck className="h-3 w-3 text-[color:var(--k-41e0a2)]" />
                   )
                 ) : null}
                 {s.label}
               </p>
-              <p className="font-mono text-[0.54rem] text-[#a9bbdc]">
+              <p className="font-mono text-[0.54rem] text-[color:var(--k-a9bbdc)]">
                 {ms !== undefined ? `${ms.toFixed(ms < 1 ? 3 : 1)} ms` : " "}
               </p>
             </div>
-            {i < STAGES.length - 1 ? <span className="text-[#3d5a8a]">›</span> : null}
+            {i < STAGES.length - 1 ? <span className="text-[color:var(--k-3d5a8a)]">›</span> : null}
           </div>
         );
       })}
@@ -470,14 +476,14 @@ export function LatencyPanel({
               .filter((s) => s.stage !== "MEASURE")
               .map((s) => (
                 <div key={s.stage} className="flex items-center gap-2 text-[0.66rem]">
-                  <span className="w-16 font-mono text-[#8095bf]">{s.stage}</span>
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#0e2247]">
+                  <span className="w-16 font-mono text-[color:var(--k-8095bf)]">{s.stage}</span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[color:var(--k-0e2247)]">
                     <div
-                      className="h-full rounded-full bg-[#3fa9ff]"
+                      className="h-full rounded-full bg-[color:var(--k-3fa9ff)]"
                       style={{ width: `${Math.min(100, (s.ms / 18) * 100)}%` }}
                     />
                   </div>
-                  <span className="w-14 text-right font-mono text-[#e6efff]">
+                  <span className="w-14 text-right font-mono text-[color:var(--k-e6efff)]">
                     {s.ms.toFixed(s.ms < 1 ? 3 : 2)}
                   </span>
                   <Tag
@@ -489,24 +495,24 @@ export function LatencyPanel({
               ))}
           </div>
           <p
-            className={`mt-2 font-mono text-[0.7rem] ${total <= target ? "text-[#9ff0cc]" : "text-[#f0d08a]"}`}
+            className={`mt-2 font-mono text-[0.7rem] ${total <= target ? "text-[color:var(--k-9ff0cc)]" : "text-[color:var(--k-f0d08a)]"}`}
           >
             Sense → write-back: {total.toFixed(2)} ms{" "}
             {total <= target ? "· within target" : `· ${(total - target).toFixed(2)} ms over`}
           </p>
-          <p className="mt-1 text-[0.6rem] leading-relaxed text-[#5e719a]">
+          <p className="mt-1 text-[0.6rem] leading-relaxed text-[color:var(--k-5e719a)]">
             The spec budgets alone (ASIC &lt; 10 ms + PRISM &lt; 5 ms) already use the 15 ms target;
             prediction time is measured here, in this browser.
           </p>
           {rolling?.total ? (
-            <div className="mt-2 border-t border-[#0e2247] pt-1.5 font-mono text-[0.6rem]">
-              <p className="text-[#5e719a]">
+            <div className="mt-2 border-t border-[color:var(--k-0e2247)] pt-1.5 font-mono text-[0.6rem]">
+              <p className="text-[color:var(--k-5e719a)]">
                 MEASURED · 60 S ROLLING WINDOW · {rolling.total.n} LOOPS
               </p>
               <div className="mt-1 grid grid-cols-[minmax(0,1fr)_4.2rem_4.2rem] gap-x-2 gap-y-0.5">
                 <span />
-                <span className="text-right text-[#5e719a]">p50</span>
-                <span className="text-right text-[#5e719a]">p95</span>
+                <span className="text-right text-[color:var(--k-5e719a)]">p50</span>
+                <span className="text-right text-[color:var(--k-5e719a)]">p95</span>
                 {(
                   [
                     ["Predict", rolling.predict, null],
@@ -514,14 +520,14 @@ export function LatencyPanel({
                   ] as [string, Percentiles | null, number | null][]
                 ).map(([label, q, limit]) => (
                   <div key={label} className="contents">
-                    <span className="text-[#8095bf]">{label}</span>
+                    <span className="text-[color:var(--k-8095bf)]">{label}</span>
                     {[q?.p50, q?.p95].map((v, i) => (
                       <span
                         key={i}
                         className={`text-right ${
                           v !== undefined && limit !== null && v > limit
-                            ? "text-[#f0d08a]"
-                            : "text-[#e6efff]"
+                            ? "text-[color:var(--k-f0d08a)]"
+                            : "text-[color:var(--k-e6efff)]"
                         }`}
                       >
                         {v === undefined ? "—" : `${v.toFixed(2)} ms`}
@@ -534,7 +540,7 @@ export function LatencyPanel({
           ) : null}
         </>
       ) : (
-        <p className="text-[0.66rem] text-[#8095bf]">Waiting for the first loop…</p>
+        <p className="text-[0.66rem] text-[color:var(--k-8095bf)]">Waiting for the first loop…</p>
       )}
     </SimPanel>
   );
@@ -549,9 +555,9 @@ export function PrismPanel({ ev }: { ev: LoopEvent | null }) {
       action={
         v ? (
           v.verified ? (
-            <ShieldCheck className="h-4 w-4 text-[#41e0a2]" />
+            <ShieldCheck className="h-4 w-4 text-[color:var(--k-41e0a2)]" />
           ) : (
-            <ShieldAlert className="h-4 w-4 text-[#ff4b5c]" />
+            <ShieldAlert className="h-4 w-4 text-[color:var(--k-ff4b5c)]" />
           )
         ) : null
       }
@@ -559,22 +565,28 @@ export function PrismPanel({ ev }: { ev: LoopEvent | null }) {
       {v ? (
         <>
           {!v.verified ? (
-            <p className="mb-2 rounded border border-[#ff4b5c]/40 bg-[#ff4b5c]/[0.08] px-2 py-1.5 text-[0.66rem] text-[#ffb3bc]">
+            <p className="mb-2 rounded border border-[color:var(--k-ff4b5c)]/40 bg-[color:var(--k-ff4b5c)]/[0.08] px-2 py-1.5 text-[0.66rem] text-[color:var(--k-ffb3bc)]">
               HALT — no write-back. {v.reason}
             </p>
           ) : null}
           <table className="w-full border-collapse text-[0.62rem]">
             <tbody>
               {v.rules.map((r) => (
-                <tr key={r.id} className="border-t border-[#0e2247]" title={`limit ${r.limit}`}>
-                  <td className="py-1 pr-1 font-mono text-[#5e719a]">{r.id}</td>
-                  <td className="py-1 text-[#c4d2ee]">{r.label}</td>
-                  <td className="py-1 pl-1 text-right font-mono text-[#e6efff]">{r.value}</td>
+                <tr
+                  key={r.id}
+                  className="border-t border-[color:var(--k-0e2247)]"
+                  title={`limit ${r.limit}`}
+                >
+                  <td className="py-1 pr-1 font-mono text-[color:var(--k-5e719a)]">{r.id}</td>
+                  <td className="py-1 text-[color:var(--k-c4d2ee)]">{r.label}</td>
+                  <td className="py-1 pl-1 text-right font-mono text-[color:var(--k-e6efff)]">
+                    {r.value}
+                  </td>
                   <td className="py-1 pl-1 text-right">
                     {r.pass ? (
-                      <Check className="ml-auto h-3 w-3 text-[#41e0a2]" />
+                      <Check className="ml-auto h-3 w-3 text-[color:var(--k-41e0a2)]" />
                     ) : (
-                      <X className="ml-auto h-3 w-3 text-[#ff4b5c]" />
+                      <X className="ml-auto h-3 w-3 text-[color:var(--k-ff4b5c)]" />
                     )}
                   </td>
                 </tr>
@@ -583,7 +595,7 @@ export function PrismPanel({ ev }: { ev: LoopEvent | null }) {
           </table>
         </>
       ) : (
-        <p className="text-[0.66rem] text-[#8095bf]">Gate idle.</p>
+        <p className="text-[0.66rem] text-[color:var(--k-8095bf)]">Gate idle.</p>
       )}
     </SimPanel>
   );
@@ -610,11 +622,14 @@ export function BeamPanel({ beams, ev }: { beams: TargetBeam[]; ev: LoopEvent | 
             ["Focal ΔT now", temp !== undefined ? `${fmt(temp, 3)} °C` : "—"],
           ];
           return (
-            <div key={b.region} className="rounded-md border border-[#0e2247] bg-[#030b20]/70 p-2">
+            <div
+              key={b.region}
+              className="rounded-md border border-[color:var(--k-0e2247)] bg-[color:var(--k-030b20)]/70 p-2"
+            >
               <p className="mb-1 flex items-center justify-between text-[0.7rem]">
-                <span className="capitalize text-[#e6efff]">{b.region}</span>
+                <span className="capitalize text-[color:var(--k-e6efff)]">{b.region}</span>
                 <span
-                  className={`font-mono text-[0.56rem] ${deliverable(b) ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                  className={`font-mono text-[0.56rem] ${deliverable(b) ? "text-[color:var(--k-9ff0cc)]" : "text-[color:var(--k-ffb3bc)]"}`}
                 >
                   {deliverable(b) ? "IN REACH" : "OUT OF REACH"}
                 </span>
@@ -622,8 +637,8 @@ export function BeamPanel({ beams, ev }: { beams: TargetBeam[]; ev: LoopEvent | 
               <dl className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[0.6rem]">
                 {rows.map(([k, v]) => (
                   <div key={k} className="contents">
-                    <dt className="text-[#8095bf]">{k}</dt>
-                    <dd className="text-right font-mono text-[#e6efff]">{v}</dd>
+                    <dt className="text-[color:var(--k-8095bf)]">{k}</dt>
+                    <dd className="text-right font-mono text-[color:var(--k-e6efff)]">{v}</dd>
                   </div>
                 ))}
               </dl>
@@ -636,7 +651,7 @@ export function BeamPanel({ beams, ev }: { beams: TargetBeam[]; ev: LoopEvent | 
 }
 
 const Cite = ({ refs }: { refs: Reference[] }) => (
-  <span className="text-[#8095bf]">({refs.map((r) => r.cite).join("; ")})</span>
+  <span className="text-[color:var(--k-8095bf)]">({refs.map((r) => r.cite).join("; ")})</span>
 );
 
 /** Which anatomy the depths were measured on, when a subject is loaded. */
@@ -667,7 +682,7 @@ function GatedExplanation({
     ...(d.region === "amygdala" ? [REFS.neurosity] : []),
   ];
   return (
-    <div className="mt-2 border-t border-[#0e2247] pt-2 text-[0.6rem] leading-relaxed text-[#c4d2ee]">
+    <div className="mt-2 border-t border-[color:var(--k-0e2247)] pt-2 text-[0.6rem] leading-relaxed text-[color:var(--k-c4d2ee)]">
       <p>
         {name} sits {fmt(d.belowScalpMm, 1)} mm below {scalp} and {fmt(d.belowBrainMm, 1)} mm below{" "}
         {brain}, measured here from its centroid in MNI152 space. The skull conducts far less than
@@ -684,7 +699,7 @@ function GatedExplanation({
         cross-validation against fMRI or intracranial EEG before clinical use; this simulation
         senses with a cortical-surface mesh, not scalp EEG.
       </p>
-      <ol className="mt-1.5 list-decimal pl-4 text-[0.56rem] text-[#8095bf]">
+      <ol className="mt-1.5 list-decimal pl-4 text-[0.56rem] text-[color:var(--k-8095bf)]">
         {sources.map((r) => (
           <li key={r.cite}>
             {r.url ? (
@@ -692,12 +707,12 @@ function GatedExplanation({
                 href={r.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-[#9cc7ff] hover:text-[#e6efff]"
+                className="text-[color:var(--k-9cc7ff)] hover:text-[color:var(--k-e6efff)]"
               >
                 {r.cite}
               </a>
             ) : (
-              <span className="text-[#c4d2ee]">{r.cite}</span>
+              <span className="text-[color:var(--k-c4d2ee)]">{r.cite}</span>
             )}{" "}
             — {r.title}
           </li>
@@ -748,17 +763,17 @@ export function DepthPanel({
             return (
               <div
                 key={d.region}
-                className="rounded-md border border-[#0e2247] bg-[#030b20]/70 p-2"
+                className="rounded-md border border-[color:var(--k-0e2247)] bg-[color:var(--k-030b20)]/70 p-2"
               >
                 <div className="mb-1 flex items-center justify-between gap-2 text-[0.7rem]">
-                  <span className="truncate text-[#e6efff]">{name(d.region)}</span>
+                  <span className="truncate text-[color:var(--k-e6efff)]">{name(d.region)}</span>
                   <span className="flex shrink-0 items-center gap-1">
                     {isSimulated(d.region) && targets.includes(d.region) ? (
-                      <span className="rounded border border-[#3d8bf5]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#9cc7ff]">
+                      <span className="rounded border border-[color:var(--k-3d8bf5)]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[color:var(--k-9cc7ff)]">
                         TARGET
                       </span>
                     ) : null}
-                    <span className="rounded border border-[#d9a441]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#f0d08a]">
+                    <span className="rounded border border-[color:var(--k-d9a441)]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[color:var(--k-f0d08a)]">
                       GATED
                     </span>
                   </span>
@@ -766,9 +781,9 @@ export function DepthPanel({
                 <dl className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[0.6rem]">
                   {rows.map(([k, v]) => (
                     <div key={k} className="contents">
-                      <dt className="text-[#8095bf]">{k}</dt>
+                      <dt className="text-[color:var(--k-8095bf)]">{k}</dt>
                       <dd
-                        className="text-right font-mono text-[#e6efff]"
+                        className="text-right font-mono text-[color:var(--k-e6efff)]"
                         title={
                           k === "Scalp-EEG error"
                             ? `${DEEP_SOURCE_ERROR.value} — ${DEEP_SOURCE_ERROR.refs.map((r) => r.cite).join("; ")}`
@@ -786,7 +801,7 @@ export function DepthPanel({
                   type="button"
                   onClick={() => setOpen(isOpen ? null : d.region)}
                   aria-expanded={isOpen}
-                  className="mt-1.5 flex items-center gap-1 text-[0.6rem] text-[#7fd8ff] hover:text-[#e6efff]"
+                  className="mt-1.5 flex items-center gap-1 text-[0.6rem] text-[color:var(--k-7fd8ff)] hover:text-[color:var(--k-e6efff)]"
                 >
                   Why gated
                   <ChevronDown
@@ -803,7 +818,7 @@ export function DepthPanel({
                 type="button"
                 onClick={() => setShowAll(!showAll)}
                 aria-expanded={showAll}
-                className="flex items-center gap-1 text-[0.6rem] text-[#7fd8ff] hover:text-[#e6efff]"
+                className="flex items-center gap-1 text-[0.6rem] text-[color:var(--k-7fd8ff)] hover:text-[color:var(--k-e6efff)]"
               >
                 All regions · {all.length}
                 <ChevronDown
@@ -814,7 +829,7 @@ export function DepthPanel({
                 <div className="mt-1.5 flex flex-col gap-2">
                   <table className="w-full border-collapse text-[0.6rem]">
                     <thead>
-                      <tr className="text-[#5e719a]">
+                      <tr className="text-[color:var(--k-5e719a)]">
                         <th className="py-0.5 text-left font-normal">Region</th>
                         <th className="py-0.5 pl-1 text-right font-normal">Scalp</th>
                         <th className="py-0.5 pl-1 text-right font-normal">Brain</th>
@@ -826,35 +841,37 @@ export function DepthPanel({
                         return (
                           <tr
                             key={d.region}
-                            className="border-t border-[#0e2247]"
+                            className="border-t border-[color:var(--k-0e2247)]"
                             title={`MNI ${mni(d.mni)} (${d.side === "left" ? "L" : "R"} centroid)${
                               stands ? ` · stands in for ${stands}` : ""
                             }`}
                           >
-                            <td className="py-1 text-[#c4d2ee]">
+                            <td className="py-1 text-[color:var(--k-c4d2ee)]">
                               <span className="flex flex-wrap items-center gap-1">
-                                <span className="text-[#e6efff]">{name(d.region)}</span>
+                                <span className="text-[color:var(--k-e6efff)]">
+                                  {name(d.region)}
+                                </span>
                                 {isGated(d.region) ? (
-                                  <span className="rounded border border-[#d9a441]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#f0d08a]">
+                                  <span className="rounded border border-[color:var(--k-d9a441)]/60 px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[color:var(--k-f0d08a)]">
                                     GATED
                                   </span>
                                 ) : null}
                                 {isSimulated(d.region) ? null : (
-                                  <span className="rounded border border-[#16305e] px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[#8095bf]">
+                                  <span className="rounded border border-[color:var(--k-16305e)] px-1 py-px font-mono text-[0.5rem] tracking-[0.1em] text-[color:var(--k-8095bf)]">
                                     NOT SIMULATED
                                   </span>
                                 )}
                               </span>
                               {stands ? (
-                                <span className="block text-[0.56rem] text-[#8095bf]">
+                                <span className="block text-[0.56rem] text-[color:var(--k-8095bf)]">
                                   for {stands}
                                 </span>
                               ) : null}
                             </td>
-                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[#e6efff]">
+                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[color:var(--k-e6efff)]">
                               {fmt(d.belowScalpMm, 1)}
                             </td>
-                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[#e6efff]">
+                            <td className="whitespace-nowrap py-1 pl-1 text-right align-top font-mono text-[color:var(--k-e6efff)]">
                               {fmt(d.belowBrainMm, 1)}
                             </td>
                           </tr>
@@ -862,17 +879,17 @@ export function DepthPanel({
                       })}
                     </tbody>
                   </table>
-                  <div className="rounded-md border border-dashed border-[#16305e] p-2 text-[0.6rem]">
-                    <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#5e719a]">
+                  <div className="rounded-md border border-dashed border-[color:var(--k-16305e)] p-2 text-[0.6rem]">
+                    <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-5e719a)]">
                       Not included
                     </p>
                     {NOT_INCLUDED.map((n) => (
-                      <p key={n.name} className="text-[#8095bf]">
-                        <span className="text-[#c4d2ee]">{n.name}</span> — {n.reason}
+                      <p key={n.name} className="text-[color:var(--k-8095bf)]">
+                        <span className="text-[color:var(--k-c4d2ee)]">{n.name}</span> — {n.reason}
                       </p>
                     ))}
                   </div>
-                  <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+                  <p className="text-[0.6rem] leading-relaxed text-[color:var(--k-5e719a)]">
                     Depth in mm below the scalp and below the brain surface, from each region&apos;s
                     left centroid. Not simulated: shown and measured, but not part of the network
                     model (it has no coupling data for them), so not a target. &quot;For&quot; names
@@ -882,7 +899,7 @@ export function DepthPanel({
               ) : null}
             </div>
           ) : null}
-          <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+          <p className="text-[0.6rem] leading-relaxed text-[color:var(--k-5e719a)]">
             Gated: deep regions that scalp EEG cannot localise precisely.{" "}
             {subject
               ? `Depths are measured on ${subject.label} from each region's centroid${
@@ -892,7 +909,7 @@ export function DepthPanel({
           </p>
         </div>
       ) : (
-        <p className="text-[0.66rem] text-[#8095bf]">Waiting for the anatomy…</p>
+        <p className="text-[0.66rem] text-[color:var(--k-8095bf)]">Waiting for the anatomy…</p>
       )}
     </SimPanel>
   );
@@ -917,9 +934,9 @@ export function PlanPanel({
       action={
         plans.length ? (
           failed ? (
-            <ShieldAlert className="h-4 w-4 text-[#ff4b5c]" />
+            <ShieldAlert className="h-4 w-4 text-[color:var(--k-ff4b5c)]" />
           ) : (
-            <ShieldCheck className="h-4 w-4 text-[#41e0a2]" />
+            <ShieldCheck className="h-4 w-4 text-[color:var(--k-41e0a2)]" />
           )
         ) : null
       }
@@ -927,11 +944,14 @@ export function PlanPanel({
       {plans.length ? (
         <div className="flex flex-col gap-2">
           {plans.map((p) => (
-            <div key={p.region} className="rounded-md border border-[#0e2247] bg-[#030b20]/70 p-2">
+            <div
+              key={p.region}
+              className="rounded-md border border-[color:var(--k-0e2247)] bg-[color:var(--k-030b20)]/70 p-2"
+            >
               <p className="mb-1 flex items-center justify-between text-[0.7rem]">
-                <span className="text-[#e6efff]">{name(p.region)}</span>
+                <span className="text-[color:var(--k-e6efff)]">{name(p.region)}</span>
                 <span
-                  className={`font-mono text-[0.56rem] ${p.pass ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                  className={`font-mono text-[0.56rem] ${p.pass ? "text-[color:var(--k-9ff0cc)]" : "text-[color:var(--k-ffb3bc)]"}`}
                 >
                   {p.pass ? "PASS" : "FAIL"}
                 </span>
@@ -945,30 +965,34 @@ export function PlanPanel({
                   ] as [string, string][]
                 ).map(([k, v]) => (
                   <div key={k} className="contents">
-                    <dt className="text-[#8095bf]">{k}</dt>
-                    <dd className="text-right font-mono text-[#e6efff]">{v}</dd>
+                    <dt className="text-[color:var(--k-8095bf)]">{k}</dt>
+                    <dd className="text-right font-mono text-[color:var(--k-e6efff)]">{v}</dd>
                   </div>
                 ))}
               </dl>
               <table className="mt-1.5 w-full border-collapse text-[0.6rem]">
                 <tbody>
                   {p.margins.map((m) => (
-                    <tr key={m.key} className="border-t border-[#0e2247]" title={m.basis}>
-                      <td className="py-1 text-[#c4d2ee]">{m.label}</td>
-                      <td className="whitespace-nowrap py-1 pl-1 text-right font-mono text-[#e6efff]">
+                    <tr
+                      key={m.key}
+                      className="border-t border-[color:var(--k-0e2247)]"
+                      title={m.basis}
+                    >
+                      <td className="py-1 text-[color:var(--k-c4d2ee)]">{m.label}</td>
+                      <td className="whitespace-nowrap py-1 pl-1 text-right font-mono text-[color:var(--k-e6efff)]">
                         {fmt(m.value, m.digits)} / {fmt(m.limit, m.digits)}
                         {m.unit ? ` ${m.unit}` : ""}
                       </td>
                       <td
-                        className={`whitespace-nowrap py-1 pl-1 text-right font-mono ${m.pass ? "text-[#9ff0cc]" : "text-[#ffb3bc]"}`}
+                        className={`whitespace-nowrap py-1 pl-1 text-right font-mono ${m.pass ? "text-[color:var(--k-9ff0cc)]" : "text-[color:var(--k-ffb3bc)]"}`}
                       >
                         {m.pass ? `${Math.round(m.margin * 100)} %` : "over"}
                       </td>
                       <td className="py-1 pl-1 text-right">
                         {m.pass ? (
-                          <Check className="ml-auto h-3 w-3 text-[#41e0a2]" />
+                          <Check className="ml-auto h-3 w-3 text-[color:var(--k-41e0a2)]" />
                         ) : (
-                          <X className="ml-auto h-3 w-3 text-[#ff4b5c]" />
+                          <X className="ml-auto h-3 w-3 text-[color:var(--k-ff4b5c)]" />
                         )}
                       </td>
                     </tr>
@@ -977,24 +1001,24 @@ export function PlanPanel({
               </table>
             </div>
           ))}
-          <div className="rounded-md border border-dashed border-[#16305e] p-2 text-[0.6rem]">
-            <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#5e719a]">
+          <div className="rounded-md border border-dashed border-[color:var(--k-16305e)] p-2 text-[0.6rem]">
+            <p className="mb-1 font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-5e719a)]">
               Not modelled
             </p>
             {NOT_MODELLED.map((n) => (
-              <p key={n.label} className="text-[#8095bf]">
-                <span className="text-[#c4d2ee]">{n.label}</span> — {n.reason}
+              <p key={n.label} className="text-[color:var(--k-8095bf)]">
+                <span className="text-[color:var(--k-c4d2ee)]">{n.label}</span> — {n.reason}
               </p>
             ))}
           </div>
-          <p className="text-[0.6rem] leading-relaxed text-[#5e719a]">
+          <p className="text-[0.6rem] leading-relaxed text-[color:var(--k-5e719a)]">
             Value / limit and headroom at full drive, from the same physics and limits PRISM
             enforces. The plan is the worst case before the loop runs; PRISM still checks every
             intent.
           </p>
         </div>
       ) : (
-        <p className="text-[0.66rem] text-[#8095bf]">Waiting for the anatomy…</p>
+        <p className="text-[0.66rem] text-[color:var(--k-8095bf)]">Waiting for the anatomy…</p>
       )}
     </SimPanel>
   );
@@ -1079,11 +1103,11 @@ export function ScopePanel({
     .join(" ");
   return (
     <SimPanel title="Neural instruments" meta="1.5 s · model LFP">
-      <canvas ref={ref} className="h-40 w-full rounded bg-[#01071a]" />
+      <canvas ref={ref} className="h-40 w-full rounded bg-[color:var(--k-01071a)]" />
       <div className="mt-2">
-        <p className="mb-1 flex items-center justify-between font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[#8095bf]">
+        <p className="mb-1 flex items-center justify-between font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[color:var(--k-8095bf)]">
           <span className="truncate normal-case tracking-normal">Model endpoint · {label}</span>
-          <span className="shrink-0 text-[#e6efff]">
+          <span className="shrink-0 text-[color:var(--k-e6efff)]">
             {hist.length
               ? `${hist[hist.length - 1]!.toFixed(1)} ${unit}`
               : `measuring · window ${windowS.toFixed(2)} / 1.50 s`}
@@ -1092,7 +1116,7 @@ export function ScopePanel({
         <svg
           viewBox="0 0 100 30"
           preserveAspectRatio="none"
-          className="h-10 w-full rounded bg-[#01071a]"
+          className="h-10 w-full rounded bg-[color:var(--k-01071a)]"
         >
           <polyline
             points={pts}
@@ -1134,10 +1158,10 @@ export function BenchmarkPanel({
     const s = d.clinical.status;
     const style =
       s === "verified"
-        ? "text-[#9ff0cc] border-[#41e0a2]/50"
+        ? "text-[color:var(--k-9ff0cc)] border-[color:var(--k-41e0a2)]/50"
         : s === "design-doc"
-          ? "text-[#f0d08a] border-[#d9a441]/50"
-          : "text-[#c4d2ee] border-[#8095bf]/50";
+          ? "text-[color:var(--k-f0d08a)] border-[color:var(--k-d9a441)]/50"
+          : "text-[color:var(--k-c4d2ee)] border-[color:var(--k-8095bf)]/50";
     const text = s === "verified" ? "cited" : s === "design-doc" ? "per design doc" : "no baseline";
     return (
       <span className={`rounded border px-1 font-mono text-[0.5rem] uppercase ${style}`}>
@@ -1151,22 +1175,22 @@ export function BenchmarkPanel({
       meta="closed loop vs open loop, same noise"
       action={
         <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1 font-mono text-[0.58rem] text-[#8095bf]">
+          <label className="flex items-center gap-1 font-mono text-[0.58rem] text-[color:var(--k-8095bf)]">
             <input
               type="checkbox"
               checked={autoDesign}
               disabled={running}
               onChange={(e) => setAutoDesign(e.target.checked)}
-              className="accent-[#7fd8ff]"
+              className="accent-[color:var(--k-7fd8ff)]"
             />
             auto-design
           </label>
-          <label className="flex items-center gap-1 font-mono text-[0.58rem] text-[#8095bf]">
+          <label className="flex items-center gap-1 font-mono text-[0.58rem] text-[color:var(--k-8095bf)]">
             N
             <select
               value={patients}
               onChange={(e) => setPatients(Number(e.target.value))}
-              className="rounded border border-[#16305e] bg-[#01071a] px-1 text-[0.66rem] text-[#e6efff]"
+              className="rounded border border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-1 text-[0.66rem] text-[color:var(--k-e6efff)]"
             >
               {[10, 25, 50].map((n) => (
                 <option key={n} value={n}>
@@ -1179,7 +1203,7 @@ export function BenchmarkPanel({
             type="button"
             disabled={running}
             onClick={() => onRun(diseases.map((d) => d.key))}
-            className="flex items-center gap-1 rounded border border-[#7fd8ff]/50 bg-[#0b2a5c] px-2 py-1 font-mono text-[0.6rem] tracking-[0.1em] text-[#e6f7ff] disabled:opacity-60"
+            className="flex items-center gap-1 rounded border border-[color:var(--k-7fd8ff)]/50 bg-[color:var(--k-0b2a5c)] px-2 py-1 font-mono text-[0.6rem] tracking-[0.1em] text-[color:var(--k-e6f7ff)] disabled:opacity-60"
           >
             <Zap className="h-3 w-3" /> RUN ALL
           </button>
@@ -1188,12 +1212,12 @@ export function BenchmarkPanel({
     >
       {progress ? (
         <div className="mb-2">
-          <p className="mb-1 font-mono text-[0.6rem] text-[#a9bbdc]">
+          <p className="mb-1 font-mono text-[0.6rem] text-[color:var(--k-a9bbdc)]">
             {progress.disease}: patient {progress.done} / {progress.total}
           </p>
-          <div className="h-1 overflow-hidden rounded-full bg-[#0e2247]">
+          <div className="h-1 overflow-hidden rounded-full bg-[color:var(--k-0e2247)]">
             <div
-              className="h-full bg-[#7fd8ff]"
+              className="h-full bg-[color:var(--k-7fd8ff)]"
               style={{ width: `${(progress.done / progress.total) * 100}%` }}
             />
           </div>
@@ -1202,7 +1226,7 @@ export function BenchmarkPanel({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[64rem] border-collapse text-[0.66rem]">
           <thead>
-            <tr className="text-left font-mono text-[0.52rem] uppercase tracking-[0.1em] text-[#5e719a]">
+            <tr className="text-left font-mono text-[0.52rem] uppercase tracking-[0.1em] text-[color:var(--k-5e719a)]">
               <th className="pb-2 font-medium">Programme</th>
               <th className="pb-2 font-medium">Clinical reference</th>
               <th className="pb-2 font-medium">NIMBLE target</th>
@@ -1222,24 +1246,34 @@ export function BenchmarkPanel({
               const r = results[d.key];
               const verdict = r?.verdict;
               return (
-                <tr key={d.key} className="border-t border-[#0e2247] align-top">
+                <tr key={d.key} className="border-t border-[color:var(--k-0e2247)] align-top">
                   <td className="py-2 pr-2">
-                    <p className="font-medium text-[#e6efff]">{d.name}</p>
-                    <p className="text-[0.58rem] text-[#8095bf]">{d.targets.join(" + ")}</p>
+                    <p className="font-medium text-[color:var(--k-e6efff)]">{d.name}</p>
+                    <p className="text-[0.58rem] text-[color:var(--k-8095bf)]">
+                      {d.targets.join(" + ")}
+                    </p>
                   </td>
-                  <td className="py-2 pr-2 text-[#c4d2ee]" title={d.clinical.citation}>
+                  <td
+                    className="py-2 pr-2 text-[color:var(--k-c4d2ee)]"
+                    title={d.clinical.citation}
+                  >
                     {d.clinical.baseline} {statusPill(d)}
                   </td>
-                  <td className="py-2 pr-2 text-[#c4d2ee]">{d.clinical.nimbleTarget}</td>
-                  <td className="py-2 pr-2 text-[#c4d2ee]" title={d.endpoint.criterion}>
+                  <td className="py-2 pr-2 text-[color:var(--k-c4d2ee)]">
+                    {d.clinical.nimbleTarget}
+                  </td>
+                  <td
+                    className="py-2 pr-2 text-[color:var(--k-c4d2ee)]"
+                    title={d.endpoint.criterion}
+                  >
                     {d.endpoint.label}
-                    <span className="block text-[0.56rem] text-[#5e719a]">
+                    <span className="block text-[0.56rem] text-[color:var(--k-5e719a)]">
                       pass: {d.endpoint.criterion}
                     </span>
                   </td>
-                  <td className="py-2 text-right font-mono text-[#e6efff]">
+                  <td className="py-2 text-right font-mono text-[color:var(--k-e6efff)]">
                     {r ? (
-                      <span className="block text-[0.54rem] text-[#5e719a]">
+                      <span className="block text-[0.54rem] text-[color:var(--k-5e719a)]">
                         {r.designMhz} MHz array
                       </span>
                     ) : null}
@@ -1249,24 +1283,24 @@ export function BenchmarkPanel({
                         : `${r.closed.endpoint.mean.toFixed(1)} ± ${r.closed.endpoint.sd.toFixed(1)}`
                       : "—"}
                   </td>
-                  <td className="py-2 text-right font-mono text-[#a9bbdc]">
+                  <td className="py-2 text-right font-mono text-[color:var(--k-a9bbdc)]">
                     {r && r.foci === null ? r.open.endpoint.mean.toFixed(1) : "—"}
                   </td>
-                  <td className="py-2 text-right font-mono text-[#e6efff]">
+                  <td className="py-2 text-right font-mono text-[color:var(--k-e6efff)]">
                     {r ? `${r.closed.verifiedDeliveries}/${r.closed.deliveries}` : "—"}
                   </td>
                   <td
-                    className="py-2 text-right font-mono text-[#a9bbdc]"
+                    className="py-2 text-right font-mono text-[color:var(--k-a9bbdc)]"
                     title={r ? JSON.stringify(r.closed.haltReasons) : ""}
                   >
                     {r ? r.closed.halts : "—"}
                   </td>
                   <td
-                    className={`py-2 text-right font-mono ${r && r.open.safetyBreaches ? "text-[#ffb3bc]" : "text-[#a9bbdc]"}`}
+                    className={`py-2 text-right font-mono ${r && r.open.safetyBreaches ? "text-[color:var(--k-ffb3bc)]" : "text-[color:var(--k-a9bbdc)]"}`}
                   >
                     {r ? r.open.safetyBreaches : "—"}
                   </td>
-                  <td className="py-2 text-right font-mono text-[#a9bbdc]">
+                  <td className="py-2 text-right font-mono text-[color:var(--k-a9bbdc)]">
                     {r ? `${r.latencyP50Ms.toFixed(1)} / ${r.latencyP95Ms.toFixed(1)}` : "—"}
                   </td>
                   <td className="py-2 text-right" title={r?.why ?? ""}>
@@ -1274,10 +1308,10 @@ export function BenchmarkPanel({
                       <span
                         className={`rounded px-1.5 py-0.5 font-mono text-[0.56rem] font-semibold ${
                           verdict === "pass"
-                            ? "bg-[#41e0a2]/15 text-[#9ff0cc]"
+                            ? "bg-[color:var(--k-41e0a2)]/15 text-[color:var(--k-9ff0cc)]"
                             : verdict === "fail"
-                              ? "bg-[#ff4b5c]/15 text-[#ffb3bc]"
-                              : "bg-[#8095bf]/15 text-[#c4d2ee]"
+                              ? "bg-[color:var(--k-ff4b5c)]/15 text-[color:var(--k-ffb3bc)]"
+                              : "bg-[color:var(--k-8095bf)]/15 text-[color:var(--k-c4d2ee)]"
                         }`}
                       >
                         {verdict === "not-assessed" ? "NOT ASSESSED" : verdict.toUpperCase()}
@@ -1291,7 +1325,7 @@ export function BenchmarkPanel({
                       type="button"
                       disabled={running}
                       onClick={() => onRun([d.key])}
-                      className="rounded border border-[#16305e] px-1.5 py-0.5 font-mono text-[0.56rem] text-[#7fd8ff] disabled:opacity-50"
+                      className="rounded border border-[color:var(--k-16305e)] px-1.5 py-0.5 font-mono text-[0.56rem] text-[color:var(--k-7fd8ff)] disabled:opacity-50"
                     >
                       RUN
                     </button>
@@ -1302,13 +1336,13 @@ export function BenchmarkPanel({
           </tbody>
         </table>
       </div>
-      <p className="mt-2 text-[0.62rem] leading-relaxed text-[#8095bf]">
+      <p className="mt-2 text-[0.62rem] leading-relaxed text-[color:var(--k-8095bf)]">
         <Cpu className="mr-1 inline h-3 w-3" />
         Each virtual patient (seeded; severity, coupling and rhythm vary) runs both arms with the
         same noise. Closed loop enforces PRISM; open loop fires a fixed protocol and only logs the
         rules. Scored: the model&apos;s own biomarker endpoint, verification, halts, safety-limit
         breaches and latency.{" "}
-        <b className="text-[#c4d2ee]">
+        <b className="text-[color:var(--k-c4d2ee)]">
           Clinical outcomes (CDR-SB, SRS-2, acuity, speech) are not predicted
         </b>{" "}
         — that needs a validated disease-progression model — so those columns show the cited

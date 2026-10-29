@@ -74,7 +74,7 @@ export function PlddtChart({ residues }: { residues: Residue[] }) {
       </svg>
       {h && hover !== null && (
         <div
-          className="pointer-events-none absolute -top-2 z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-[var(--v-ink)] px-2 py-1 text-[11px] text-white shadow"
+          className="pointer-events-none absolute -top-2 z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-[var(--v-ink)] px-2 py-1 text-[11px] text-[var(--v-on-ink)] shadow"
           style={{ left: `${(x(hover) / W) * 100}%` }}
         >
           {h.name} {h.seq}

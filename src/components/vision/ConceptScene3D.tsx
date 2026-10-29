@@ -468,12 +468,12 @@ export function ConceptScene3D({ mode, onInspect }: Props) {
   return (
     <div
       ref={host}
-      className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-[#dfeaf7] ring-1 ring-[var(--v-line)]"
+      className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-[color:var(--kv-dfeaf7)] ring-1 ring-[var(--v-line)]"
       role="img"
       aria-label="3D meadow: left half as a human eye sees it, right half in false colour"
     >
       <div
-        className="absolute inset-y-0 z-10 w-0.5 bg-white/90 shadow-[0_0_0_1px_rgba(22,21,29,0.25)]"
+        className="absolute inset-y-0 z-10 w-0.5 bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] shadow-[0_0_0_1px_rgba(22,21,29,0.25)]"
         style={{ left: `${split * 100}%` }}
         aria-hidden
       />
@@ -495,15 +495,15 @@ export function ConceptScene3D({ mode, onInspect }: Props) {
         onPointerMove={(e) => {
           if (e.currentTarget.hasPointerCapture(e.pointerId)) drag(e);
         }}
-        className="absolute top-1/2 z-20 grid h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize touch-none place-items-center rounded-full bg-white text-[13px] text-[var(--v-ink)] shadow-[0_4px_16px_rgba(22,21,29,0.25)]"
+        className="absolute top-1/2 z-20 grid h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize touch-none place-items-center rounded-full bg-[var(--v-card)] text-[13px] text-[var(--v-ink)] shadow-[0_4px_16px_rgba(22,21,29,0.25)]"
         style={{ left: `${split * 100}%` }}
       >
         ⇆
       </div>
-      <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium">
+      <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-[color-mix(in_oklab,var(--v-card)_90%,transparent)] px-2.5 py-1 text-[11px] font-medium">
         Human eye · visible light
       </span>
-      <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-[#b0306a] px-2.5 py-1 text-[11px] font-medium text-white">
+      <span className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-[color:var(--kv-b0306a)] px-2.5 py-1 text-[11px] font-medium text-white">
         Concept ·{" "}
         {mode === "human"
           ? "same as human"
