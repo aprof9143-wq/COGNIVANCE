@@ -26,26 +26,25 @@ const SPEED = 0.25; // model time per real time: slow enough to read
 /** The camera tour: the simulator's own views, in turn. */
 // Field of view per stop, for the hero's near-square window: tight on the whole
 // brain so it fills the frame, wider on the close-ups so they keep context.
-const TOUR: { view: View; s: number; caption: string; fov: number }[] = [
-  { view: "cinematic", s: 10, caption: "Whole brain, MNI152", fov: 38 },
-  { view: "beam", s: 8, caption: "Ultrasound beam to V1", fov: 56 },
-  { view: "section", s: 8, caption: "Cross-section through the focus", fov: 50 },
-  { view: "implant", s: 7, caption: "The cortical implant", fov: 52 },
+// `glow`: the stop is mostly bloom, which the light theme's inverted render
+// turns into a dark smudge, so the light theme skips it.
+const TOUR: { view: View; s: number; caption: string; fov: number; glow?: boolean }[] = [
+  { view: "cinematic", s: 10, caption: "The whole brain, in standard MNI152 space", fov: 38 },
+  {
+    view: "beam",
+    s: 8,
+    caption: "Focused ultrasound reaching the visual cortex",
+    fov: 56,
+    glow: true,
+  },
+  { view: "section", s: 8, caption: "A section through the focus", fov: 50 },
+  { view: "implant", s: 7, caption: "The cortical implant", fov: 52, glow: true },
 ];
 const RESUME_MS = 12000; // after the visitor stops dragging
-
-const STAGE_WORDS: Record<string, string> = {
-  SENSE: "Sensing",
-  PREDICT: "Predicting",
-  VERIFY: "Verifying",
-  WRITE: "Writing back",
-  MEASURE: "Measuring",
-};
 
 export function HeroCircuit({ className = "" }: { className?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const labels = useRef<HTMLDivElement>(null);
-  const stageOut = useRef<HTMLSpanElement>(null);
   const [stop, setStop] = useState(0);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -137,7 +136,6 @@ export function HeroCircuit({ className = "" }: { className?: string }) {
     let t = 0;
     let ev: LoopEvent | null = null;
     let prev: LoopEvent | null = null;
-    let lastStage = "";
     // Tour: advance through TOUR; a drag pauses it for a while.
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let stopIdx = 0;
@@ -145,6 +143,8 @@ export function HeroCircuit({ className = "" }: { className?: string }) {
     let heldUntil = 0;
     const goTo = (i: number, now: number) => {
       stopIdx = i % TOUR.length;
+      const light = !document.documentElement.classList.contains("dark");
+      while (light && TOUR[stopIdx]!.glow) stopIdx = (stopIdx + 1) % TOUR.length;
       const st = TOUR[stopIdx]!;
       scene.setView(st.view);
       c.autoRotate = st.view === "cinematic" && !still;
@@ -187,10 +187,6 @@ export function HeroCircuit({ className = "" }: { className?: string }) {
       if (!ev) return;
       const { stage, phase, index } = stageAt(t / sim.period);
       const shown = index >= 2 ? ev : prev;
-      if (stage !== lastStage && stageOut.current) {
-        lastStage = stage;
-        stageOut.current.textContent = STAGE_WORDS[stage] ?? "";
-      }
       const activity: Record<string, number> = {};
       const plasticity: Record<string, number> = {};
       for (const r of REGIONS) {
@@ -246,21 +242,21 @@ export function HeroCircuit({ className = "" }: { className?: string }) {
     <div className={className}>
       <div
         ref={host}
-        className={`absolute inset-0 transition-opacity duration-[1600ms] ${ready ? "opacity-100" : "opacity-0"}`}
+        // The scene draws light on black. In dark mode that black is the page;
+        // in light mode the render is inverted (hue kept) and multiplied onto
+        // the page, so it reads as fine line work on paper. Either way the
+        // edges feather out: there is no frame.
+        className={`absolute inset-0 transition-opacity duration-[1600ms] [mask-image:radial-gradient(closest-side,black_68%,transparent)] invert hue-rotate-180 mix-blend-multiply dark:invert-0 dark:hue-rotate-0 dark:mix-blend-normal ${ready ? "opacity-100" : "opacity-0"}`}
         role="img"
         aria-label="The CIRCUIT simulator running live: a 3D brain with a cortical visual implant, its ultrasound beam reaching the visual cortex in a closed loop"
       />
       <div ref={labels} className="pointer-events-none absolute inset-0" aria-hidden />
       {ready && (
-        <p className="pointer-events-none absolute bottom-4 left-4 z-10 flex max-w-[calc(100%-2rem)] items-center gap-3 rounded-full border border-white/10 bg-[#02040c]/70 py-1.5 pl-3 pr-4 text-[12px] text-white/70 backdrop-blur">
-          <span className="relative flex h-2 w-2 shrink-0">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#41e0a2] opacity-60 motion-reduce:animate-none" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#41e0a2]" />
-          </span>
-          <span className="truncate">
-            Running live in your browser. {TOUR[stop]!.caption}.{" "}
-            <span ref={stageOut} className="text-white" />
-          </span>
+        <p
+          aria-live="polite"
+          className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-[13px] tracking-[-0.005em] text-foreground/50"
+        >
+          {TOUR[stop]!.caption}
         </p>
       )}
       {failed && (

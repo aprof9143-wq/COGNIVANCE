@@ -133,6 +133,8 @@ const TILES: {
   pos: string;
   span: string;
   h: string;
+  /** "contain" for a capture drawn on the card's own colour: shown whole, no crop. */
+  fit?: "contain";
 }[] = [
   {
     key: "therapy",
@@ -144,7 +146,8 @@ const TILES: {
   {
     key: "eye",
     img: "eye",
-    pos: "object-[50%_72%]",
+    pos: "object-center",
+    fit: "contain",
     span: "lg:col-span-2",
     h: "h-[clamp(240px,30vw,400px)]",
   },
@@ -231,15 +234,10 @@ function Landing() {
             </div>
           </div>
 
-          {/* The simulator renders on a dark ground in both themes, like an instrument's screen. */}
-          <div
-            className="rise relative h-[clamp(380px,46vw,600px)] overflow-hidden rounded-[28px] bg-[#02040c] shadow-[0_40px_90px_-40px_rgba(10,16,36,0.55)] ring-1 ring-foreground/10 dark:shadow-none dark:ring-white/10"
-            style={{ animationDelay: "200ms" }}
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_55%_at_58%_46%,rgba(61,139,245,0.22),transparent_72%)]"
-            />
+          {/* No entrance animation here: its filter would isolate the canvas, and
+              the light theme's multiply blend needs to reach the page. The
+              canvas fades in on its own once the anatomy has loaded. */}
+          <div className="relative h-[clamp(400px,48vw,640px)]">
             <HeroCircuit className="absolute inset-0" />
           </div>
         </Container>
@@ -309,14 +307,16 @@ function Landing() {
           <div className="mt-14 grid gap-4 lg:grid-cols-6">
             {TILES.map((t, i) => {
               const m = MODULES.find((x) => x.key === t.key)!;
-              const img = `w-full ${t.h} object-cover ${t.pos}`;
+              const img = `w-full ${t.h} ${t.fit === "contain" ? "object-contain" : "object-cover"} ${t.pos}`;
               return (
                 <Link
                   key={t.key}
                   to={m.to}
                   className={`group flex flex-col overflow-hidden rounded-[20px] border border-border bg-card transition-colors hover:border-foreground/25 ${t.span}`}
                 >
-                  <div className="relative overflow-hidden border-b border-border bg-secondary">
+                  <div
+                    className={`relative overflow-hidden border-b border-border ${t.fit === "contain" ? "bg-card" : "bg-secondary"}`}
+                  >
                     <img
                       src={`/landing/tile-${t.img}-light.jpg`}
                       alt=""
