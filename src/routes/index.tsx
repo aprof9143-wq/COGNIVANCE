@@ -173,37 +173,37 @@ function Landing() {
   const rest = MODULES.filter((m) => !tiled.has(m.key));
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Nav overStage />
+      <Nav />
 
-      {/* ---------------------------------------------------------- stage: always dark */}
+      {/* ---------------------------------------------------------- hero */}
       <section
         id="stage"
-        className="dark relative overflow-hidden bg-[#02040c] pb-12 pt-[clamp(6.5rem,10vw,8.5rem)] text-foreground lg:min-h-[min(100svh,980px)]"
+        className="relative overflow-hidden pb-[clamp(3.5rem,7vw,6rem)] pt-[clamp(6.5rem,10vw,8.5rem)]"
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_40%_at_12%_8%,rgba(61,139,245,0.16),transparent_70%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_40%_at_10%_6%,color-mix(in_oklab,var(--electric)_16%,transparent),transparent_70%)]"
         />
-        <Container className="relative z-10 lg:pointer-events-none">
-          <div className="lg:pointer-events-auto lg:max-w-[560px]">
+        <Container className="relative grid items-center gap-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-14">
+          <div>
             <Link
               to="/auth"
-              className="rise inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] py-1 pl-1 pr-3 text-[12.5px] text-white/80 backdrop-blur transition-colors hover:border-white/25"
+              className="rise inline-flex items-center gap-2 rounded-full border border-border bg-card/70 py-1 pl-1 pr-3 text-[12.5px] text-foreground/80 backdrop-blur transition-colors hover:border-foreground/25"
             >
-              <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-[#02040c]">
+              <span className="rounded-full bg-foreground px-2 py-0.5 text-[11px] font-medium text-background">
                 Live
               </span>
               Genome v1: RPE65 from the gene to the visual cortex
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
             <h1
-              className={`${head} rise mt-7 text-[clamp(2.8rem,6vw,5.4rem)] font-semibold leading-[0.95] tracking-[-0.055em] text-white`}
+              className={`${head} rise mt-7 text-[clamp(2.8rem,5.6vw,5.2rem)] font-semibold leading-[0.95] tracking-[-0.055em] text-foreground`}
               style={{ animationDelay: "80ms" }}
             >
               In-silico trials for the eye and the brain.
             </h1>
             <p
-              className="rise mt-6 max-w-[50ch] text-[clamp(1rem,1.35vw,1.15rem)] leading-relaxed text-white/65"
+              className="rise mt-6 max-w-[50ch] text-[clamp(1rem,1.35vw,1.15rem)] leading-relaxed text-foreground/70"
               style={{ animationDelay: "160ms" }}
             >
               We are building the vertical foundation model for the eye and the brain. Cognivance
@@ -216,36 +216,50 @@ function Landing() {
             >
               <Link
                 to="/auth"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-medium text-[#02040c] transition-opacity hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-[14px] font-medium text-background transition-opacity hover:opacity-90"
               >
                 Open the platform <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link
                 to="/"
                 hash="platform"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-[14px] font-medium text-white transition-colors hover:bg-white/[0.06]"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-[14px] font-medium text-foreground transition-colors hover:bg-foreground/[0.04]"
               >
                 See what's inside
               </Link>
             </div>
           </div>
+
+          {/* The simulator renders on a dark ground in both themes, like an instrument's screen. */}
+          <div
+            className="rise relative h-[clamp(380px,46vw,600px)] overflow-hidden rounded-[28px] bg-[#02040c] shadow-[0_40px_90px_-40px_rgba(10,16,36,0.55)] ring-1 ring-foreground/10 dark:shadow-none dark:ring-white/10"
+            style={{ animationDelay: "200ms" }}
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_55%_at_58%_46%,rgba(61,139,245,0.22),transparent_72%)]"
+            />
+            <HeroCircuit className="absolute inset-0" />
+          </div>
         </Container>
 
-        <HeroCircuit className="relative mb-[160px] mt-6 h-[440px] w-full sm:mb-0 sm:h-[480px] lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-[64%] lg:[mask-image:linear-gradient(to_right,transparent_4%,black_40%)]" />
-
-        <Container className="relative z-10 lg:pointer-events-none">
-          <dl className="mt-6 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3 lg:pointer-events-auto lg:mt-20 lg:max-w-[620px]">
+        <Container className="relative">
+          <dl className="mt-[clamp(3rem,6vw,4.5rem)] grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3">
             {PROOF.map((p) => (
-              <div key={p.v} className="bg-[#02040c]/80 p-5 backdrop-blur">
-                <dt className={`${head} text-[1.9rem] font-semibold tracking-[-0.04em] text-white`}>
+              <div key={p.v} className="bg-card p-5 sm:p-6">
+                <dt
+                  className={`${head} text-[1.9rem] font-semibold tracking-[-0.04em] text-foreground`}
+                >
                   {p.v}
                 </dt>
-                <dd className="mt-1 text-[13px] leading-snug text-white/60">{p.d}</dd>
+                <dd className="mt-1 max-w-[34ch] text-[13.5px] leading-snug text-foreground/65">
+                  {p.d}
+                </dd>
               </div>
             ))}
           </dl>
 
-          <div className="mt-12 border-t border-white/10 pt-7 lg:pointer-events-auto">
+          <div className="mt-10 border-t border-border pt-7">
             <ProgramStrip />
           </div>
         </Container>
