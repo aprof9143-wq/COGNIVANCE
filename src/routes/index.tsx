@@ -5,6 +5,7 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { ProgramStrip } from "@/components/site/ProgramStrip";
 import { HeroCircuit } from "@/components/site/HeroCircuit";
+import { Trace } from "@/components/site/Trace";
 import { COMPANY, MODULES, TEAM, type ModuleKey } from "@/lib/company";
 
 const title = "Cognivance — the simulation layer for brain and eye medicine";
@@ -372,7 +373,7 @@ function Landing() {
             {AUDIENCE.map((a) => (
               <div key={a.t} className="border-t border-foreground/80 pt-5">
                 <h3 className="text-[1.1rem] font-semibold tracking-[-0.02em]">{a.t}</h3>
-                <p className="mt-3 max-w-[40ch] text-[14.5px] leading-relaxed text-ash">{a.d}</p>
+                <p className="mt-3 max-w-[40ch] text-[15.5px] leading-relaxed text-ash">{a.d}</p>
               </div>
             ))}
           </div>
@@ -383,7 +384,19 @@ function Landing() {
       <section id="how" className={section}>
         <Container>
           <H2>Ingest, model, benchmark.</H2>
-          <ol className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
+          <Lead>
+            One signal, followed through the platform: the RPE65 coding sequence as Ensembl
+            publishes it, translated codon by codon, then the model's retina and visual cortex.
+          </Lead>
+          {/* Another instrument window: the trace draws light on dark in both themes. */}
+          <div className="dark relative mt-12 overflow-hidden rounded-[28px] bg-[#02040c] px-5 py-7 ring-1 ring-foreground/10 sm:px-9 sm:py-10 dark:ring-white/10">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_70%_at_75%_40%,rgba(255,180,92,0.08),transparent_70%),radial-gradient(45%_60%_at_15%_30%,rgba(61,139,245,0.14),transparent_70%)]"
+            />
+            <Trace className="relative" />
+          </div>
+          <ol className="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
             <span
               aria-hidden
               className="absolute left-0 right-0 top-[15px] hidden h-px bg-border md:block"
@@ -398,7 +411,7 @@ function Landing() {
                 <h3 className={`${head} mt-6 text-[1.5rem] font-semibold tracking-[-0.03em]`}>
                   {s.t}
                 </h3>
-                <p className="mt-3 max-w-[38ch] text-[14.5px] leading-relaxed text-ash">{s.d}</p>
+                <p className="mt-3 max-w-[38ch] text-[15.5px] leading-relaxed text-ash">{s.d}</p>
               </li>
             ))}
           </ol>
@@ -416,7 +429,7 @@ function Landing() {
                 className="grid gap-3 border-t border-border py-7 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-10"
               >
                 <dt className={`${head} text-[1.3rem] font-semibold tracking-[-0.025em]`}>{w.t}</dt>
-                <dd className="max-w-[60ch] text-[15px] leading-relaxed text-ash">{w.d}</dd>
+                <dd className="max-w-[60ch] text-[16px] leading-relaxed text-ash">{w.d}</dd>
               </div>
             ))}
           </dl>
@@ -469,9 +482,9 @@ function Landing() {
                       className="aspect-[4/5] w-full object-cover object-top grayscale"
                     />
                   ) : (
-                    <div className="grid aspect-[4/5] w-full place-items-center bg-secondary">
+                    <div className="grid aspect-[4/5] w-full place-items-center bg-[linear-gradient(150deg,color-mix(in_oklab,var(--electric)_24%,var(--card)),var(--secondary)_70%)]">
                       <span
-                        className={`${head} text-[clamp(2.5rem,5vw,3.5rem)] font-semibold tracking-[-0.04em] text-foreground/35`}
+                        className={`${head} text-[clamp(2.5rem,5vw,3.5rem)] font-semibold tracking-[-0.04em] text-foreground/55`}
                       >
                         {initials(m.name)}
                       </span>

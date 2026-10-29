@@ -164,10 +164,16 @@ export function HeroCircuit({ className = "" }: { className?: string }) {
       // Close-ups need room: narrow screens keep the whole-brain view.
       if (!still && el.clientWidth >= 480 && now > heldUntil && now > stopUntil)
         goTo(stopIdx + 1, now);
-      // Ease the field of view with the camera move instead of jumping.
+      // Ease the field of view with the camera move instead of jumping. In a
+      // window taller than it is wide (phones), widen it so the framing holds
+      // horizontally rather than cropping the sides of the brain.
       const cam = scene.camera;
-      if (Math.abs(cam.fov - fovTo) > 0.05) {
-        cam.fov += (fovTo - cam.fov) * Math.min(1, dt / 600);
+      const want =
+        cam.aspect >= 1
+          ? fovTo
+          : (2 * Math.atan(Math.tan((fovTo * Math.PI) / 360) / cam.aspect) * 180) / Math.PI;
+      if (Math.abs(cam.fov - want) > 0.05) {
+        cam.fov += (want - cam.fov) * Math.min(1, dt / 600);
         cam.updateProjectionMatrix();
       }
       t += dt * SPEED;
