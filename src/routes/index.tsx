@@ -231,7 +231,7 @@ function Landing() {
           </div>
         </Container>
 
-        <HeroCircuit className="relative mt-6 h-[380px] w-full sm:h-[460px] lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-[64%] lg:[mask-image:linear-gradient(to_right,transparent_4%,black_40%)]" />
+        <HeroCircuit className="relative mb-[160px] mt-6 h-[440px] w-full sm:mb-0 sm:h-[480px] lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-[64%] lg:[mask-image:linear-gradient(to_right,transparent_4%,black_40%)]" />
 
         <Container className="relative z-10 lg:pointer-events-none">
           <dl className="mt-6 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3 lg:pointer-events-auto lg:mt-20 lg:max-w-[620px]">
