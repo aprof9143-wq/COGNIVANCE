@@ -433,10 +433,9 @@ function Benchmarks() {
       <main className="scope px-[clamp(0.75rem,2vw,1.75rem)] pb-10 pt-6">
         <div className="mx-auto max-w-[1680px]">
           {/* ---------------- console header ---------------- */}
-          <header className="relative overflow-hidden rounded-lg border border-foreground/12 bg-[linear-gradient(90deg,color-mix(in_oklab,var(--deep)_75%,transparent),transparent_60%)]">
+          <header className="relative overflow-hidden rounded-lg border border-foreground/12 bg-card/60">
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
               <div className="flex min-w-0 items-center gap-3">
-                <img src="/logo-mark.png" alt="" width={64} height={64} className="h-7 w-auto" />
                 <h1 className="truncate text-[1.05rem] font-semibold tracking-[-0.02em] text-foreground">
                   NIMBLE Benchmark Console
                 </h1>

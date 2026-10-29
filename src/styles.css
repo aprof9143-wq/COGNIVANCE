@@ -146,8 +146,11 @@
    step up from the page ground; in light it simply uses the light tokens. */
 .scope {
   color: var(--foreground);
+  /* --ion is a pale cyan made for dark grounds; on light it needs a deeper blue. */
+  --ion: var(--electric);
 }
 .dark .scope {
+  --ion: #7fd8ff;
   --background: var(--slab);
   --foreground: #eaf2ff;
   --paper: var(--slab);
@@ -283,6 +286,7 @@
 
 /* instrument screen: dark scope + subtle scanline texture */
 @utility instrument {
+  --ion: #7fd8ff;
   position: relative;
   overflow: hidden;
   background: radial-gradient(120% 100% at 50% 0%, #0a1f4a 0%, #01081c 70%);

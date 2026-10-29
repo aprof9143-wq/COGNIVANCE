@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Download, FileUp, ScanLine } from "lucide-react";
+import { Brain, Download, FileUp, ScanLine } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   exportCaseFile,
@@ -94,10 +94,10 @@ export function NeuroDashboard() {
     <div className="ws min-h-screen bg-[color:var(--k-00030b)] text-[color:var(--k-e6efff)]">
       <header className="flex flex-wrap items-center gap-3 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-4 py-2.5">
         <Link to="/research" className="btn">
-          <ArrowLeft className="h-4 w-4" /> Research console
+          <Brain className="h-4 w-4" /> Research console
         </Link>
         <Link to="/viewer" className="btn">
-          <ScanLine className="h-4 w-4" /> Diagnostic viewer
+          <ScanLine className="h-4 w-4" /> Imaging workstation
         </Link>
         <div className="leading-tight">
           <h1 className="text-[15px] font-semibold">Neurodegeneration tracking</h1>

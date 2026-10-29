@@ -73,13 +73,18 @@ describe("demo session", () => {
     expect(tab.length).toBe(0);
   });
 
-  it("still honours a local account signed in before the demo", async () => {
+  it("ignores the removed sign-up form's keys and erases its stored passwords", async () => {
     local.setItem("cognivance_session", JSON.stringify({ name: "A", email: "a@example.com" }));
+    local.setItem("cognivance_users", JSON.stringify([{ email: "a@example.com", password: "x" }]));
     const s = await load();
-    expect(s.isDemo()).toBe(false);
-    expect(s.hasSession()).toBe(true);
-    s.endSession();
+    expect(s.hasSession()).toBe(false);
+    s.startDemo();
     expect(local.getItem("cognivance_session")).toBeNull();
+    expect(local.getItem("cognivance_users")).toBeNull();
+
+    local.setItem("cognivance_users", "[]");
+    s.endSession();
+    expect(local.getItem("cognivance_users")).toBeNull();
   });
 
   it("works where storage is blocked", async () => {

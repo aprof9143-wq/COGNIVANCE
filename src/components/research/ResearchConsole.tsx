@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   Activity,
   ArrowUpRight,
@@ -7,7 +7,6 @@ import {
   Brain,
   FileUp,
   Layers,
-  LogOut,
   Microscope,
   Pause,
   Play,
@@ -67,7 +66,6 @@ import {
 } from "@/lib/neuro/linked";
 import { linkTemplateAseg } from "@/lib/neuro/templateAtlas";
 import { setLinkedFiles, setLinkedParcellation } from "@/lib/neuro/linkedFiles";
-import { endSession } from "@/lib/session";
 
 /** EEG analysed over at most this many seconds, so a long recording stays responsive. */
 const ANALYSIS_WINDOW_S = 300;
@@ -107,8 +105,6 @@ async function fetchTemplate(): Promise<NiftiVolume> {
 }
 
 export function ResearchConsole() {
-  const navigate = useNavigate();
-
   // -- data -----------------------------------------------------------------
   const [volume, setVolume] = useState<NiftiVolume>(() => phantomVolume(144));
   const [volumeName, setVolumeName] = useState("Synthetic phantom");
@@ -587,11 +583,6 @@ export function ResearchConsole() {
     }
   };
 
-  const signOut = () => {
-    endSession();
-    navigate({ to: "/" });
-  };
-
   const fused = volumeSource === "upload" && recordingSource === "upload";
 
   return (
@@ -605,10 +596,9 @@ export function ResearchConsole() {
         <span className="pointer-events-none absolute inset-x-0 bottom-[-1px] h-px bg-gradient-to-r from-transparent via-[color:var(--k-7fd8ff)]/60 to-transparent" />
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5">
           <div className="flex items-center gap-3">
-            <img src="/logo-mark.png" alt="Cognivance" className="h-8 w-auto" />
             <div className="leading-tight">
               <p className="font-mono text-[0.62rem] font-semibold tracking-[0.22em] text-[color:var(--k-7fd8ff)]">
-                NIMBLE / RESEARCH OS
+                RESEARCH CONSOLE
               </p>
               <p className="text-[0.72rem] text-[color:var(--k-8095bf)]">
                 Multimodal neural workstation
@@ -634,8 +624,8 @@ export function ResearchConsole() {
             </span>
             <Link to="/viewer" className={NAV_BUTTON}>
               <ScanLine className="h-3.5 w-3.5" />
-              <span className="sm:hidden">Viewer</span>
-              <span className="hidden sm:inline">Diagnostic viewer</span>
+              <span className="sm:hidden">Workstation</span>
+              <span className="hidden sm:inline">Imaging workstation</span>
             </Link>
             <Link to="/neurodegeneration" className={NAV_BUTTON}>
               <Microscope className="h-3.5 w-3.5" /> Neurodegeneration
@@ -643,13 +633,6 @@ export function ResearchConsole() {
             <Link to="/simulation" className={NAV_BUTTON}>
               <Box className="h-3.5 w-3.5" /> Simulation
             </Link>
-            <button
-              type="button"
-              onClick={signOut}
-              className="flex items-center gap-1.5 rounded-md border border-[color:var(--k-16305e)] px-2.5 py-1.5 text-[0.72rem] text-[color:var(--k-8095bf)] transition hover:border-[color:var(--k-3d8bf5)] hover:text-[color:var(--k-e6efff)]"
-            >
-              <LogOut className="h-3.5 w-3.5" /> Sign out
-            </button>
           </div>
         </div>
       </header>
@@ -661,7 +644,7 @@ export function ResearchConsole() {
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-[color:var(--k-ffc9cb)]/70 hover:text-white"
+            className="text-[color:var(--k-ffc9cb)]/70 hover:text-[color:var(--k-ffffff)]"
           >
             Dismiss
           </button>
@@ -1670,7 +1653,9 @@ function ElectrodeCard({
   return (
     <div className="pointer-events-none absolute right-4 top-3 w-[13.5rem] rounded-md border border-[color:var(--k-7fd8ff)]/40 bg-[color:var(--k-00030b)]/85 p-3 backdrop-blur">
       <div className="flex items-baseline justify-between">
-        <span className="font-mono text-[1.05rem] font-semibold text-white">{label}</span>
+        <span className="font-mono text-[1.05rem] font-semibold text-[color:var(--k-ffffff)]">
+          {label}
+        </span>
         <span className="font-mono text-[0.58rem] uppercase tracking-[0.1em] text-[color:var(--k-7fd8ff)]">
           {pos?.region} · {pos?.hemisphere}
         </span>
@@ -1991,7 +1976,7 @@ function BiomarkerRow({ marker }: { marker: import("./fusion").Biomarker }) {
         </p>
       </div>
       <div className="flex flex-col items-end">
-        <span className="font-mono text-[1.02rem] font-semibold tabular-nums text-white">
+        <span className="font-mono text-[1.02rem] font-semibold tabular-nums text-[color:var(--k-ffffff)]">
           {marker.format(marker.value)}
         </span>
         <span className="font-mono text-[0.56rem] text-[color:var(--k-5e719a)]">{marker.unit}</span>

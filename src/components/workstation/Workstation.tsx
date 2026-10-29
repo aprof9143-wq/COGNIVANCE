@@ -671,11 +671,8 @@ export function Workstation() {
     >
       {/* ------------------------------------------------------------ header */}
       <header className="flex flex-wrap items-center gap-3 border-b border-[color:var(--k-16305e)] bg-[color:var(--k-01071a)] px-4 py-2.5">
-        <Link to="/" className="flex items-center gap-2">
-          <img src="/logo-mark.png" alt="Cognivance" className="h-7 w-7" />
-        </Link>
         <div className="leading-tight">
-          <h1 className="text-[15px] font-semibold">Diagnostic imaging viewer</h1>
+          <h1 className="text-[15px] font-semibold">Imaging workstation</h1>
           <p className="text-[12px] text-[color:var(--k-8095bf)]">
             MRI · segmentation · tractography · EEG — decision-support visualisation
           </p>

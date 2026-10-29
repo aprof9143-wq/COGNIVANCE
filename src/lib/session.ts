@@ -6,14 +6,15 @@
  * neuro/linked.ts stay in memory), and it lasts only as long as this tab
  * (sessionStorage). The pages behind the gate accept it.
  *
- * A local account signed in before the demo existed (SESSION_KEY in
- * localStorage, written by the hidden LoginForm) is still honoured.
+ * Before the demo, a local sign-up form kept accounts, passwords included, in
+ * localStorage. That form is gone and its keys are no longer honoured; they are
+ * erased whenever a session starts or ends, so no password stays behind.
  */
 
 // AUTH: bypassed for demo — connect managed identity provider before collecting real credentials.
 
-/** Local-account session written by components/auth/LoginForm.tsx (hidden). */
-export const SESSION_KEY = "cognivance_session";
+/** Keys the removed local sign-up form wrote: its session and its account list. */
+export const LEGACY_KEYS = ["cognivance_session", "cognivance_users"] as const;
 /** The demo session; sessionStorage, so it ends with the tab. */
 export const DEMO_KEY = "cognivance_demo";
 
@@ -30,9 +31,21 @@ export function isDemo(): boolean {
   return demo;
 }
 
+/** Erase what the removed local sign-up form left in this browser. */
+function clearLegacyAccounts() {
+  for (const k of LEGACY_KEYS) {
+    try {
+      localStorage.removeItem(k);
+    } catch {
+      // Nothing stored.
+    }
+  }
+}
+
 /** Start a demo session: no account, nothing persisted beyond this tab. */
 export function startDemo() {
   demo = true;
+  clearLegacyAccounts();
   try {
     sessionStorage.setItem(DEMO_KEY, JSON.stringify({ startedAt: Date.now() }));
   } catch {
@@ -66,14 +79,9 @@ export function returnTo(value: unknown): GatedPage | undefined {
   return GATED_PAGES.find((p) => p === value);
 }
 
-/** Whether the gated pages may open: a demo session or a local account. */
+/** Whether the gated pages may open: only a demo session does. */
 export function hasSession(): boolean {
-  if (isDemo()) return true;
-  try {
-    return localStorage.getItem(SESSION_KEY) !== null;
-  } catch {
-    return false;
-  }
+  return isDemo();
 }
 
 /** Sign out of whichever session is open. */
@@ -84,9 +92,5 @@ export function endSession() {
   } catch {
     // Nothing stored.
   }
-  try {
-    localStorage.removeItem(SESSION_KEY);
-  } catch {
-    // Nothing stored.
-  }
+  clearLegacyAccounts();
 }
