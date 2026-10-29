@@ -1,407 +1,537 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import type { ReactNode } from "react";
 import { Reveal } from "@/components/Reveal";
-import { SiteNav } from "@/components/SiteNav";
-import { SiteFooter } from "@/components/SiteFooter";
-import { AboutSection } from "@/components/AboutSection";
-import { Waitlist } from "@/components/Waitlist";
-import { NimbleSection } from "@/components/NimbleSection";
-import { NoveltySection } from "@/components/NoveltySection";
-import { TechnologySection } from "@/components/TechnologySection";
-import { EEGTrace, LiveBadge, Metric } from "@/components/research-viz";
-import f1 from "@/assets/f1.jpg";
-import f2 from "@/assets/f2.jpg";
-import f3 from "@/assets/f3.jpg";
-import f4 from "@/assets/f4.jpg";
-import f5 from "@/assets/f5.jpg";
+import { Nav } from "@/components/site/Nav";
+import { Footer } from "@/components/site/Footer";
+import { ProgramStrip } from "@/components/site/ProgramStrip";
+import { ProductShot } from "@/components/site/ProductShot";
+import { COMPANY, MODULES, TEAM } from "@/lib/company";
 
-const title = "Cognivance Labs — Institute of Neuronanotechnology";
-const description =
-  "Nanorobotic systems and computational neuroscience in one engine: mapping synapses in living tissue and modelling neurodegeneration before the first symptom.";
+const title = "Cognivance — the simulation layer for brain and eye medicine";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title },
-      { name: "description", content: description },
+      { name: "description", content: COMPANY.pitch },
       { property: "og:title", content: title },
-      { property: "og:description", content: description },
+      { property: "og:description", content: COMPANY.pitch },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Index,
+  component: Landing,
 });
 
-const frontiers = [
-  {
-    n: "01",
-    img: f1,
-    alt: "Points of contact between translucent organic filaments",
-    title: "Real-Time Synaptic Mapping",
-    claim:
-      "Individual synaptic junctions mapped in living tissue — not inferred from imaging averages.",
-    body: "Every existing method for studying synaptic activity is a translation. fMRI translates blood flow into signal. EEG translates surface voltage into guesswork. We map the synapse itself, in living tissue, in real time.",
-  },
-  {
-    n: "02",
-    img: f2,
-    alt: "An intact pale membrane with the first faint traces of erosion",
-    title: "Pre-Symptomatic Neurodegeneration",
-    claim: "Models detect disease signatures years before clinical symptoms appear.",
-    body: "By the time a neurodegenerative disease is diagnosed, damage has been accumulating for years. Our models identify the earliest computational signatures of degeneration — the disease, before it becomes a disease.",
-  },
-  {
-    n: "03",
-    img: f3,
-    alt: "A single droplet held inside a dense field of pale fibers",
-    title: "Sub-Cellular Intervention",
-    claim: "Molecular instructions delivered to specific circuits — not broadcast drugs.",
-    body: "Drugs are broadcast signals. We deliver instructions: molecular payloads carried by nanorobotic systems to specific circuits, specific synapses, specific cells.",
-  },
-  {
-    n: "04",
-    img: f4,
-    alt: "Fragments of a pale organic structure reassembling",
-    title: "Circuit Reconstruction",
-    claim: "Neural circuits rebuilt from nanorobotic traversal data, not MRI approximations.",
-    body: "Every existing map of neural circuitry is a statistical guess from low-resolution imaging. We reconstruct circuits from within, using physical traversal data.",
-  },
-  {
-    n: "05",
-    img: f5,
-    alt: "A single coherent thread of light running through dense texture",
-    title: "Intent-Reading BCI",
-    claim: "An interface that reads cognitive intent, not voltage spikes.",
-    body: "Current BCIs read electrical noise and translate it into commands. We read the computational structure of intent itself — the pattern that precedes the signal.",
-  },
-];
+/* ------------------------------------------------------------------ parts */
 
-const analytics = [
-  { k: "18.4 nm", v: "Median traversal resolution", d: "Sub-cellular, in living tissue" },
-  { k: "1.2 M", v: "Synaptic events / session", d: "Captured without inference layers" },
-  { k: "6.4 yrs", v: "Mean pre-symptomatic lead", d: "Across retrospective cohorts" },
-  { k: "94.1 %", v: "Circuit reconstruction fidelity", d: "Versus ground-truth histology" },
-];
+function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`mx-auto max-w-[1180px] px-5 sm:px-8 ${className}`}>{children}</div>;
+}
 
-const studies = [
-  {
-    id: "CGN-01",
-    title: "Acoustic-gradient navigation in cortical tissue",
-    status: "In review",
-    n: "n = 42",
-  },
-  {
-    id: "CGN-04",
-    title: "Synaptic-junction event coding at 18 nm resolution",
-    status: "Preprint",
-    n: "n = 118",
-  },
-  {
-    id: "CGN-07",
-    title: "Pre-symptomatic degeneration signatures in longitudinal cohorts",
-    status: "Active",
-    n: "n = 1,306",
-  },
-  {
-    id: "CGN-11",
-    title: "First-principles reconstruction versus diffusion tractography",
-    status: "Active",
-    n: "n = 76",
-  },
-];
-
-function Index() {
+function SectionHead({
+  n,
+  label,
+  title,
+  lead,
+}: {
+  n: string;
+  label: string;
+  title: ReactNode;
+  lead?: ReactNode;
+}) {
   return (
-    <div id="top" className="min-h-screen bg-paper">
-      <SiteNav />
-
-      {/* ---------- Hero ---------- */}
-      <section className="relative flex min-h-svh items-end overflow-hidden">
-        <img
-          src="/main-hero.png"
-          alt="A human head dissolving into a spiral of luminous neural filaments against deep space"
-          width={1664}
-          height={936}
-          className="drift-slow absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-paper/70 via-paper/25 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/25 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(75%_65%_at_50%_38%,transparent,color-mix(in_oklab,var(--paper)_35%,transparent))]" />
-
-        <div className="relative w-full px-[clamp(1.25rem,4vw,3.5rem)] pt-36 pb-[clamp(2.5rem,6vw,5rem)]">
-          <div className="mx-auto max-w-[1500px]">
-            <p
-              className="t-marker rise text-[var(--ion)]"
-              style={{ animationDelay: "80ms", textShadow: "0 1px 12px rgba(0,4,20,0.9)" }}
-            >
-              Institute of Neuronanotechnology
-            </p>
-            <h1 className="t-hero rise mt-7 max-w-[19ch] text-foreground">
-              The last frontier of science is between your ears.
-            </h1>
-            <div className="mt-9 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-end">
-              <p
-                className="t-lead rise max-w-[48ch] text-foreground/80"
-                style={{ animationDelay: "160ms" }}
-              >
-                We engineer the instruments neuroscience never had — nanorobotic systems that move
-                through living neural tissue, and computational models that turn what they find into
-                structure.
-              </p>
-              <div
-                className="rise flex flex-wrap items-center gap-4 lg:justify-end"
-                style={{ animationDelay: "300ms" }}
-              >
-                <Link
-                  to="/research"
-                  className="rounded-full bg-foreground px-7 py-3.5 text-[0.9rem] font-semibold text-primary-foreground transition-opacity hover:opacity-85"
-                >
-                  See the live research demo
-                </Link>
-                <Link
-                  to="/"
-                  hash="frontiers"
-                  className="rule-link text-[0.9rem] font-medium text-foreground"
-                >
-                  Read the science
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Novelty (directly under hero) ---------- */}
-      <NoveltySection />
-
-      {/* ---------- Problem ---------- */}
-      <section
-        id="problem"
-        className="haze px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(4.5rem,10vw,9rem)]"
-      >
-        <div className="mx-auto max-w-[1500px] grid gap-[clamp(2rem,5vw,5rem)] lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1fr)]">
-          <Reveal>
-            <p className="t-marker text-ash">The problem, stated without flattery</p>
-          </Reveal>
-          <div className="space-y-8">
-            <Reveal delay={80}>
-              <p className="t-lead text-foreground">
-                Neuroscience has been working with instruments designed for a different era. MRI
-                shows you averages. EEG shows you surface noise. Patch clamps show you one cell at a
-                time. The hardest problems in the field were never unsolvable — they were
-                under-tooled.
-              </p>
-            </Reveal>
-            <Reveal delay={160}>
-              <p className="t-body text-ash">
-                We build the tools that were missing. Nanorobotic systems that navigate neural
-                tissue at sub-cellular resolution. Computational frameworks that make sense of what
-                those instruments find. Not two teams working in parallel — one engine, designed
-                from the first principle that you cannot understand what you cannot measure, and you
-                cannot measure what you cannot reach.
-              </p>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Technology ---------- */}
-      <TechnologySection />
-
-      {/* ---------- Frontiers ---------- */}
-      <section
-        id="frontiers"
-        className="grain border-t border-foreground/10 bg-veil px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(4.5rem,10vw,9rem)]"
-      >
-        <div className="mx-auto max-w-[1500px]">
-          <Reveal>
-            <p className="t-marker text-ash">Frontiers</p>
-            <h2 className="t-section mt-4 max-w-[26ch] text-foreground">
-              Five problems the field declared unsolvable.
-            </h2>
-          </Reveal>
-
-          <div className="mt-[clamp(2.5rem,5vw,4rem)] grid gap-4 md:grid-cols-3">
-            <BentoCard f={frontiers[0]!} variant="wide" className="md:col-span-3" />
-            <BentoCard f={frontiers[1]!} delay={80} />
-            <BentoCard f={frontiers[2]!} delay={140} variant="halo" />
-            <BentoCard f={frontiers[3]!} delay={200} />
-            <BentoCard f={frontiers[4]!} delay={260} variant="feature" className="md:col-span-3" />
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Research & analytics ---------- */}
-      <section
-        id="analytics"
-        className="border-t border-foreground/10 px-[clamp(1.25rem,4vw,3.5rem)] py-[clamp(4.5rem,10vw,9rem)]"
-      >
-        <div className="mx-auto max-w-[1500px]">
-          <Reveal>
-            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-              <div className="min-w-0">
-                <p className="t-marker text-ash">Research & analytics</p>
-                <h2 className="t-section mt-4 max-w-[24ch] text-foreground">
-                  Measured, not asserted.
-                </h2>
-              </div>
-              <LiveBadge label="Illustrative — not live data" />
-            </div>
-          </Reveal>
-
-          <Reveal delay={100}>
-            <div className="mt-[clamp(2rem,4vw,3.5rem)] grid gap-px overflow-hidden rounded-2xl border border-foreground/12 bg-foreground/10 sm:grid-cols-2 lg:grid-cols-4">
-              {analytics.map((a) => (
-                <div key={a.v} className="bg-paper px-6 py-7">
-                  <p className="t-num text-[clamp(1.6rem,3vw,2.3rem)] font-semibold text-foreground">
-                    {a.k}
-                  </p>
-                  <p className="mt-3 text-[0.92rem] font-medium text-foreground/85">{a.v}</p>
-                  <p className="mt-1.5 text-[0.8rem] text-ash">{a.d}</p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-
-          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-            <Reveal delay={140}>
-              <div className="h-full rounded-2xl border border-foreground/12 bg-veil p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="t-marker text-ash">
-                    Cortical channel array — illustrative animation
-                  </p>
-                  <span className="t-num text-[0.75rem] text-ash">1.2 kHz</span>
-                </div>
-                <div className="scope instrument mt-5 overflow-hidden rounded-xl border border-foreground/10">
-                  <EEGTrace channels={6} height={200} />
-                </div>
-                <div className="mt-5 grid grid-cols-3 gap-3">
-                  <Metric label="SNR" value={38.6} unit="dB" />
-                  <Metric label="Drift" value={0.42} unit="µm/h" />
-                  <Metric label="Yield" value={97.3} unit="%" />
-                </div>
-                <p className="mt-3 text-[0.78rem] text-ash">
-                  Illustrative trace and values for design purposes — not recorded or measured data.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={200}>
-              <div className="h-full rounded-2xl border border-foreground/12 bg-veil p-6">
-                <p className="t-marker text-ash">Active studies</p>
-                <ul className="mt-5">
-                  {studies.map((s) => (
-                    <li
-                      key={s.id}
-                      className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-1 border-b border-foreground/10 py-4 last:border-0"
-                    >
-                      <span className="t-num text-[0.75rem] text-ash">{s.id}</span>
-                      <span className="min-w-0 text-[0.95rem] font-medium text-foreground">
-                        {s.title}
-                      </span>
-                      <span />
-                      <span className="flex flex-wrap items-center gap-3 text-[0.78rem] text-ash">
-                        <span className="rounded-full border border-foreground/15 px-2.5 py-0.5">
-                          {s.status}
-                        </span>
-                        <span className="t-num">{s.n}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/research"
-                  className="rule-link mt-6 inline-block text-[0.9rem] font-medium text-foreground"
-                >
-                  Open the real-time research console →
-                </Link>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- About us ---------- */}
-      <div className="border-t border-foreground/10">
-        <NimbleSection />
-
-        <AboutSection />
-      </div>
-
-      {/* ---------- Waitlist ---------- */}
-      <Waitlist />
-
-      <SiteFooter />
-    </div>
+    <Reveal>
+      <p className="t-marker text-ash">
+        <span className="text-foreground/40">{n}</span>
+        <span className="mx-2 text-foreground/25">/</span>
+        {label}
+      </p>
+      <h2 className="mt-5 max-w-[22ch] text-[clamp(2rem,4.2vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-foreground">
+        {title}
+      </h2>
+      {lead && (
+        <p className="mt-5 max-w-[60ch] text-[clamp(1rem,1.3vw,1.125rem)] leading-relaxed text-ash">
+          {lead}
+        </p>
+      )}
+    </Reveal>
   );
 }
 
-type Frontier = (typeof frontiers)[number];
+const Serif = ({ children }: { children: ReactNode }) => (
+  <span className="font-[family-name:var(--font-display)] font-normal italic tracking-[-0.01em]">
+    {children}
+  </span>
+);
 
-function BentoCard({
-  f,
-  variant = "small",
-  className = "",
-  delay = 0,
-}: {
-  f: Frontier;
-  variant?: "small" | "wide" | "halo" | "feature";
-  className?: string;
-  delay?: number;
-}) {
-  const big = variant === "wide" || variant === "feature";
+/* ------------------------------------------------------------------ content */
 
+const PROBLEMS = [
+  {
+    t: "Therapies are tested on people first",
+    d: "Neurology and ophthalmology still learn whether a therapy works in the clinic, one cohort at a time, years after the decision to build it.",
+  },
+  {
+    t: "Patient data lives in silos",
+    d: "The genome sits in one system, the MRI in another, the EEG in a third. Nothing joins them into a single picture of one nervous system.",
+  },
+  {
+    t: "Models nobody can audit",
+    d: "When a number cannot be traced to its source, release and method, a regulator cannot accept it and a clinician should not trust it.",
+  },
+];
+
+const STEPS = [
+  {
+    n: "01",
+    t: "Ingest",
+    d: "Genome, imaging and EEG enter through one acquisition contract. Public references (Ensembl, UniProt, AlphaFold DB, ClinVar) are captured with a SHA-256 manifest per gene.",
+  },
+  {
+    n: "02",
+    t: "Model",
+    d: "Simulate from the gene to the protein, the cell, the retina and the visual cortex, and run neural circuits for six conditions in a 3D brain.",
+  },
+  {
+    n: "03",
+    t: "Benchmark",
+    d: "Every result is labelled measured, reference, computed or hypothetical, and no figure is published until it clears its benchmark gate on a locked hold-out set.",
+  },
+];
+
+// Who the platform is built for: the users the founders are designing around, not customers.
+const AUDIENCE = [
+  {
+    t: "Gene and cell therapy developers",
+    d: "Run a construct against a genotype and follow its modelled effect from the vector to the visual cortex before committing to a study.",
+  },
+  {
+    t: "Neurology and ophthalmology researchers",
+    d: "Join a cohort's genome, imaging and EEG in one coordinate frame, with every value traced to its source and release.",
+  },
+  {
+    t: "Trial designers and CROs",
+    d: "Pressure-test inclusion criteria and endpoints in silico, with an audit trail a reviewer can follow line by line.",
+  },
+];
+
+const WHY_NOW = [
+  {
+    t: "Foundation models are going vertical",
+    d: "General models are giving way to lean, domain models for biology. Neurology and vision need one trained on joined genome, imaging and signal data.",
+  },
+  {
+    t: "Every AI output will need an audit trail",
+    d: "Regulated medicine will not adopt a model whose numbers cannot be traced. Provenance has to be built in from the first record, not bolted on.",
+  },
+  {
+    t: "An ageing population is losing sight and memory",
+    d: "Retinal and neurodegenerative disease grows with age, and every new gene or cell therapy needs evidence long before its first trial.",
+  },
+  {
+    t: "The reference data finally connects",
+    d: "Open gene, protein, structure and variant databases now cover the genome. Joining them per patient, with provenance, is an engineering problem.",
+  },
+];
+
+const EVIDENCE = [
+  { k: "Measured", d: "Recorded from an instrument" },
+  { k: "Reference", d: "Taken from a public database, with its release" },
+  { k: "Computed", d: "Derived by a model from the above" },
+  { k: "Hypothetical", d: "A labelled assumption, never a result" },
+];
+
+const GROUP_SHOTS: Record<string, { light: string; dark: string; path: string; alt: string }> = {
+  "Genome & Vision": {
+    light: "/landing/vision-light.jpg",
+    dark: "/landing/vision-dark.jpg",
+    path: "/vision",
+    alt: "Gene and protein evidence for RPE65: ClinVar variants on the gene and protein, and the AlphaFold structure",
+  },
+  Brain: {
+    light: "/landing/simulation-light.jpg",
+    dark: "/landing/simulation-dark.jpg",
+    path: "/simulation",
+    alt: "The CIRCUIT simulation window: a closed-loop neural circuit assembled in a 3D brain",
+  },
+  Platform: {
+    light: "/landing/nimble-light.jpg",
+    dark: "/landing/nimble-dark.jpg",
+    path: "/nimble",
+    alt: "The NIMBLE acquisition core streaming a simulated 19-channel EEG with link health",
+  },
+};
+
+const initials = (n: string) =>
+  n
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("");
+
+/* ------------------------------------------------------------------ page */
+
+function Landing() {
+  const groups = ["Genome & Vision", "Brain", "Platform"] as const;
   return (
-    <Reveal delay={delay} className={className}>
-      <article className="scope group relative h-full overflow-hidden rounded-2xl border border-foreground/12 bg-paper">
-        <img
-          src={f.img}
-          alt={f.alt}
-          width={1280}
-          height={960}
-          loading="lazy"
-          className={`absolute inset-0 h-full w-full object-cover transition-all duration-[1400ms] ease-out group-hover:scale-[1.06] ${
-            big ? "opacity-40" : "opacity-30"
-          }`}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/35" />
-        {variant === "halo" ? (
-          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(circle,oklch(1_0_0/0.22),transparent_65%)]" />
-        ) : null}
+    <div className="min-h-screen bg-background text-foreground">
+      <Nav />
 
+      {/* ---------------------------------------------------------- hero */}
+      <section className="relative overflow-hidden pt-[clamp(7.5rem,15vw,10.5rem)]">
         <div
-          className={`relative flex h-full flex-col ${
-            big
-              ? "gap-6 p-[clamp(1.5rem,3vw,2.75rem)] md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-end"
-              : "justify-end gap-4 p-[clamp(1.25rem,2.5vw,2rem)] min-h-[19rem]"
-          }`}
-        >
-          <div className="min-w-0">
-            <p className="t-marker text-foreground/50">{f.n}</p>
-            <h3
-              className={`mt-3 font-semibold tracking-[-0.03em] text-foreground ${
-                big
-                  ? "[font-size:clamp(1.6rem,3vw,2.4rem)]"
-                  : "[font-size:clamp(1.2rem,2vw,1.55rem)]"
-              }`}
-            >
-              {f.title}
-            </h3>
-            <p className="mt-3 max-w-[40ch] text-[0.92rem] font-medium leading-relaxed text-foreground/75">
-              {f.claim}
-            </p>
-          </div>
-          <p
-            className={`min-w-0 text-[0.88rem] leading-relaxed text-ash ${
-              big
-                ? ""
-                : "max-h-0 overflow-hidden opacity-0 transition-all duration-700 group-hover:max-h-40 group-hover:opacity-100"
-            }`}
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-[640px] bg-[radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--beam)_14%,transparent),transparent_70%)] dark:bg-[radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--deep)_80%,transparent),transparent_70%)]"
+        />
+        <Container className="relative">
+          <Link
+            to="/auth"
+            className="rise inline-flex items-center gap-2 rounded-full border border-border bg-card/70 py-1 pl-1 pr-3 text-[12.5px] text-foreground/80 backdrop-blur transition-colors hover:border-foreground/25"
           >
-            {f.body}
+            <span className="rounded-full bg-foreground px-2 py-0.5 text-[11px] font-medium text-background">
+              New
+            </span>
+            Genome v1: gene to visual cortex, every value traced
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+          </Link>
+          <h1
+            className="rise mt-7 max-w-[17ch] text-[clamp(2.75rem,7vw,5.5rem)] font-semibold leading-[0.98] tracking-[-0.045em]"
+            style={{ animationDelay: "80ms" }}
+          >
+            The simulation layer for <Serif>brain and eye</Serif> medicine.
+          </h1>
+          <p
+            className="rise mt-7 max-w-[58ch] text-[clamp(1.05rem,1.5vw,1.25rem)] leading-relaxed text-ash"
+            style={{ animationDelay: "160ms" }}
+          >
+            {COMPANY.pitch}
           </p>
-        </div>
-      </article>
-    </Reveal>
+          <div
+            className="rise mt-9 flex flex-wrap items-center gap-3"
+            style={{ animationDelay: "240ms" }}
+          >
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-[14px] font-medium text-background transition-opacity hover:opacity-85"
+            >
+              Open the platform <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              to="/"
+              hash="platform"
+              className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-[14px] font-medium text-foreground transition-colors hover:bg-secondary"
+            >
+              See what's inside
+            </Link>
+          </div>
+
+          <div className="rise mt-[clamp(3.5rem,8vw,5.5rem)]" style={{ animationDelay: "320ms" }}>
+            <ProductShot
+              light="/landing/therapy-light.jpg"
+              dark="/landing/therapy-dark.jpg"
+              path="/vision/therapy"
+              alt="The gene therapy simulator: RPE65 genotype, vector, enzyme, photoreceptors, optic nerve and visual cortex over time"
+              priority
+            />
+          </div>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- programs */}
+      <section className="py-14">
+        <Container>
+          <ProgramStrip />
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- problem */}
+      <section
+        id="problem"
+        className="scroll-mt-20 border-t border-border py-[clamp(4.5rem,10vw,8rem)]"
+      >
+        <Container>
+          <SectionHead
+            n="01"
+            label="Problem"
+            title={
+              <>
+                Medicine for the nervous system is still <Serif>discovered in the clinic.</Serif>
+              </>
+            }
+          />
+          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-3">
+            {PROBLEMS.map((p, i) => (
+              <Reveal key={p.t} delay={i * 80} className="bg-background p-7 sm:p-8">
+                <p className="t-num text-[12px] text-ash">0{i + 1}</p>
+                <h3 className="mt-8 text-[1.15rem] font-semibold tracking-[-0.02em]">{p.t}</h3>
+                <p className="mt-3 text-[14.5px] leading-relaxed text-ash">{p.d}</p>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- platform */}
+      <section
+        id="platform"
+        className="scroll-mt-20 border-t border-border py-[clamp(4.5rem,10vw,8rem)]"
+      >
+        <Container>
+          <SectionHead
+            n="02"
+            label="Platform"
+            title={
+              <>
+                One workspace, <Serif>from the gene to the cortex.</Serif>
+              </>
+            }
+            lead="Nine tools, one login, one theme. Each is working software you can open today, labelled honestly as live data, model or demo."
+          />
+          <div className="mt-14 space-y-6">
+            {groups.map((g, gi) => {
+              const shot = GROUP_SHOTS[g]!;
+              const mods = MODULES.filter((m) => m.group === g);
+              return (
+                <Reveal key={g} delay={gi * 60}>
+                  <div
+                    className={`grid items-center gap-8 rounded-2xl border border-border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12 ${
+                      gi % 2 ? "lg:[&>*:first-child]:order-2" : ""
+                    }`}
+                  >
+                    <div>
+                      <p className="t-marker text-ash">{g}</p>
+                      <ul className="mt-6 divide-y divide-border border-y border-border">
+                        {mods.map((m) => (
+                          <li key={m.key} className="py-4">
+                            <div className="flex items-baseline justify-between gap-3">
+                              <h3 className="text-[15.5px] font-semibold tracking-[-0.015em]">
+                                {m.name}
+                              </h3>
+                              <span className="t-num shrink-0 text-[11px] text-ash">
+                                {m.status}
+                              </span>
+                            </div>
+                            <p className="mt-1.5 text-[14px] leading-relaxed text-ash">{m.blurb}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <ProductShot {...shot} />
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- who */}
+      <section
+        id="who"
+        className="scroll-mt-20 border-t border-border py-[clamp(4.5rem,10vw,8rem)]"
+      >
+        <Container>
+          <SectionHead
+            n="03"
+            label="Who it's for"
+            title={
+              <>
+                Built for the teams that <Serif>decide what reaches a patient.</Serif>
+              </>
+            }
+          />
+          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-3">
+            {AUDIENCE.map((a, i) => (
+              <Reveal key={a.t} delay={i * 80} className="bg-card p-7 sm:p-8">
+                <h3 className="text-[1.15rem] font-semibold tracking-[-0.02em]">{a.t}</h3>
+                <p className="mt-3 text-[14.5px] leading-relaxed text-ash">{a.d}</p>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- how */}
+      <section
+        id="how"
+        className="scroll-mt-20 border-t border-border py-[clamp(4.5rem,10vw,8rem)]"
+      >
+        <Container>
+          <SectionHead
+            n="04"
+            label="How it works"
+            title={
+              <>
+                Ingest. Model. <Serif>Benchmark.</Serif>
+              </>
+            }
+          />
+          <ol className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
+            <span
+              aria-hidden
+              className="absolute left-0 right-0 top-[7px] hidden h-px bg-border md:block"
+            />
+            {STEPS.map((s, i) => (
+              <Reveal as="li" key={s.n} delay={i * 90} className="relative">
+                <span className="relative block h-[15px] w-[15px] rounded-full border border-foreground/30 bg-background">
+                  <span className="absolute inset-[4px] rounded-full bg-primary" />
+                </span>
+                <p className="t-num mt-6 text-[12px] text-ash">{s.n}</p>
+                <h3 className="mt-2 text-[1.4rem] font-semibold tracking-[-0.025em]">{s.t}</h3>
+                <p className="mt-3 max-w-[38ch] text-[14.5px] leading-relaxed text-ash">{s.d}</p>
+              </Reveal>
+            ))}
+          </ol>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- why now */}
+      <section
+        id="why-now"
+        className="scroll-mt-20 border-t border-border py-[clamp(4.5rem,10vw,8rem)]"
+      >
+        <Container>
+          <SectionHead
+            n="05"
+            label="Why now"
+            title={
+              <>
+                Four shifts make this <Serif>buildable this year.</Serif>
+              </>
+            }
+          />
+          <div className="mt-14 grid gap-4 sm:grid-cols-2">
+            {WHY_NOW.map((w, i) => (
+              <Reveal
+                key={w.t}
+                delay={i * 70}
+                className="group rounded-2xl border border-border bg-card p-7 transition-colors hover:border-foreground/25"
+              >
+                <p className="t-num text-[12px] text-ash">0{i + 1}</p>
+                <h3 className="mt-6 text-[1.15rem] font-semibold tracking-[-0.02em]">{w.t}</h3>
+                <p className="mt-3 text-[14.5px] leading-relaxed text-ash">{w.d}</p>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- trust */}
+      <section
+        id="trust"
+        className="scroll-mt-20 border-t border-border py-[clamp(4.5rem,10vw,8rem)]"
+      >
+        <Container className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+          <SectionHead
+            n="06"
+            label="Built to be audited"
+            title={
+              <>
+                Every number <Serif>knows where it came from.</Serif>
+              </>
+            }
+            lead="Each value in the platform carries its source, release, retrieval time and checksum, and says what kind of evidence it is. The software never calls itself clinically validated."
+          />
+          <Reveal delay={100}>
+            <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
+              {EVIDENCE.map((e) => (
+                <li key={e.k} className="flex items-baseline justify-between gap-6 px-6 py-5">
+                  <span className="text-[15px] font-semibold tracking-[-0.015em]">{e.k}</span>
+                  <span className="text-right text-[13.5px] text-ash">{e.d}</span>
+                </li>
+              ))}
+              <li className="flex items-baseline justify-between gap-6 px-6 py-5">
+                <span className="text-[15px] font-semibold tracking-[-0.015em] text-foreground/45">
+                  Validated
+                </span>
+                <span className="text-right text-[13.5px] text-ash">
+                  Reserved until an independent validation exists
+                </span>
+              </li>
+            </ul>
+          </Reveal>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- team */}
+      <section
+        id="team"
+        className="scroll-mt-20 border-t border-border py-[clamp(4.5rem,10vw,8rem)]"
+      >
+        <Container>
+          <SectionHead
+            n="07"
+            label="Team"
+            title={
+              <>
+                A small team, <Serif>one bench.</Serif>
+              </>
+            }
+          />
+          <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {TEAM.map((m, i) => (
+              <Reveal as="li" key={m.name} delay={i * 60}>
+                <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                  {m.img ? (
+                    <img
+                      src={m.img}
+                      alt={`${m.name}, ${m.role}`}
+                      loading="lazy"
+                      className="aspect-[4/5] w-full object-cover object-top grayscale transition duration-500 hover:grayscale-0"
+                    />
+                  ) : (
+                    <div className="grid aspect-[4/5] w-full place-items-center bg-secondary">
+                      <span className="font-[family-name:var(--font-display)] text-5xl italic text-foreground/50">
+                        {initials(m.name)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <p className="text-[14.5px] font-semibold tracking-[-0.015em]">{m.name}</p>
+                    <p className="mt-0.5 text-[12.5px] text-ash">{m.role}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </ul>
+        </Container>
+      </section>
+
+      {/* ---------------------------------------------------------- CTA */}
+      <section className="border-t border-border py-[clamp(4.5rem,10vw,8rem)]">
+        <Container>
+          <Reveal>
+            <div className="relative overflow-hidden rounded-3xl bg-[#00030b] px-7 py-14 text-white ring-1 ring-white/10 sm:px-14 sm:py-20">
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-[radial-gradient(50%_80%_at_85%_0%,rgba(61,139,245,0.35),transparent_70%),radial-gradient(40%_60%_at_0%_100%,rgba(138,107,255,0.22),transparent_70%)]"
+              />
+              <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                <div>
+                  <h2 className="max-w-[18ch] text-[clamp(2rem,4.6vw,3.6rem)] font-semibold leading-[1.02] tracking-[-0.04em]">
+                    See it working, <Serif>not in a deck.</Serif>
+                  </h2>
+                  <p className="mt-5 max-w-[52ch] text-[15px] leading-relaxed text-white/65">
+                    One sign-in opens every tool: genome evidence, the therapy simulator, the eye,
+                    the brain simulation and the imaging workstation.
+                  </p>
+                </div>
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center gap-2 self-start rounded-full bg-white px-6 py-3 text-[14px] font-medium text-[#00030b] transition-opacity hover:opacity-90 lg:self-end"
+                >
+                  Open the platform <ArrowUpRight className="h-4 w-4" aria-hidden />
+                </Link>
+              </div>
+            </div>
+          </Reveal>
+        </Container>
+      </section>
+
+      <Footer />
+    </div>
   );
 }
