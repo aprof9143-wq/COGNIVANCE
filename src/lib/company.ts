@@ -43,10 +43,13 @@ export const TEAM: Member[] = [
     img: "/Ansab-founder.jpeg",
     bio: "Sets the research agenda and holds the line on first-principles engineering.",
   },
-  { name: "Saad Saqib", role: "Chief Growth Officer" },
-  { name: "Nabeel Shahzad", role: "Director, Partnerships & Collaborations" },
+  { name: "Saad Saqib", role: "Chief Growth Officer", img: "/team/saad-saqib.jpg" },
+  {
+    name: "Nabeel Shahzad",
+    role: "Director, Partnerships & Collaborations",
+    img: "/nabeel.jpeg",
+  },
   { name: "Momina Zafar", role: "Founding Integration Engineer" },
-  { name: "Zimal Fatima", role: "Founding Research Scientist" },
 ];
 
 export type ModuleKey =
