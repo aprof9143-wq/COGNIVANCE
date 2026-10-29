@@ -1,20 +1,21 @@
 import { Link } from "@tanstack/react-router";
 
-/** The brain mark and wordmark. `to` makes it a link home (or to the app). */
+/**
+ * The brain mark (transparent) and the wordmark, set in Unbounded.
+ * `to` makes it a link home (or to the app).
+ */
 export function Logo({ to = "/", compact = false }: { to?: string; compact?: boolean }) {
   return (
-    <Link to={to} className="group inline-flex items-center gap-2.5" aria-label="Cognivance home">
-      <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-[9px] bg-[#00030b] ring-1 ring-black/5 dark:ring-white/10">
-        <img
-          src="/logo-mark.png"
-          alt=""
-          width={214}
-          height={210}
-          className="h-7 w-7 object-contain"
-        />
-      </span>
+    <Link to={to} className="group inline-flex items-center gap-2" aria-label="Cognivance home">
+      <img
+        src="/logo-mark.png"
+        alt=""
+        width={214}
+        height={210}
+        className="h-8 w-8 shrink-0 object-contain"
+      />
       {!compact && (
-        <span className="text-[15px] font-semibold tracking-[-0.02em] text-foreground">
+        <span className="font-[family-name:var(--font-brand)] text-[15.5px] font-medium tracking-[-0.01em] text-foreground">
           Cognivance
         </span>
       )}

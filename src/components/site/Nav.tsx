@@ -13,19 +13,29 @@ const LINKS = [
   { label: "About", to: "/about" },
 ] as const;
 
-/** The public site's top bar: quiet until scrolled, then a hairline and a blur. */
-export function Nav() {
+/**
+ * The public site's top bar: quiet until scrolled, then a hairline and a blur.
+ * `overStage` is for a page that opens on a dark stage (an element with
+ * id="stage"): while the bar is over it, the bar takes the dark theme's colours
+ * whatever the visitor's theme.
+ */
+export function Nav({ overStage = false }: { overStage?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [onStage, setOnStage] = useState(overStage);
 
   useEffect(() => {
     setSignedIn(hasSession());
-    const on = () => setScrolled(window.scrollY > 8);
+    const on = () => {
+      setScrolled(window.scrollY > 8);
+      const stage = overStage ? document.getElementById("stage") : null;
+      setOnStage(!!stage && stage.getBoundingClientRect().bottom > 64);
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
-  }, []);
+  }, [overStage]);
 
   const cta = signedIn ? (
     <Link
@@ -46,6 +56,8 @@ export function Nav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background,border-color,backdrop-filter] duration-300 ${
+        onStage ? "dark" : ""
+      } ${
         scrolled || open
           ? "border-b border-border bg-background/80 backdrop-blur-xl"
           : "border-b border-transparent"

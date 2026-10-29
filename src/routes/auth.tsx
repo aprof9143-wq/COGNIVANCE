@@ -45,7 +45,7 @@ function AuthPage() {
   return (
     <main className="min-h-screen bg-background text-foreground lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       {/* brand panel */}
-      <section className="relative hidden overflow-hidden bg-[#00030b] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+      <section className="dark relative hidden overflow-hidden bg-[#00030b] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div
           aria-hidden
           className="absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_0%,rgba(61,139,245,0.32),transparent_70%),radial-gradient(50%_50%_at_100%_100%,rgba(138,107,255,0.2),transparent_70%)]"
@@ -57,12 +57,7 @@ function AuthPage() {
           className="pointer-events-none absolute -right-24 top-1/2 w-[620px] max-w-none -translate-y-1/2 opacity-60"
         />
         <div className="relative">
-          <Link to="/" className="inline-flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-[9px] bg-black ring-1 ring-white/15">
-              <img src="/logo-mark.png" alt="" className="h-7 w-7 object-contain" />
-            </span>
-            <span className="text-[15px] font-semibold tracking-[-0.02em]">Cognivance</span>
-          </Link>
+          <Logo />
         </div>
         <div className="relative max-w-[30rem]">
           <h1 className="text-[clamp(2.2rem,3.6vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.04em]">
