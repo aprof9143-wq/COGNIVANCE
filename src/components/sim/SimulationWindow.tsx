@@ -800,7 +800,10 @@ export function SimulationWindow() {
 
             {/* left overlay: programme + status */}
             <div className="pointer-events-none absolute left-3 top-3 hidden max-w-[15rem] flex-col gap-1 md:flex">
-              {mode === "loop" || mode === "benchmark" ? null : (
+              {mode === "loop" ||
+              mode === "benchmark" ||
+              phase === "assembling" ||
+              subjectStep ? null : (
                 <p className="font-mono text-[0.56rem] uppercase tracking-[0.16em] text-[color:var(--k-5e719a)]">
                   {disease.implant}
                 </p>

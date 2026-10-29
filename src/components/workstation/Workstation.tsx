@@ -3,6 +3,7 @@ import {
   Box,
   Circle,
   Crosshair,
+  MousePointer2,
   Download,
   FolderOpen,
   Hand,
@@ -578,7 +579,7 @@ export function Workstation() {
   const layerInput = useRef<HTMLInputElement>(null);
 
   const tools: [Tool, typeof Crosshair][] = [
-    ["navigate", Crosshair],
+    ["navigate", MousePointer2],
     ["wl", SunMedium],
     ["pan", Hand],
     ["zoom", ZoomIn],
@@ -775,6 +776,8 @@ export function Workstation() {
         <button
           type="button"
           className={`tool ${showCrosshair ? "tool-on" : ""}`}
+          aria-pressed={showCrosshair}
+          title="Show or hide the crosshair lines"
           onClick={() => setShowCrosshair((s) => !s)}
         >
           <Crosshair className="h-4 w-4" /> Crosshair

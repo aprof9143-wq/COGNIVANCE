@@ -909,6 +909,11 @@ export function ResearchConsole() {
                   · {palette.toUpperCase()}
                 </span>
                 <span>{volume.extent.map((v) => v.toFixed(0)).join(" × ")} mm</span>
+                {showLesion && lesion && lesionSource !== "upload" ? (
+                  <span className="mt-1 self-start rounded border border-[color:var(--k-ff4860)]/50 bg-[color:var(--k-1a0508)]/80 px-2.5 py-1 text-[0.58rem] tracking-[0.12em] text-[color:var(--k-ff9aa6)] backdrop-blur">
+                    DEMO LESION · SYNTHETIC · NOT A FINDING
+                  </span>
+                ) : null}
                 {/* The layer list needs room; on phones the Layers panel below carries it. */}
                 <span className="mt-2 hidden flex-col gap-1 sm:flex">
                   <span className="text-[color:var(--k-5e719a)]">
@@ -959,15 +964,6 @@ export function ResearchConsole() {
                 </span>
               </div>
 
-              {showLesion && lesion && lesionSource !== "upload" ? (
-                <div className="pointer-events-none absolute left-4 top-[3.3rem] rounded border border-[color:var(--k-ff4860)]/50 bg-[color:var(--k-1a0508)]/80 px-3 py-1.5 font-mono text-[0.6rem] tracking-[0.12em] text-[color:var(--k-ff9aa6)] backdrop-blur lg:left-1/2 lg:top-3 lg:-translate-x-1/2">
-                  <span className="lg:hidden">DEMO LESION · SYNTHETIC · NOT A FINDING</span>
-                  <span className="hidden lg:inline">
-                    DEMONSTRATION LESION · SYNTHETIC · NOT A FINDING
-                  </span>
-                </div>
-              ) : null}
-
               <SceneSwitch scene={scene} onChange={applyScene} />
 
               {hovered ? (
@@ -978,14 +974,7 @@ export function ResearchConsole() {
                 />
               ) : null}
 
-              <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex flex-wrap items-end justify-between gap-3">
-                <p className="hidden max-w-[46ch] font-mono text-[0.6rem] leading-relaxed tracking-[0.06em] text-[color:var(--k-5e719a)] sm:block">
-                  DRAG TO ORBIT · SCROLL TO ZOOM · HOVER AN ELECTRODE · ELECTRODES PROJECTED ONTO
-                  THIS SCALP — APPROXIMATE, NOT CO-REGISTERED ·{" "}
-                  {tractSource === "bundled" && volumeSource === "template"
-                    ? "TRACTS AFFINELY REGISTERED TO THIS TEMPLATE"
-                    : "TRACTS FITTED TO THIS BRAIN"}
-                </p>
+              <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex flex-wrap items-end justify-end gap-3">
                 <div className="flex flex-col items-end gap-1.5">
                   {showTracts ? <TractLegend /> : null}
                   <BandLegend band={band} />
@@ -1000,6 +989,13 @@ export function ResearchConsole() {
                 </div>
               ) : null}
             </div>
+            <p className="px-3 pb-2.5 pt-2 font-mono text-[0.6rem] leading-relaxed tracking-[0.06em] text-[color:var(--k-5e719a)]">
+              DRAG TO ORBIT · SCROLL TO ZOOM · HOVER AN ELECTRODE. ELECTRODES PROJECTED ONTO THIS
+              SCALP — APPROXIMATE, NOT CO-REGISTERED ·{" "}
+              {tractSource === "bundled" && volumeSource === "template"
+                ? "TRACTS AFFINELY REGISTERED TO THIS TEMPLATE"
+                : "TRACTS FITTED TO THIS BRAIN"}
+            </p>
           </Panel>
 
           <div className="grid gap-3 md:grid-cols-3">
