@@ -1344,6 +1344,17 @@ export class SimScene {
     }
   }
 
+  /** Stop or resume drawing, e.g. while the view is scrolled off screen. */
+  setPaused(paused: boolean) {
+    if (paused) {
+      cancelAnimationFrame(this.raf);
+      this.raf = 0;
+    } else if (!this.raf) {
+      this.clock.getDelta();
+      this.tick();
+    }
+  }
+
   setLabelsVisible(on: boolean) {
     this.showLabels = on;
   }

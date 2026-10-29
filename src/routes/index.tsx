@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { ProgramStrip } from "@/components/site/ProgramStrip";
-import { Trace } from "@/components/site/Trace";
+import { HeroCircuit } from "@/components/site/HeroCircuit";
 import { COMPANY, MODULES, TEAM, type ModuleKey } from "@/lib/company";
 
 const title = "Cognivance — the simulation layer for brain and eye medicine";
@@ -83,22 +83,38 @@ const STEPS = [
   },
 ];
 
+/** The three facts a reader should leave the hero with. All are checkable. */
+const PROOF = [
+  {
+    v: "2.2 billion",
+    d: "people live with a near or distance vision impairment (WHO, World report on vision, 2019).",
+  },
+  {
+    v: "RPE65",
+    d: "our first gene: the target of Luxturna, the first FDA-approved gene therapy for an inherited disease (2017).",
+  },
+  {
+    v: "9 tools",
+    d: "working today behind one sign-in, from genome evidence to a 3D brain simulation.",
+  },
+];
+
 const WHY_NOW = [
   {
     t: "Foundation models are going vertical",
-    d: "General models are giving way to lean, domain models for biology. Neurology and vision need one trained on joined genome, imaging and signal data.",
-  },
-  {
-    t: "Every AI output will need an audit trail",
-    d: "Regulated medicine will not adopt a model whose numbers cannot be traced. Provenance has to be built in from the first record, not bolted on.",
+    d: "General models are giving way to lean domain models for biology. The eye and the brain need one trained on joined genome, imaging and signal data, and nobody owns that model yet.",
   },
   {
     t: "An ageing population is losing sight and memory",
-    d: "Retinal and neurodegenerative disease grows with age, and every new gene or cell therapy needs evidence long before its first trial.",
+    d: "Retinal and neurodegenerative disease grows with age. Every new gene therapy, cell therapy and implant needs evidence long before its first trial.",
+  },
+  {
+    t: "Every AI output in medicine will need an audit trail",
+    d: "Regulators will not accept a number nobody can trace. Provenance has to be built in from the first record, not bolted on, and ours is.",
   },
   {
     t: "The reference data finally connects",
-    d: "Open gene, protein, structure and variant databases now cover the genome. Joining them per patient, with provenance, is an engineering problem.",
+    d: "Open gene, protein, structure and variant databases now cover the genome. Joining them per patient, with provenance, is an engineering problem, and engineering problems get solved.",
   },
 ];
 
@@ -162,59 +178,74 @@ function Landing() {
       {/* ---------------------------------------------------------- stage: always dark */}
       <section
         id="stage"
-        className="dark relative overflow-hidden bg-[#02040c] pb-14 pt-[clamp(6.5rem,10vw,8rem)] text-foreground"
+        className="dark relative overflow-hidden bg-[#02040c] pb-12 pt-[clamp(6.5rem,10vw,8.5rem)] text-foreground lg:min-h-[min(100svh,980px)]"
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_45%_at_18%_0%,rgba(61,139,245,0.22),transparent_70%),radial-gradient(40%_35%_at_62%_78%,rgba(255,180,92,0.07),transparent_70%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_40%_at_12%_8%,rgba(61,139,245,0.16),transparent_70%)]"
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.5] [background-image:linear-gradient(rgba(120,150,210,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,150,210,0.07)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(70%_60%_at_50%_40%,black,transparent)]"
-        />
-        <Container className="relative">
-          <Link
-            to="/auth"
-            className="rise inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] py-1 pl-1 pr-3 text-[12.5px] text-white/80 backdrop-blur transition-colors hover:border-white/25"
-          >
-            <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-[#02040c]">
-              New
-            </span>
-            Genome v1: gene to visual cortex, every value traced
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </Link>
-          <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+        <Container className="relative z-10 lg:pointer-events-none">
+          <div className="lg:pointer-events-auto lg:max-w-[560px]">
+            <Link
+              to="/auth"
+              className="rise inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] py-1 pl-1 pr-3 text-[12.5px] text-white/80 backdrop-blur transition-colors hover:border-white/25"
+            >
+              <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-[#02040c]">
+                Live
+              </span>
+              Genome v1: RPE65 from the gene to the visual cortex
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </Link>
             <h1
-              className={`${head} rise max-w-[16ch] text-[clamp(2.6rem,5.4vw,4.75rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-white`}
+              className={`${head} rise mt-7 text-[clamp(2.8rem,6vw,5.4rem)] font-semibold leading-[0.95] tracking-[-0.055em] text-white`}
               style={{ animationDelay: "80ms" }}
             >
-              The simulation layer for brain and eye medicine.
+              In-silico trials for the eye and the brain.
             </h1>
-            <div className="rise" style={{ animationDelay: "180ms" }}>
-              <p className="max-w-[46ch] text-[clamp(1rem,1.35vw,1.15rem)] leading-relaxed text-white/65">
-                {COMPANY.pitch}
-              </p>
-              <div className="mt-7 flex flex-wrap items-center gap-3">
-                <Link
-                  to="/auth"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-medium text-[#02040c] transition-opacity hover:opacity-90"
-                >
-                  Open the platform <ArrowRight className="h-4 w-4" aria-hidden />
-                </Link>
-                <Link
-                  to="/"
-                  hash="platform"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-[14px] font-medium text-white transition-colors hover:bg-white/[0.06]"
-                >
-                  See what's inside
-                </Link>
-              </div>
+            <p
+              className="rise mt-6 max-w-[50ch] text-[clamp(1rem,1.35vw,1.15rem)] leading-relaxed text-white/65"
+              style={{ animationDelay: "160ms" }}
+            >
+              We are building the vertical foundation model for the eye and the brain. Cognivance
+              joins a patient's genome, imaging and EEG into one simulation, so a gene therapy or an
+              implant can be tested from the gene to the visual cortex before it reaches a person.
+            </p>
+            <div
+              className="rise mt-8 flex flex-wrap items-center gap-3"
+              style={{ animationDelay: "240ms" }}
+            >
+              <Link
+                to="/auth"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-medium text-[#02040c] transition-opacity hover:opacity-90"
+              >
+                Open the platform <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+              <Link
+                to="/"
+                hash="platform"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-[14px] font-medium text-white transition-colors hover:bg-white/[0.06]"
+              >
+                See what's inside
+              </Link>
             </div>
           </div>
+        </Container>
 
-          <Trace className="mt-[clamp(2.5rem,4.5vw,3.75rem)]" />
+        <HeroCircuit className="relative mt-6 h-[380px] w-full sm:h-[460px] lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-[64%] lg:[mask-image:linear-gradient(to_right,transparent_4%,black_40%)]" />
 
-          <div className="mt-16 border-t border-white/10 pt-8">
+        <Container className="relative z-10 lg:pointer-events-none">
+          <dl className="mt-6 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3 lg:pointer-events-auto lg:mt-20 lg:max-w-[620px]">
+            {PROOF.map((p) => (
+              <div key={p.v} className="bg-[#02040c]/80 p-5 backdrop-blur">
+                <dt className={`${head} text-[1.9rem] font-semibold tracking-[-0.04em] text-white`}>
+                  {p.v}
+                </dt>
+                <dd className="mt-1 text-[13px] leading-snug text-white/60">{p.d}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="mt-12 border-t border-white/10 pt-7 lg:pointer-events-auto">
             <ProgramStrip />
           </div>
         </Container>

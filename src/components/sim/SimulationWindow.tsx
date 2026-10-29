@@ -66,29 +66,11 @@ import {
   PrismPanel,
   ScopePanel,
 } from "./panels";
+import { stageAt } from "@/lib/sim/stages";
 import { SimScene, type View } from "./scene";
 
 type Mode = "assemble" | "loop" | "benchmark";
 type Phase = "loading" | "assembling" | "ready" | "error";
-
-/** Visual share of one loop period given to each stage. */
-const STAGE_SPANS: [Stage, number][] = [
-  ["SENSE", 0.25],
-  ["PREDICT", 0.17],
-  ["VERIFY", 0.16],
-  ["WRITE", 0.3],
-  ["MEASURE", 0.12],
-];
-
-function stageAt(f: number): { stage: Stage; phase: number; index: number } {
-  let acc = 0;
-  for (let i = 0; i < STAGE_SPANS.length; i++) {
-    const [s, w] = STAGE_SPANS[i]!;
-    if (f < acc + w) return { stage: s, phase: (f - acc) / w, index: i };
-    acc += w;
-  }
-  return { stage: "MEASURE", phase: 1, index: STAGE_SPANS.length - 1 };
-}
 
 const SPEEDS = [
   { id: "slow", label: "Slow-mo", sub: "1 loop / 2.4 s", factor: 30 / 2400 },
