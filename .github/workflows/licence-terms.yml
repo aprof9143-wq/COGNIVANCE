@@ -11,6 +11,7 @@ on:
       - ".github/workflows/licence-terms.yml"
       - "tools/licence-terms/**"
       - "config/genome/licences.json"
+      - "config/genome/source-candidates.json"
 
 permissions:
   contents: write
@@ -29,6 +30,13 @@ jobs:
           python-version: "3.12"
       - name: Fetch terms pages
         run: python tools/licence-terms/check_terms.py
+      - name: Render candidate sources' pages (text to the log, hashes to docs/genome/source-survey.json)
+        # Evidence for a person to read; a failure here does not block the terms record.
+        continue-on-error: true
+        run: |
+          python -m pip install --quiet playwright==1.47.0
+          python -m playwright install --with-deps chromium > /dev/null
+          python tools/licence-terms/survey_sources.py
       - name: Commit the record
         # Put this run's record on top of the latest branch head, so a
         # concurrent push never causes a merge conflict.
@@ -36,11 +44,16 @@ jobs:
           git config user.name "licence-terms[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           cp docs/genome/terms-check.json "$RUNNER_TEMP/terms-check.json"
+          if [ -f docs/genome/source-survey.json ]; then cp docs/genome/source-survey.json "$RUNNER_TEMP/source-survey.json"; fi
           for attempt in 1 2 3; do
             git fetch -q origin "$GITHUB_REF_NAME"
             git checkout -q -f --detach "origin/$GITHUB_REF_NAME"
             cp "$RUNNER_TEMP/terms-check.json" docs/genome/terms-check.json
             git add docs/genome/terms-check.json
+            if [ -f "$RUNNER_TEMP/source-survey.json" ]; then
+              cp "$RUNNER_TEMP/source-survey.json" docs/genome/source-survey.json
+              git add docs/genome/source-survey.json
+            fi
             if git diff --cached --quiet; then
               echo "Unchanged."
               exit 0

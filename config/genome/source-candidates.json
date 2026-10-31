@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "note": "Pages the source survey (tools/licence-terms/survey_sources.py) renders in a browser in CI, so a person can read their availability, provenance, update status and terms. Being listed here is not use: no candidate is fetched by any capture tool or shown in the app. URLs are starting points; the survey also follows links whose text names terms, licences, citation, downloads or updates.",
+  "candidates": [
+    {
+      "id": "alzgene",
+      "name": "AlzGene (Alzheimer disease genetic association meta-analyses)",
+      "question": "Alzheimer disease source: is it available, maintained, documented and usable?",
+      "urls": ["http://www.alzgene.org/", "https://www.alzgene.org/"]
+    },
+    {
+      "id": "gwas-catalog",
+      "name": "NHGRI-EBI GWAS Catalog",
+      "question": "Alzheimer disease source: genome-wide association evidence, its update cadence and terms.",
+      "urls": [
+        "https://www.ebi.ac.uk/gwas/docs/about",
+        "https://www.ebi.ac.uk/gwas/docs/file-downloads",
+        "https://www.ebi.ac.uk/gwas/efotraits/MONDO_0004975"
+      ]
+    },
+    {
+      "id": "gencc",
+      "name": "Gene Curation Coalition (GenCC)",
+      "question": "Alzheimer disease source: curated gene-disease validity from several submitters, and its terms.",
+      "urls": ["https://thegencc.org/", "https://search.thegencc.org/download"]
+    },
+    {
+      "id": "orphadata",
+      "name": "Orphanet / Orphadata genes associated with rare diseases",
+      "question": "Alzheimer disease source: curated gene-disease associations for rare (early-onset, monogenic) forms, and its licence.",
+      "urls": ["https://www.orphadata.com/genes/", "https://www.orphadata.com/"]
+    },
+    {
+      "id": "alzforum-mutations",
+      "name": "Alzforum Mutations database",
+      "question": "Alzheimer disease source: curated variants in APP, PSEN1, PSEN2 and others, and its terms.",
+      "urls": ["https://www.alzforum.org/mutations"]
+    },
+    {
+      "id": "open-targets",
+      "name": "Open Targets Platform",
+      "question": "Alzheimer disease source: aggregated target-disease evidence, and its licence.",
+      "urls": [
+        "https://platform-docs.opentargets.org/licence",
+        "https://platform.opentargets.org/disease/MONDO_0004975"
+      ]
+    },
+    {
+      "id": "omim",
+      "name": "OMIM",
+      "question": "Alzheimer disease source: terms of use for Mendelian gene-phenotype entries.",
+      "urls": ["https://www.omim.org/help/agreement"]
+    },
+    {
+      "id": "clingen-terms",
+      "name": "ClinGen terms of use and citation",
+      "question": "Terms for the library's ClinGen data: display, storage, caching, demos, attribution.",
+      "urls": ["https://clinicalgenome.org/", "https://search.clinicalgenome.org/kb/gene-validity"]
+    },
+    {
+      "id": "hpo-terms",
+      "name": "Human Phenotype Ontology licence",
+      "question": "Terms for the library's HPO annotations: display, storage, caching, demos, attribution.",
+      "urls": ["https://hpo.jax.org/app/license", "https://hpo.jax.org/license"]
+    },
+    {
+      "id": "ensembl-compara-docs",
+      "name": "Ensembl REST homology documentation",
+      "question": "What perc_id means, and the homology endpoint's current parameters.",
+      "urls": [
+        "https://rest.ensembl.org/documentation/info/homology_symbol",
+        "https://rest.ensembl.org/documentation/info/homology_species_gene_id"
+      ]
+    }
+  ]
+}
