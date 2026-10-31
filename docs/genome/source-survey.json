@@ -2,18 +2,18 @@
   "note": "Evidence that each candidate page was rendered and what its visible text hashed to. The text is printed in the job log, not stored. Not a review outcome.",
   "pages": [
     {
-      "checkedAt": "2026-10-31T12:23:46+00:00",
+      "checkedAt": "2026-10-31T12:40:47+00:00",
       "finalUrl": "https://www.alzforum.org/mutations",
       "id": "alzforum-mutations",
       "status": 403,
-      "textChars": 205,
-      "textSha256": "ddb7f121723d7d3601aa92d740eecb1ff3a3e36aaa15044fbe06e9f6da1955fd",
+      "textChars": 207,
+      "textSha256": "87be85e9a9702508346a0c1c1f268d14bf270d3905eb0c9cb71bb1b2799a650c",
       "title": "Access Denied",
       "url": "https://www.alzforum.org/mutations",
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:22:28+00:00",
+      "checkedAt": "2026-10-31T12:39:25+00:00",
       "error": "Page.goto: net::ERR_NAME_NOT_RESOLVED at http://www.alzgene.org/\nCall log:\nnavigating to \"http://www.alzgene.org/\", waiting until \"domcontentloaded\"\n",
       "id": "alzgene",
       "status": null,
@@ -21,7 +21,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:22:28+00:00",
+      "checkedAt": "2026-10-31T12:39:25+00:00",
       "error": "Page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.alzgene.org/\nCall log:\nnavigating to \"https://www.alzgene.org/\", waiting until \"domcontentloaded\"\n",
       "id": "alzgene",
       "status": null,
@@ -29,7 +29,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:18+00:00",
+      "checkedAt": "2026-10-31T12:41:18+00:00",
       "finalUrl": "https://clinicalgenome.org/",
       "id": "clingen-terms",
       "status": 200,
@@ -40,7 +40,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:51+00:00",
+      "checkedAt": "2026-10-31T12:41:54+00:00",
       "finalUrl": "https://clinicalgenome.org/docs/?doc-type=website-updates",
       "id": "clingen-terms",
       "status": 200,
@@ -51,7 +51,7 @@
       "via": "Learn About New Features"
     },
     {
-      "checkedAt": "2026-10-31T12:24:48+00:00",
+      "checkedAt": "2026-10-31T12:41:52+00:00",
       "finalUrl": "https://search.clinicalgenome.org/kb/downloads",
       "id": "clingen-terms",
       "status": 200,
@@ -62,7 +62,7 @@
       "via": "File Downloads & APIs"
     },
     {
-      "checkedAt": "2026-10-31T12:24:46+00:00",
+      "checkedAt": "2026-10-31T12:41:49+00:00",
       "finalUrl": "https://search.clinicalgenome.org/kb/downloads",
       "id": "clingen-terms",
       "status": 200,
@@ -73,7 +73,7 @@
       "via": "File Downloads"
     },
     {
-      "checkedAt": "2026-10-31T12:24:21+00:00",
+      "checkedAt": "2026-10-31T12:41:21+00:00",
       "finalUrl": "https://search.clinicalgenome.org/kb/gene-validity?page=1&size=25&search=",
       "id": "clingen-terms",
       "status": 200,
@@ -84,7 +84,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:41+00:00",
+      "checkedAt": "2026-10-31T12:41:45+00:00",
       "finalUrl": "https://www.clinicalgenome.org/docs/terms-of-use/",
       "id": "clingen-terms",
       "status": 200,
@@ -95,7 +95,7 @@
       "via": "Citing ClinGen & Terms of Use"
     },
     {
-      "checkedAt": "2026-10-31T12:24:43+00:00",
+      "checkedAt": "2026-10-31T12:41:47+00:00",
       "finalUrl": "https://www.clinicalgenome.org/docs/?doc-type=website-updates",
       "id": "clingen-terms",
       "status": 200,
@@ -106,7 +106,7 @@
       "via": "Website Updates"
     },
     {
-      "checkedAt": "2026-10-31T12:24:39+00:00",
+      "checkedAt": "2026-10-31T12:41:42+00:00",
       "finalUrl": "https://www.clinicalgenome.org/docs/terms-of-use/",
       "id": "clingen-terms",
       "status": 200,
@@ -117,29 +117,29 @@
       "via": "Citing ClinGen"
     },
     {
-      "checkedAt": "2026-10-31T12:25:56+00:00",
+      "checkedAt": "2026-10-31T12:42:51+00:00",
       "finalUrl": "https://rest.ensembl.org/documentation/info/homology_species_gene_id",
       "id": "ensembl-compara-docs",
       "status": 200,
-      "textChars": 4954,
-      "textSha256": "87ad178437c7b91809a1181843eadee829fede40dd9f10bbd2a1e66e2c1f2bb8",
+      "textChars": 1449798,
+      "textSha256": "96847fa3b3dc0ef5930c7c321d6f5e6dfe16d0e4a09d5d3532bc64618d7c61ee",
       "title": "Ensembl Rest API - GET homology/id/:species/:id",
       "url": "https://rest.ensembl.org/documentation/info/homology_species_gene_id",
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:58+00:00",
+      "checkedAt": "2026-10-31T12:42:01+00:00",
       "finalUrl": "https://rest.ensembl.org/documentation/info/homology_symbol",
       "id": "ensembl-compara-docs",
       "status": 200,
       "textChars": 2558,
-      "textSha256": "2300f8466055fb220ce62d150ab387a11dc1fdccd9ad9d4c885578f7c10e702a",
+      "textSha256": "9b846d1df073853e5b8216b6ac8f2030268870a771d0e5174439f5326de693c9",
       "title": "Ensembl Rest API - GET homology/symbol/:species/:symbol",
       "url": "https://rest.ensembl.org/documentation/info/homology_symbol",
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:23:16+00:00",
+      "checkedAt": "2026-10-31T12:40:20+00:00",
       "finalUrl": "https://thegencc.org/download",
       "id": "gencc",
       "status": 200,
@@ -150,7 +150,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:23:13+00:00",
+      "checkedAt": "2026-10-31T12:40:17+00:00",
       "finalUrl": "https://thegencc.org/",
       "id": "gencc",
       "status": 200,
@@ -161,7 +161,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:23:18+00:00",
+      "checkedAt": "2026-10-31T12:40:22+00:00",
       "finalUrl": "https://thegencc.org/download",
       "id": "gencc",
       "status": 200,
@@ -172,7 +172,7 @@
       "via": "Download"
     },
     {
-      "checkedAt": "2026-10-31T12:23:26+00:00",
+      "checkedAt": "2026-10-31T12:40:29+00:00",
       "error": "Page.goto: net::ERR_ABORTED at https://thegencc.org/download/action/submissions-export-csv?format=new\nCall log:\nnavigating to \"https://thegencc.org/download/action/submissions-export-csv?format=new\", waiting until \"domcontentloaded\"\n",
       "id": "gencc",
       "status": null,
@@ -180,7 +180,7 @@
       "via": "Submissions (csv)"
     },
     {
-      "checkedAt": "2026-10-31T12:23:25+00:00",
+      "checkedAt": "2026-10-31T12:40:29+00:00",
       "error": "Page.goto: net::ERR_ABORTED at https://thegencc.org/download/action/submissions-export-tsv?format=new\nCall log:\nnavigating to \"https://thegencc.org/download/action/submissions-export-tsv?format=new\", waiting until \"domcontentloaded\"\n",
       "id": "gencc",
       "status": null,
@@ -188,7 +188,7 @@
       "via": "Submissions (tsv)"
     },
     {
-      "checkedAt": "2026-10-31T12:23:25+00:00",
+      "checkedAt": "2026-10-31T12:40:29+00:00",
       "error": "Page.goto: net::ERR_ABORTED at https://thegencc.org/download/action/submissions-export-xlsx?format=new\nCall log:\nnavigating to \"https://thegencc.org/download/action/submissions-export-xlsx?format=new\", waiting until \"domcontentloaded\"\n",
       "id": "gencc",
       "status": null,
@@ -196,7 +196,7 @@
       "via": "Submissions (xlsx)"
     },
     {
-      "checkedAt": "2026-10-31T12:23:21+00:00",
+      "checkedAt": "2026-10-31T12:40:24+00:00",
       "finalUrl": "https://thegencc.org/faq",
       "id": "gencc",
       "status": 200,
@@ -207,7 +207,7 @@
       "via": "About GenCC\nClassifications"
     },
     {
-      "checkedAt": "2026-10-31T12:23:23+00:00",
+      "checkedAt": "2026-10-31T12:40:26+00:00",
       "finalUrl": "https://thegencc.org/terms",
       "id": "gencc",
       "status": 200,
@@ -218,7 +218,7 @@
       "via": "GenCC Terms of Use"
     },
     {
-      "checkedAt": "2026-10-31T12:23:06+00:00",
+      "checkedAt": "2026-10-31T12:40:11+00:00",
       "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
       "id": "gwas-catalog",
       "status": 200,
@@ -229,7 +229,7 @@
       "via": "Terms of Use for EMBL-EBI Services"
     },
     {
-      "checkedAt": "2026-10-31T12:23:11+00:00",
+      "checkedAt": "2026-10-31T12:40:14+00:00",
       "finalUrl": "https://creativecommons.org/licenses/by/4.0/",
       "id": "gwas-catalog",
       "status": 200,
@@ -240,7 +240,7 @@
       "via": "CC-BY-4.0"
     },
     {
-      "checkedAt": "2026-10-31T12:22:28+00:00",
+      "checkedAt": "2026-10-31T12:39:26+00:00",
       "finalUrl": "https://www.ebi.ac.uk/gwas/docs/about/",
       "id": "gwas-catalog",
       "status": 200,
@@ -251,7 +251,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:22:56+00:00",
+      "checkedAt": "2026-10-31T12:40:01+00:00",
       "finalUrl": "https://www.ebi.ac.uk/gwas/docs/citation/",
       "id": "gwas-catalog",
       "status": 200,
@@ -262,7 +262,7 @@
       "via": "Citing the GWAS Catalog"
     },
     {
-      "checkedAt": "2026-10-31T12:22:52+00:00",
+      "checkedAt": "2026-10-31T12:39:57+00:00",
       "finalUrl": "https://www.ebi.ac.uk/gwas/docs/downloads/",
       "id": "gwas-catalog",
       "status": 200,
@@ -273,7 +273,7 @@
       "via": "Downloads"
     },
     {
-      "checkedAt": "2026-10-31T12:22:35+00:00",
+      "checkedAt": "2026-10-31T12:39:30+00:00",
       "finalUrl": "https://www.ebi.ac.uk/gwas/docs/file-downloads/",
       "id": "gwas-catalog",
       "status": 200,
@@ -284,7 +284,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:22:59+00:00",
+      "checkedAt": "2026-10-31T12:40:04+00:00",
       "finalUrl": "https://www.ebi.ac.uk/gwas/docs/downloads/",
       "id": "gwas-catalog",
       "status": 200,
@@ -295,7 +295,7 @@
       "via": "downloads"
     },
     {
-      "checkedAt": "2026-10-31T12:23:02+00:00",
+      "checkedAt": "2026-10-31T12:40:07+00:00",
       "finalUrl": "https://www.ebi.ac.uk/gwas/downloads/summary-statistics",
       "id": "gwas-catalog",
       "status": 200,
@@ -306,7 +306,7 @@
       "via": "summary statistics page"
     },
     {
-      "checkedAt": "2026-10-31T12:22:38+00:00",
+      "checkedAt": "2026-10-31T12:39:40+00:00",
       "finalUrl": "https://www.ebi.ac.uk/gwas/efotraits/MONDO_0004975",
       "id": "gwas-catalog",
       "status": 200,
@@ -317,7 +317,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:53+00:00",
+      "checkedAt": "2026-10-31T12:41:57+00:00",
       "finalUrl": "https://hpo.jax.org/license",
       "id": "hpo-terms",
       "status": 404,
@@ -328,7 +328,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:56+00:00",
+      "checkedAt": "2026-10-31T12:41:59+00:00",
       "finalUrl": "https://hpo.jax.org/license",
       "id": "hpo-terms",
       "status": 404,
@@ -339,18 +339,18 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:15+00:00",
+      "checkedAt": "2026-10-31T12:41:14+00:00",
       "finalUrl": "https://www.omim.org/help/agreement",
       "id": "omim",
       "status": 403,
       "textChars": 260,
-      "textSha256": "51cbe93152afd53500ff5588d2356d2fc5f274962bd31c80b24c8287404f2337",
+      "textSha256": "852e750a2c0dcb6f1a43adc3eed8ac46bb1b8931ac805017229dc0a62205d4bd",
       "title": "Just a moment...",
       "url": "https://www.omim.org/help/agreement",
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:01+00:00",
+      "checkedAt": "2026-10-31T12:41:00+00:00",
       "finalUrl": "https://platform-docs.opentargets.org/citation",
       "id": "open-targets",
       "status": 200,
@@ -361,7 +361,7 @@
       "via": "Citation"
     },
     {
-      "checkedAt": "2026-10-31T12:23:49+00:00",
+      "checkedAt": "2026-10-31T12:40:49+00:00",
       "finalUrl": "https://platform-docs.opentargets.org/licence",
       "id": "open-targets",
       "status": 200,
@@ -372,7 +372,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:08+00:00",
+      "checkedAt": "2026-10-31T12:41:07+00:00",
       "finalUrl": "https://platform-docs.opentargets.org/licence.md",
       "id": "open-targets",
       "status": 200,
@@ -383,7 +383,7 @@
       "via": "Markdown"
     },
     {
-      "checkedAt": "2026-10-31T12:24:05+00:00",
+      "checkedAt": "2026-10-31T12:41:04+00:00",
       "finalUrl": "https://platform-docs.opentargets.org/licence/terms-of-use",
       "id": "open-targets",
       "status": 200,
@@ -394,18 +394,18 @@
       "via": "Terms of use"
     },
     {
-      "checkedAt": "2026-10-31T12:23:58+00:00",
+      "checkedAt": "2026-10-31T12:40:57+00:00",
       "finalUrl": "https://platform-docs.opentargets.org/release-notes",
       "id": "open-targets",
       "status": 200,
-      "textChars": 44170,
-      "textSha256": "3e71c4aa4911da72135ad9301dfa01d7e884b9973d3e32574750b84f60570fb4",
+      "textChars": 43957,
+      "textSha256": "b9b5e6d289cf680c764d9b3f7c0d1480a11092ccbef8aefe2fcdd0ec798ced65",
       "title": "Release notes | Open Targets Platform Documentation",
       "url": "https://platform-docs.opentargets.org/release-notes",
       "via": "Release notes"
     },
     {
-      "checkedAt": "2026-10-31T12:23:53+00:00",
+      "checkedAt": "2026-10-31T12:40:52+00:00",
       "error": "Page.evaluate: TypeError: Cannot read properties of undefined (reading 'trim')\n    at eval (eval at evaluate (:234:30), <anonymous>:1:71)\n    at Array.map (<anonymous>)\n    at eval (eval at evaluate (:234:30), <anonymous>:1:49)\n    at UtilityScript.evaluate (<anonymous>:241:19)\n    at UtilityScript.",
       "id": "open-targets",
       "status": null,
@@ -413,7 +413,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:24:10+00:00",
+      "checkedAt": "2026-10-31T12:41:10+00:00",
       "finalUrl": "https://www.apache.org/licenses/LICENSE-2.0",
       "id": "open-targets",
       "status": 200,
@@ -424,7 +424,7 @@
       "via": "APACHE LICENSE, VERSION 2.0"
     },
     {
-      "checkedAt": "2026-10-31T12:24:13+00:00",
+      "checkedAt": "2026-10-31T12:41:12+00:00",
       "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
       "id": "open-targets",
       "status": 200,
@@ -435,7 +435,7 @@
       "via": "EMBL-EBI terms of use"
     },
     {
-      "checkedAt": "2026-10-31T12:23:38+00:00",
+      "checkedAt": "2026-10-31T12:40:39+00:00",
       "finalUrl": "https://creativecommons.org/licenses/by/4.0/",
       "id": "orphadata",
       "status": 200,
@@ -446,7 +446,7 @@
       "via": "Commons Attribution 4.0 International (CC BY 4.0) licence"
     },
     {
-      "checkedAt": "2026-10-31T12:23:33+00:00",
+      "checkedAt": "2026-10-31T12:40:35+00:00",
       "finalUrl": "https://www.orphadata.com/",
       "id": "orphadata",
       "status": 200,
@@ -457,7 +457,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:23:26+00:00",
+      "checkedAt": "2026-10-31T12:40:29+00:00",
       "finalUrl": "https://sciences.orphadata.com/genes/",
       "id": "orphadata",
       "status": 200,
@@ -468,7 +468,7 @@
       "via": null
     },
     {
-      "checkedAt": "2026-10-31T12:23:41+00:00",
+      "checkedAt": "2026-10-31T12:40:42+00:00",
       "finalUrl": "https://www.orphadata.com/legal-notice/",
       "id": "orphadata",
       "status": 200,
