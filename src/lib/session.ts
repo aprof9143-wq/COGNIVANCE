@@ -66,6 +66,8 @@ export const GATED_PAGES = [
   "/vision",
   "/vision/eye",
   "/vision/therapy",
+  "/genomics",
+  "/genomics/compare",
   "/nimble",
   "/benchmarks",
 ] as const;

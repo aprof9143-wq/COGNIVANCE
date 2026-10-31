@@ -9,6 +9,7 @@ import {
   Eye,
   Gauge,
   LayoutGrid,
+  Library,
   LogOut,
   Menu,
   PanelLeftClose,
@@ -27,6 +28,7 @@ import { Logo } from "@/components/site/Logo";
 export const MODULE_ICON: Record<ModuleKey, LucideIcon> = {
   home: LayoutGrid,
   vision: Dna,
+  genomics: Library,
   therapy: Syringe,
   eye: Eye,
   simulation: Workflow,

@@ -55,6 +55,7 @@ export const TEAM: Member[] = [
 export type ModuleKey =
   | "home"
   | "vision"
+  | "genomics"
   | "therapy"
   | "eye"
   | "simulation"
@@ -80,6 +81,15 @@ export const MODULES: {
     name: "Gene & protein evidence",
     blurb:
       "RPE65 from gene to structure: Ensembl, UniProt and AlphaFold DB, every value traced to its source.",
+    status: "Reference data",
+  },
+  {
+    key: "genomics",
+    to: "/genomics",
+    group: "Genome & Vision",
+    name: "Gene library",
+    blurb:
+      "Autism and Alzheimer disease genes from ClinGen curations, with orthologues across eight species and the evidence behind every value.",
     status: "Reference data",
   },
   {
