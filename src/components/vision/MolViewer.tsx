@@ -28,6 +28,26 @@ type Props = {
   focusResidues?: number[] | undefined;
 };
 
+/**
+ * Still pictures of models, rendered by Mol* from the same files, shown when
+ * the browser cannot start WebGL. Keyed by the record the viewer is given.
+ */
+const STILLS: Record<string, string> = {
+  "AF-Q16518-F1": "/vision/stills/rpe65-structure",
+};
+
+/** Whether this browser can create a WebGL context at all; checked before Mol* starts. */
+export function webglAvailable(): boolean {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") ?? c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+const NO_WEBGL = "no-webgl";
+
 const REPR: Record<MolStyle, string> = {
   cartoon: "cartoon",
   surface: "gaussian-surface",
@@ -48,6 +68,7 @@ export function MolViewer({
   const canvas = useRef<HTMLCanvasElement>(null);
   const [plugin, setPlugin] = useState<PluginContext | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [drawn, setDrawn] = useState(false);
   const hoverRef = useRef(onHover);
   hoverRef.current = onHover;
 
@@ -57,6 +78,10 @@ export function MolViewer({
     let ctx: PluginContext | undefined;
     let unsubscribe: (() => void) | undefined;
     (async () => {
+      if (!webglAvailable()) {
+        setError(NO_WEBGL);
+        return;
+      }
       try {
         const [
           { PluginContext },
@@ -86,7 +111,7 @@ export function MolViewer({
         ctx = new PluginContext(spec);
         await ctx.init();
         const ok = await ctx.initViewerAsync(canvas.current!, host.current!);
-        if (!ok || !ctx.canvas3d) throw new Error("WebGL is not available in this browser.");
+        if (!ok || !ctx.canvas3d) throw new Error(NO_WEBGL);
         if (disposed) return ctx.dispose();
 
         ctx.representation.structure.themes.colorThemeRegistry.add(theme.PlddtBandsThemeProvider);
@@ -188,6 +213,7 @@ export function MolViewer({
       const first = reprRef.current === null;
       reprRef.current = repr.ref;
       if (first) plugin.managers.camera.reset();
+      setDrawn(true);
     });
   }, [plugin, loaded, style, colourBy]);
 
@@ -241,10 +267,65 @@ export function MolViewer({
   return (
     <div ref={host} className="absolute inset-0" role="img" aria-label={`3D structure: ${label}`}>
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" />
-      {error && (
-        <p className="absolute inset-0 grid place-items-center p-8 text-center text-sm text-[var(--v-ink-2)]">
-          {error}
-        </p>
+      {!error && !drawn && (
+        <div
+          role="status"
+          className="pointer-events-none absolute inset-0 grid place-items-center text-[13px] text-[var(--v-ink-2)]"
+        >
+          <span className="flex items-center gap-2 rounded-full bg-[var(--v-card)]/80 px-3 py-1.5 backdrop-blur">
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-[var(--v-ink-3)] border-t-transparent" />
+            Building the 3D model…
+          </span>
+        </div>
+      )}
+      {error && <ViewerFallback reason={error} still={STILLS[label]} label={label} />}
+    </div>
+  );
+}
+
+/**
+ * What shows when the 3D view cannot: a still picture of the same model when
+ * there is one, labelled as a picture, and the reason in plain words.
+ */
+export function ViewerFallback({
+  reason,
+  still,
+  label,
+}: {
+  reason: string;
+  still: string | undefined;
+  label: string;
+}) {
+  const why =
+    reason === NO_WEBGL
+      ? "This browser could not start 3D graphics (WebGL), so the interactive view is unavailable. Turning on hardware acceleration, or another browser, usually fixes it."
+      : `The 3D viewer could not start: ${reason}`;
+  return (
+    <div
+      role="note"
+      className="absolute inset-0 flex flex-col items-center justify-start gap-3 p-6 text-center"
+    >
+      <p className="max-w-[46ch] text-[13px] leading-snug text-[var(--v-ink-2)]">
+        {still && (
+          <span className="font-medium text-[var(--v-ink)]">
+            Still picture of the same model, rendered from the same file.{" "}
+          </span>
+        )}
+        {why}
+      </p>
+      {still && (
+        <>
+          <img
+            src={`${still}-light.jpg`}
+            alt={`Still picture of ${label}`}
+            className="max-h-[62%] w-auto rounded-2xl dark:hidden"
+          />
+          <img
+            src={`${still}-dark.jpg`}
+            alt={`Still picture of ${label}`}
+            className="hidden max-h-[62%] w-auto rounded-2xl dark:block"
+          />
+        </>
       )}
     </div>
   );
