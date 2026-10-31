@@ -64,7 +64,12 @@ HOMOLOGY = {
                     "taxonomy_level": "Euarchontoglires",
                     "method_link_type": "ENSEMBL_ORTHOLOGUES",
                     "dn_ds": None,
-                    "source": {"id": "ENSG90000000001", "species": "homo_sapiens", "perc_id": 91.234},
+                    "source": {
+                        "id": "ENSG90000000001",
+                        "species": "homo_sapiens",
+                        "protein_id": "ENSP90000000001",
+                        "perc_id": 91.234,
+                    },
                     "target": {
                         "id": "ENSMUSG9000001",
                         "species": "mus_musculus",
@@ -131,6 +136,13 @@ class FakeNet:
             return 200, {}, json.dumps(HOMOLOGY).encode()
         if "/homology/id/human/" in url:
             return 200, {}, b'{"data":[{"homologies":[]}]}'
+        if "/lookup/id/" in url:
+            ident = url.split("/lookup/id/")[1].split("?")[0]
+            if ident in ("ENSP90000000001", "ENSMUSP9000001"):
+                return 200, {}, json.dumps({"id": ident, "object_type": "Translation", "length": 420 if ident.startswith("ENSP") else 300}).encode()
+            gene = {"id": ident, "display_name": "Samplea", "biotype": "protein_coding", "assembly_name": "GRCm39",
+                    "seq_region_name": "1", "start": 10, "end": 20, "source": "ensembl", "version": 3}
+            return 200, {}, json.dumps(gene).encode()
         if "/taxonomy/classification/" in url:
             return 200, {}, json.dumps(TAXONOMY).encode()
         if url == cl.HPO_RELEASE:
@@ -179,6 +191,20 @@ class Parsers(unittest.TestCase):
         self.assertEqual((mouse["percId"], mouse["sourcePercId"], mouse["taxonomyLevel"]), (90.1, 91.23, "Euarchontoglires"))
         self.assertIsNone(out[0]["percPos"])
 
+    def test_gene_models_attach_the_other_gene_and_both_protein_lengths(self):
+        orth = cl.parse_homology(HOMOLOGY, CFG["species"])
+        out = cl.with_models(
+            orth,
+            {"ENSMUSG9000001": cl.parse_lookup_gene({"id": "ENSMUSG9000001", "biotype": "protein_coding", "seq_region_name": "4", "start": 1, "end": 9})},
+            {"ENSMUSP9000001": cl.parse_lookup_translation({"length": 300}), "ENSP90000000001": 420},
+        )
+        mouse = next(o for o in out if o["species"] == "mus_musculus")
+        self.assertEqual(mouse["model"]["targetGene"]["location"], "4:1-9")
+        self.assertEqual((mouse["model"]["targetProteinLength"], mouse["model"]["sourceProteinLength"]), (300, 420))
+        fish = next(o for o in out if o["species"] == "danio_rerio")
+        self.assertIsNone(fish["model"]["targetGene"])
+        self.assertIsNone(cl.parse_lookup_translation({}))
+
     def test_taxonomy_reads_nodes_not_their_children(self):
         anc = cl.parse_taxonomy(TAXONOMY, 9606)
         self.assertEqual(anc, [{"id": "9605", "name": "Homo"}, {"id": "40674", "name": "Mammalia"}])
@@ -214,6 +240,10 @@ class Capture(unittest.TestCase):
         self.assertEqual({c["classification"] for c in a["curations"]}, {"Definitive", "Limited"})
         self.assertEqual(a["phenotypes"][0]["diseaseIds"], ["OMIM:900001", "ORPHA:900001"])
         self.assertEqual(disp["genes"][1]["orthologues"], [])
+        mouse = next(o for o in a["orthologues"] if o["species"] == "mus_musculus")
+        self.assertEqual(mouse["model"]["targetProteinLength"], 300)
+        self.assertEqual(mouse["model"]["sourceProteinLength"], 420)
+        self.assertIn("ensembl/lookup/ENSMUSG9000001.json", {f["file"] for f in a["files"]})
         self.assertEqual({c["key"]: c["geneCount"] for c in disp["conditions"]}, {"autism": 2, "alzheimer": 1})
         self.assertEqual(disp["releases"], {"ensembl": 116, "hpo": "v2026-09-01"})
         self.assertTrue(all(s["status"] == "ok" for s in disp["sources"]), disp["sources"])

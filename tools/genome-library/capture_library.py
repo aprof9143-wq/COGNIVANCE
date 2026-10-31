@@ -90,6 +90,7 @@ LICENCE = {
     "ensembl_release": "ensembl-compara",
     "homology": "ensembl-compara",
     "taxonomy": "ensembl-compara",
+    "gene_models": "ensembl-compara",
     "hpo": "hpo-annotations",
 }
 SOURCE_NAME = {
@@ -230,6 +231,7 @@ def parse_homology(raw: dict, species: list[dict]) -> list[dict]:
                     "type": h.get("type"),
                     "geneId": t.get("id"),
                     "proteinId": t.get("protein_id"),
+                    "sourceProteinId": s.get("protein_id"),
                     "percId": _num(t.get("perc_id")),
                     "percPos": _num(t.get("perc_pos")),
                     "sourcePercId": _num(s.get("perc_id")),
@@ -239,6 +241,46 @@ def parse_homology(raw: dict, species: list[dict]) -> list[dict]:
                 }
             )
     return sorted(out, key=lambda o: (o["species"] or "", o["geneId"] or ""))
+
+
+def parse_lookup_gene(raw: dict) -> dict:
+    """An Ensembl gene record (lookup/id, no expansion), reduced to what the review needs."""
+    loc = None
+    if raw.get("seq_region_name") and raw.get("start") and raw.get("end"):
+        loc = f"{raw['seq_region_name']}:{raw['start']}-{raw['end']}"
+    return {
+        "id": raw.get("id"),
+        "version": raw.get("version"),
+        "symbol": raw.get("display_name"),
+        "biotype": raw.get("biotype"),
+        "assembly": raw.get("assembly_name"),
+        "location": loc,
+        "source": raw.get("source"),
+        "description": raw.get("description"),
+    }
+
+
+def parse_lookup_translation(raw: dict) -> int | None:
+    """The length, in amino acids, of an Ensembl translation (lookup/id on a protein ID)."""
+    n = raw.get("length")
+    return int(n) if isinstance(n, (int, float)) else None
+
+
+def with_models(orthologues: list[dict], genes: dict[str, dict], proteins: dict[str, int | None]) -> list[dict]:
+    """Each orthologue with the other species' gene record and both aligned proteins' lengths."""
+    out = []
+    for o in orthologues:
+        out.append(
+            {
+                **o,
+                "model": {
+                    "targetGene": genes.get(o.get("geneId") or ""),
+                    "targetProteinLength": proteins.get(o.get("proteinId") or ""),
+                    "sourceProteinLength": proteins.get(o.get("sourceProteinId") or ""),
+                },
+            }
+        )
+    return out
 
 
 def parse_taxonomy(raw: Any, taxon_id: int) -> list[dict]:
@@ -414,6 +456,24 @@ class LibraryCapture:
                 raise first from None
         return parse_homology(json.loads(body), self.cfg["species"])
 
+    def gene_models(self, orthologues: list[dict]) -> list[dict]:
+        """Look up each orthologue's gene and both aligned proteins in Ensembl, to check gene models."""
+        genes: dict[str, dict] = {}
+        proteins: dict[str, int | None] = {}
+        q = "?content-type=application/json"
+        for o in orthologues:
+            gid = o.get("geneId")
+            if gid and gid not in genes:
+                genes[gid] = parse_lookup_gene(
+                    json.loads(self.save(f"ensembl/lookup/{gid}.json", f"{ENSEMBL}/lookup/id/{urllib.parse.quote(gid)}{q}"))
+                )
+            for pid in (o.get("proteinId"), o.get("sourceProteinId")):
+                if pid and pid not in proteins:
+                    proteins[pid] = parse_lookup_translation(
+                        json.loads(self.save(f"ensembl/lookup/{pid}.json", f"{ENSEMBL}/lookup/id/{urllib.parse.quote(pid)}{q}"))
+                    )
+        return with_models(orthologues, genes, proteins)
+
     def taxonomy(self, taxon_id: int) -> list[dict]:
         url = f"{ENSEMBL}/taxonomy/classification/{taxon_id}?content-type=application/json"
         return parse_taxonomy(json.loads(self.save(f"ensembl/taxonomy_{taxon_id}.json", url)), taxon_id)
@@ -463,6 +523,10 @@ class LibraryCapture:
                 if ensg:
                     genes[s]["orthologues"] = self.run_step("homology", lambda s=s, e=ensg: self.homology(s, e))
                     genes[s]["homologyStatus"] = self.sources[-1]["status"]
+                    if genes[s]["orthologues"]:
+                        checked = self.run_step("gene_models", lambda o=genes[s]["orthologues"]: self.gene_models(o))
+                        if checked is not None:
+                            genes[s]["orthologues"] = checked
                 else:
                     self.record("homology", "skipped", f"{s}: no Ensembl gene ID from HGNC.")
                     genes[s]["orthologues"] = None
@@ -490,7 +554,8 @@ class LibraryCapture:
             "sources": self.sources,
             "files": sorted(self.files, key=lambda f: f["file"]),
             "note": "Raw responses as received, except: HGNC records are reduced to the fields used, and HPO's "
-            "annotation file to the rows for library genes (bytes and sha256 describe the full file).",
+            "annotation file to the rows for library genes (bytes and sha256 describe the full file). "
+            "ensembl/lookup/ holds the gene and protein records behind each orthologue, for checking gene models.",
         }
         # Parsed results, so the display copy can be rebuilt without the network.
         parsed = {
@@ -583,7 +648,19 @@ def build_display(out_dir: pathlib.Path, licences: dict) -> dict:
                 "orthologues": g.get("orthologues") if "ensembl-compara" in ok else None,
                 "orthologueStatus": g.get("homologyStatus") if "ensembl-compara" in ok else "withheld",
                 "phenotypes": terms,
-                "files": file_ref(f"hgnc/{g['symbol']}.") + file_ref(f"ensembl/homology_{g['symbol']}."),
+                "files": file_ref(f"hgnc/{g['symbol']}.")
+                + file_ref(f"ensembl/homology_{g['symbol']}.")
+                + [
+                    f
+                    for f in file_ref("ensembl/lookup/")
+                    if f["file"].removeprefix("ensembl/lookup/").removesuffix(".json")
+                    in {
+                        x
+                        for o in (g.get("orthologues") or [])
+                        for x in (o.get("geneId"), o.get("proteinId"), o.get("sourceProteinId"))
+                        if x
+                    }
+                ],
             }
         )
     species = []
