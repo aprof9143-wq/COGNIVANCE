@@ -6,12 +6,22 @@ name: vision-snapshot
 # into data/genome/snapshot/<gene>/, which the website does not serve. It then
 # rebuilds the display-only copy the website serves, public/vision/display/<gene>/.
 #
+# With "what: genome-library" it instead captures the research gene library
+# (tools/genome-library/capture_library.py: ClinGen curations for the library's
+# conditions, HGNC, Ensembl Compara orthology and HPO annotations) into
+# data/genome/library/, and rebuilds public/genomics/library.json.
+#
 # Manual only. It used to run on every push that touched the capture tool or the
 # gene registry, which could commit new captures to any branch unasked; while
 # the source policy is under review, a person starts each capture.
 on:
   workflow_dispatch:
     inputs:
+      what:
+        description: "What to capture"
+        type: choice
+        options: [gene-snapshot, genome-library]
+        default: gene-snapshot
       genes:
         description: "Space-separated HGNC symbols from config/genome/genes.json"
         default: "RPE65"
@@ -33,6 +43,7 @@ concurrency:
 
 jobs:
   capture:
+    if: github.event.inputs.what != 'genome-library'
     runs-on: ubuntu-latest
     env:
       GENES: ${{ github.event.inputs.genes || 'RPE65' }}
@@ -91,6 +102,56 @@ jobs:
               exit 0
             fi
             git commit -q -m "data(vision): reference snapshot ${GENES} $(date -u +%Y-%m-%d)"
+            if git push origin "HEAD:$GITHUB_REF_NAME"; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+  library:
+    if: github.event.inputs.what == 'genome-library'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests (offline)
+        run: python -m unittest discover -s tools/genome-library -p "test_*.py" -v
+      - name: Capture the library and build its display copy
+        run: |
+          args=""
+          if [ "${{ github.event.inputs.allow_partial }}" = "true" ]; then args="--allow-partial"; fi
+          python tools/genome-library/capture_library.py $args
+      - name: Upload the capture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: genome-library
+          path: |
+            data/genome/library
+            public/genomics/library.json
+          if-no-files-found: ignore
+      - name: Commit the library
+        if: github.event.inputs.commit == 'true'
+        # Put this run's capture on top of the latest branch head: the newest capture wins.
+        run: |
+          git config user.name "genome-library[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp -r data/genome/library "$RUNNER_TEMP/library"
+          cp public/genomics/library.json "$RUNNER_TEMP/library.json"
+          for attempt in 1 2 3; do
+            git fetch -q origin "$GITHUB_REF_NAME"
+            git checkout -q -f --detach "origin/$GITHUB_REF_NAME"
+            rm -rf data/genome/library
+            mkdir -p data/genome public/genomics
+            cp -r "$RUNNER_TEMP/library" data/genome/library
+            cp "$RUNNER_TEMP/library.json" public/genomics/library.json
+            git add data/genome/library public/genomics/library.json
+            if git diff --cached --quiet; then
+              echo "Library unchanged."
+              exit 0
+            fi
+            git commit -q -m "data(genomics): research gene library $(date -u +%Y-%m-%d)"
             if git push origin "HEAD:$GITHUB_REF_NAME"; then exit 0; fi
             sleep $((attempt * 5))
           done

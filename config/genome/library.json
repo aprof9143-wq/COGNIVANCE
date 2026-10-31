@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "libraryVersion": "1.0.0",
+  "decision": "GOV-5 (docs/genome/DECISIONS.md)",
+  "note": "What the research gene library captures. The genes are not listed here: they are whichever genes ClinGen's gene-disease validity curations associate with a condition below, at capture time. Conditions are matched on ClinGen's own disease label, which is kept verbatim. Being in the library says nothing about diagnosis, risk or causation for any person. Species are a product choice for the comparison view; each taxon ID is checked against what Ensembl reports at capture time.",
+  "conditions": [
+    {
+      "key": "autism",
+      "label": "Autism spectrum disorder",
+      "match": "\\bautis",
+      "note": "Matches ClinGen disease labels containing 'autis' (autism, autistic). Curations recorded under a named syndrome without that word are not included."
+    },
+    {
+      "key": "alzheimer",
+      "label": "Alzheimer disease",
+      "match": "\\balzheimer",
+      "note": "Matches ClinGen disease labels containing 'alzheimer'."
+    }
+  ],
+  "species": [
+    {
+      "ensembl": "homo_sapiens",
+      "taxonId": 9606,
+      "scientificName": "Homo sapiens",
+      "commonName": "Human",
+      "role": "reference"
+    },
+    {
+      "ensembl": "pan_troglodytes",
+      "taxonId": 9598,
+      "scientificName": "Pan troglodytes",
+      "commonName": "Chimpanzee",
+      "role": "comparison"
+    },
+    {
+      "ensembl": "macaca_mulatta",
+      "taxonId": 9544,
+      "scientificName": "Macaca mulatta",
+      "commonName": "Rhesus macaque",
+      "role": "comparison"
+    },
+    {
+      "ensembl": "mus_musculus",
+      "taxonId": 10090,
+      "scientificName": "Mus musculus",
+      "commonName": "Mouse",
+      "role": "comparison"
+    },
+    {
+      "ensembl": "rattus_norvegicus",
+      "taxonId": 10116,
+      "scientificName": "Rattus norvegicus",
+      "commonName": "Rat",
+      "role": "comparison"
+    },
+    {
+      "ensembl": "canis_lupus_familiaris",
+      "taxonId": 9615,
+      "scientificName": "Canis lupus familiaris",
+      "commonName": "Dog",
+      "role": "comparison"
+    },
+    {
+      "ensembl": "gallus_gallus",
+      "taxonId": 9031,
+      "scientificName": "Gallus gallus",
+      "commonName": "Chicken",
+      "role": "comparison"
+    },
+    {
+      "ensembl": "danio_rerio",
+      "taxonId": 7955,
+      "scientificName": "Danio rerio",
+      "commonName": "Zebrafish",
+      "role": "comparison"
+    }
+  ]
+}
