@@ -112,8 +112,22 @@ and does not fall back to the sample.
   page shows "Source under review". Source options and proposed inclusion criteria are in
   [ALZHEIMER-SOURCES.md](ALZHEIMER-SOURCES.md) (review REV-ALZHEIMER-SOURCE).
 - **Baseline.** With 8 genes, at most 8 one-to-one orthologues exist per species. Macaque, rat, dog and
-  chicken have exactly 8; mouse and chimpanzee 7; zebrafish 3. Only the first four get a baseline. The
-  deviations shown (for example PAX5 in macaque, TMLHE in rat) may reflect gene models rather than biology.
+  chicken have exactly 8; mouse and chimpanzee 7; zebrafish 3. Only the first four get a baseline.
+- **Candidates for review, and the first check.** Three pairs fall outside their species' baseline. Ensembl
+  reports identity relative to each protein's own length, so the ratio of the two identities gives the ratio
+  of the two proteins' lengths:
+
+  | Pair | Identity (other / human) | Median, fences | Implied length, other ÷ human |
+  | --- | --- | --- | --- |
+  | PAX5, macaque (ENSMMUG00000019639) | 66.3% / 69.1% | 96.8%, 87.0–106.2 | 1.04 |
+  | TMLHE, rat (ENSRNOG00000000729) | 65.8% / 69.6% | 92.3%, 81.3–102.0 | 1.06 |
+  | AVPR1A, dog (ENSCAFG00845009998) | 81.9% / 81.1% | 95.8%, 84.2–106.1 | 0.99 |
+
+  The aligned proteins are of similar length, so a truncated or partial gene model is unlikely to explain the
+  low identity. Still open: which isoform Ensembl chose for each protein (an alternative exon could explain a
+  low identity at similar length), the alignment itself, and the orthology call. A capture now in progress
+  records both proteins' lengths and the other species' gene records directly; the pages show them once it
+  lands. No conclusion is drawn about biology.
 - **Species tree.** It uses the ancestors Ensembl lists. Where that list does not separate species (chicken
   and zebrafish here), they branch from the same point.
 - **Phenotypes.** HPO phenotypes belong to diseases linked with the gene, not specifically to the library's
