@@ -49,10 +49,10 @@ Server
 
 | Source | Research use | Redistribution | Terms | Attribution shown |
 | --- | --- | --- | --- | --- |
-| ClinGen gene–disease validity | fetch, store, display allowed (GOV-5) | not permitted | not yet read; the pages link to "Citing ClinGen & Terms of Use" | "ClinGen gene–disease validity" with each curation's report link |
+| ClinGen gene–disease validity | fetch, store, display allowed (GOV-5) | pending review | read 2026-10-31: CC0, attribution with date accessed requested, logo needs approval ([TERMS-REVIEW.md](TERMS-REVIEW.md)) | ClinGen's example attribution with the capture date, and each curation's report link |
 | HGNC | allowed (since 2026-10-27) | not permitted | CC0, read 2026-10-27 | "Identifiers from HGNC" |
 | Ensembl Compara | allowed (GOV-5) | not permitted | Ensembl disclaimer and EMBL-EBI terms read; not yet confirmed for Compara | "Ensembl Compara" and its release on every orthology view |
-| HPO annotations | allowed (GOV-5) | not permitted | not yet read; LICENSE.md points to hpo.jax.org/app/license | "Human Phenotype Ontology" and its release tag |
+| HPO annotations | allowed (GOV-5) | pending review | read 2026-10-31: free to use if cited, version shown and content not altered; commercial use not mentioned ([TERMS-REVIEW.md](TERMS-REVIEW.md)) | HPO's requested statement with the release tag |
 | ClinVar, NCBI | withheld | — | blocked until NCBI's notice and legal review | link-out to NCBI only |
 
 The terms are recorded in `config/genome/licences.json` and [LICENCES.md](LICENCES.md). The terms-check
@@ -90,9 +90,16 @@ and does not fall back to the sample.
   gene.
 - **Baseline:** for one species, the distribution of percent identity across the one-to-one orthologues of
   every gene in this library. It needs at least 8 genes, and describes this gene set, not the genome.
-- **Deviation ("outside the baseline"):** identity below Q1 − 1.5 × IQR or above Q3 + 1.5 × IQR (Tukey
-  fences). It is a measurable difference within this gene set, not a biological finding. Alignment, gene
-  models and annotation add uncertainty, and the baseline moves as the library changes.
+- **Comparison set:** the species where this library has at least 8 one-to-one orthologues with a reported
+  identity. In the current capture these are macaque, rat, dog and chicken. Chimpanzee and mouse (7) and
+  zebrafish (3) have fewer, so they are shown for orthology only, without a baseline. The set is constrained
+  by what the sources report, not chosen for a result.
+- **Candidate for review:** identity below Q1 − 1.5 × IQR or above Q3 + 1.5 × IQR (Tukey fences). It marks a
+  pair to check, not a biological anomaly. Each candidate shows the other species' gene record, both aligned
+  proteins' lengths and the retrieval date.
+- **Gene-model check:** if the two aligned proteins differ in length by more than a fifth, the pair is flagged
+  as a likely gene-model issue to check first. Such a difference lowers identity without any biological
+  difference.
 
 ## 7. Limitations of the capture of 2026-10-31
 
@@ -100,9 +107,10 @@ and does not fall back to the sample.
   SLC6A4, SLC9A9, TMLHE) are classified Disputed, and the pages show that. ClinGen's Intellectual Disability
   and Autism expert panel curated 370 more genes under other disease labels (for example "complex
   neurodevelopmental disorder"). They are not included, because their curations do not name autism.
-- **Alzheimer disease.** No ClinGen curation's disease label names Alzheimer disease, so the condition is
-  empty. APP is curated for cerebral amyloid angiopathy, and PSEN1 and PSEN2 only for cardiomyopathy.
-  Nothing is added by hand. Choosing another source is review REV-LIBRARY-SCOPE.
+- **Alzheimer disease.** No ClinGen curation's disease label names Alzheimer disease. APP is curated for
+  cerebral amyloid angiopathy, and PSEN1 and PSEN2 only for cardiomyopathy. Nothing is added by hand. The
+  page shows "Source under review". Source options and proposed inclusion criteria are in
+  [ALZHEIMER-SOURCES.md](ALZHEIMER-SOURCES.md) (review REV-ALZHEIMER-SOURCE).
 - **Baseline.** With 8 genes, at most 8 one-to-one orthologues exist per species. Macaque, rat, dog and
   chicken have exactly 8; mouse and chimpanzee 7; zebrafish 3. Only the first four get a baseline. The
   deviations shown (for example PAX5 in macaque, TMLHE in rat) may reflect gene models rather than biology.
@@ -123,3 +131,22 @@ python tools/genome-library/capture_library.py --build-only   # rebuild library.
 
 The tests use synthetic fixtures and need no network. A full capture needs the sources, so it runs in
 GitHub Actions.
+
+## 9. Related neurodevelopmental evidence: proposed, not built
+
+Autism stays narrowly defined: only curations whose disease label names autism. ClinGen's Intellectual
+Disability and Autism expert panel also curated 370 genes under other labels, mostly "complex
+neurodevelopmental disorder", "syndromic intellectual disability" and "intellectual disability". They are
+**not** autism genes and are not counted as such.
+
+They could be shown separately, as "related neurodevelopmental evidence". This is not built, and it will not
+be until a genomics reviewer approves the rule (review REV-LIBRARY-SCOPE). **No reviewer has decided yet.**
+Proposed rule:
+
+1. **Included:** curations by that expert panel whose disease label does not name autism.
+2. **Shown:** each curation's own disease label and MONDO ID, verbatim, with its classification, date and
+   report link.
+3. **Placement:** a separate section headed "Related neurodevelopmental evidence (not autism-specific)". It
+   is never added to the autism count, filter or cross-species baseline.
+4. **Excluded:** curations by other panels, and any label the reviewer marks as too broad.
+

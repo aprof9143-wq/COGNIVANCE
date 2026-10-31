@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import libraryCfg from "../../../config/genome/library.json";
 import { useId, useMemo, useState } from "react";
 import { ArrowRight, Search, X } from "lucide-react";
 import {
@@ -22,8 +23,15 @@ import {
   useLibrary,
 } from "./shared";
 
+/** A condition's evidence status, from the library's configuration rather than a capture. */
+const STATUS_NOTE: Record<string, string> = Object.fromEntries(
+  libraryCfg.conditions.flatMap((c) =>
+    "statusNote" in c && typeof c.statusNote === "string" ? [[c.key, c.statusNote]] : [],
+  ),
+);
+
 const LEAD =
-  "Genes that ClinGen's gene–disease validity curations associate with autism spectrum disorder or Alzheimer disease, with their identifiers, orthologues and annotated phenotypes. A curation describes published evidence about a gene. It is not a diagnosis, a risk estimate or proof of cause for any person.";
+  "Research evidence, not clinical interpretation. Genes that ClinGen's gene–disease validity curations associate with autism spectrum disorder, with their identifiers, orthologues and annotated phenotypes; Alzheimer disease awaits an approved source. A curation describes published evidence about a gene. It is not a diagnosis, a risk estimate or proof of cause for any person.";
 
 export function LibraryPage() {
   const loaded = useLibrary();
@@ -72,6 +80,11 @@ export function LibraryView({ lib }: { lib: Library }) {
               </span>
               <span className="text-[13px] opacity-70">genes with a curation</span>
             </span>
+            {STATUS_NOTE[c.key] && (
+              <span className="mt-3 block rounded-xl border border-current/20 px-2.5 py-1.5 text-[12px] font-medium leading-snug">
+                {STATUS_NOTE[c.key]}
+              </span>
+            )}
             <span className="mt-3 block text-[12px] leading-snug opacity-70">
               {c.geneCount === 0 && lib.mode === "snapshot"
                 ? `ClinGen's download of ${fmtDate(lib.capturedAt)} has no curation whose disease label names this condition, so no gene is listed. None is added by hand. `

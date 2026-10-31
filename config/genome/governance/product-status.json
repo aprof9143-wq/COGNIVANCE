@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "recordVersion": "1.1.0",
+  "recordVersion": "1.2.0",
   "effectiveFrom": "2026-10-31",
   "softwareVersion": "unreleased",
   "note": "What Genome v1 and the Vision pages do today, grouped for the status panel shown on each Vision page. 'Implemented, not validated' means the software exists and its tests pass; it does not mean it is correct for any clinical purpose. None of these items has clinical validation.",
@@ -23,7 +23,7 @@
       "id": "ST-LIBRARY",
       "category": "research",
       "name": "Gene library",
-      "description": "Genes ClinGen's curations link to autism spectrum disorder (8 in the capture of 31 Oct 2026) or Alzheimer disease (none), with HGNC identifiers, HPO phenotypes and every curation as ClinGen states it.",
+      "description": "Research evidence, not clinical interpretation: genes ClinGen's curations link to autism spectrum disorder (8 in the capture of 31 Oct 2026), with HGNC identifiers, HPO phenotypes and every curation as ClinGen states it. Alzheimer disease: source under review; nothing shown.",
       "requirements": ["REQ-018", "REQ-019"]
     },
     {
@@ -65,7 +65,7 @@
       "id": "ST-CROSS-SPECIES",
       "category": "implemented-unvalidated",
       "name": "Cross-species comparison",
-      "description": "Orthologues of library genes in seven species from Ensembl Compara, a species tree from Ensembl's taxonomy, and a stated baseline for identity. Orthology is not shown as equivalent function.",
+      "description": "Orthologues of library genes from Ensembl Compara, a species tree from Ensembl's taxonomy, and a baseline comparison limited by data availability to the species with enough one-to-one orthologues (macaque, rat, dog and chicken). Outliers are candidates for review, shown with both proteins' lengths and the gene records.",
       "requirements": ["REQ-014"]
     },
     {

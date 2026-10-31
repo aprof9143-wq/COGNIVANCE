@@ -172,6 +172,29 @@ const SOURCE_WORDS: Record<LibrarySource["status"], string> = {
   "not-run": "not read",
 };
 
+/**
+ * The attribution each source asks for, in its own words where it gives them
+ * (docs/genome/TERMS-REVIEW.md), with the capture's date or version filled in.
+ * Null for sample data, which comes from no source.
+ */
+export function attribution(lib: Library, id: string): string | null {
+  if (lib.mode === "sample") return null;
+  const src = lib.sources.find((x) => x.id === id);
+  const date = fmtDate(src?.retrievedAt ?? lib.capturedAt);
+  switch (id) {
+    case "clingen-gene-validity":
+      return `The following curated content was obtained from the Clinical Genome Resource (www.clinicalgenome.org): Gene-Disease Validity classifications [${date}].`;
+    case "hpo-annotations":
+      return `This service/product uses the Human Phenotype Ontology (${lib.releases.hpo ?? "version not recorded"}). Find out more at http://www.human-phenotype-ontology.org`;
+    case "ensembl-compara":
+      return `Orthology and gene records from Ensembl Compara${lib.releases.ensembl ? `, release ${lib.releases.ensembl}` : ""} (EMBL-EBI), accessed ${date}.`;
+    case "hgnc-rest":
+      return `Gene symbols and identifiers from the HUGO Gene Nomenclature Committee (www.genenames.org), accessed ${date}.`;
+    default:
+      return null;
+  }
+}
+
 /** Every source behind the library, with its state and retrieval time. */
 export function SourceList({ lib }: { lib: Library }) {
   if (lib.mode === "sample")
@@ -197,6 +220,11 @@ export function SourceList({ lib }: { lib: Library }) {
             {s.id === "hpo-annotations" && lib.releases.hpo && ` · ${lib.releases.hpo}`}
           </span>
           {s.reason && <span className="w-full text-[12px] text-[var(--v-ink-3)]">{s.reason}</span>}
+          {s.status !== "withheld" && attribution(lib, s.id) && (
+            <span className="w-full text-[11px] leading-snug text-[var(--v-ink-3)]">
+              {attribution(lib, s.id)}
+            </span>
+          )}
         </li>
       ))}
     </ul>

@@ -24,6 +24,7 @@ import {
   Panel,
   Term,
   useLibrary,
+  attribution,
 } from "./shared";
 
 export function GenePage({ symbol }: { symbol: string }) {
@@ -119,6 +120,11 @@ function Gene({ lib, g }: { lib: Library; g: LibraryGene }) {
             </p>
           ) : (
             <>
+              {attribution(lib, "clingen-gene-validity") && (
+                <p className="mb-2 text-[11px] text-[var(--v-ink-3)]">
+                  {attribution(lib, "clingen-gene-validity")}
+                </p>
+              )}
               {hasConflict(g) && (
                 <div className="mb-3">
                   <Banner tone="info" icon={<span aria-hidden>≠</span>}>
@@ -471,6 +477,11 @@ function Phenotypes({ g, lib }: { g: LibraryGene; lib: Library }) {
             Terms HPO annotates to diseases linked with this gene. They are not specific to autism
             or Alzheimer disease and describe no particular person.
           </p>
+          {attribution(lib, "hpo-annotations") && (
+            <p className="mt-1 text-[11px] text-[var(--v-ink-3)]">
+              {attribution(lib, "hpo-annotations")}
+            </p>
+          )}
         </>
       )}
     </Panel>

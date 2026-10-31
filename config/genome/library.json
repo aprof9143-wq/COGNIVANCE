@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "libraryVersion": "1.0.0",
+  "libraryVersion": "1.1.0",
   "decision": "GOV-5 (docs/genome/DECISIONS.md)",
   "note": "What the research gene library captures. The genes are not listed here: they are whichever genes ClinGen's gene-disease validity curations associate with a condition below, at capture time. Conditions are matched on ClinGen's own disease label, which is kept verbatim. Being in the library says nothing about diagnosis, risk or causation for any person. Species are a product choice for the comparison view; each taxon ID is checked against what Ensembl reports at capture time.",
   "conditions": [
@@ -8,13 +8,16 @@
       "key": "autism",
       "label": "Autism spectrum disorder",
       "match": "\\bautis",
-      "note": "Matches ClinGen disease labels containing 'autis' (autism, autistic). Curations recorded under a named syndrome without that word are not included."
+      "note": "Matches ClinGen disease labels containing 'autis' (autism, autistic). Curations recorded under a named syndrome without that word are not included.",
+      "evidenceStatus": "curated"
     },
     {
       "key": "alzheimer",
       "label": "Alzheimer disease",
       "match": "\\balzheimer",
-      "note": "Matches ClinGen disease labels containing 'alzheimer'."
+      "note": "Matches ClinGen disease labels containing 'alzheimer'.",
+      "evidenceStatus": "source-under-review",
+      "statusNote": "Source under review. ClinGen has no curation for this condition, and no other source has been approved yet. Nothing is shown until a source and its inclusion criteria are documented (docs/genome/ALZHEIMER-SOURCES.md) and approved."
     }
   ],
   "species": [
