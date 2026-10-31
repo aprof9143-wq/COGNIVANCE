@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordVersion": "1.0.0",
-  "effectiveFrom": "2026-10-29",
+  "recordVersion": "1.1.0",
+  "effectiveFrom": "2026-10-31",
   "note": "Reviews the project needs, and reviews that have been completed. No review has been completed: 'completed' is empty. A completed review records the reviewer's name, role, date, outcome, rationale and where the signed record is kept.",
   "required": [
     {
@@ -52,6 +52,20 @@
       "reviewerRole": "qualified clinical and regulatory reviewers",
       "status": "not-started",
       "blocks": ["ST-CLINICAL"]
+    },
+    {
+      "id": "REV-LIBRARY-TERMS",
+      "subject": "ClinGen and HPO terms of use and attribution, and whether Ensembl's terms cover Compara orthology data; the build environment could not read them",
+      "reviewerRole": "person reading the providers' terms pages; legal reviewer for redistribution",
+      "status": "not-started",
+      "blocks": ["ST-LIBRARY", "ST-CROSS-SPECIES"]
+    },
+    {
+      "id": "REV-LIBRARY-SCOPE",
+      "subject": "Whether the library should also include genes ClinGen's Intellectual Disability and Autism expert panel curated under other disease labels, and which source to use for Alzheimer disease genes, since ClinGen has none",
+      "reviewerRole": "qualified genomics reviewer and product owner",
+      "status": "not-started",
+      "blocks": ["ST-LIBRARY"]
     }
   ],
   "completed": []

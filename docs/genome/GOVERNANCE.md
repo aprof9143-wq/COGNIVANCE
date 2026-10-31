@@ -1,6 +1,7 @@
 # Genome governance
 
-Status: **research software**, 2026-10-29. Not a medical device, not clinically validated, and not for clinical
+Status: **research software**, 2026-10-29; updated 2026-10-31 for the research gene library (GOV-5,
+[LIBRARY.md](LIBRARY.md)). Not a medical device, not clinically validated, and not for clinical
 decision-making. Clinical use is a future goal. Nothing in this document, in the records it describes, or in
 the tests that check them establishes clinical validity, analytical validity or regulatory status. The tests
 check that the records are consistent and that the software does what the records say. They do not show the
@@ -15,8 +16,10 @@ them.
 Recorded in `intended-use.json`, status `research-only`.
 
 **Intended use.** Research and demonstration: an evidence layer that shows public reference records for
-registered inherited-retinal-disease genes (gene, transcript, protein and predicted structure), each with its
-source, release and retrieval time, alongside clearly labelled hypothetical models.
+registered inherited-retinal-disease genes (gene, transcript, protein and predicted structure), and a research
+gene library of the genes ClinGen's gene–disease validity curations associate with autism spectrum disorder or
+Alzheimer disease, with their identifiers, orthologues in other species and annotated phenotypes. Each value
+carries its source, release and retrieval time, alongside clearly labelled hypothetical models.
 
 **Excluded uses:**
 
@@ -30,9 +33,11 @@ source, release and retrieval time, alongside clearly labelled hypothetical mode
 - uploading clinical VCF files or other patient data;
 - designing, generating or recommending genome edits or engineered genomes.
 
-**Scope.** One condition (RPE65-associated inherited retinal dystrophy, a product decision made on
-2026-10-19, not a diagnosis), Homo sapiens only, GRCh38 only, and VCF header validation only (versions 4.2 to
-4.5, no variant records, no upload screen).
+**Scope.** RPE65-associated inherited retinal dystrophy (a product decision made on 2026-10-19, not a
+diagnosis). A research library for autism spectrum disorder and Alzheimer disease, whose genes are whatever
+ClinGen's curations name at capture time (GOV-5). Gene records are Homo sapiens only; other species appear
+only as orthologues. GRCh38 only, and VCF header validation only (versions 4.2 to 4.5, no variant records, no
+upload screen).
 
 **Not a clinical intended-use statement.** None exists. Writing one needs a qualified clinical reviewer
 (release gate item `INTENDED-USE`).
@@ -41,10 +46,10 @@ source, release and retrieval time, alongside clearly labelled hypothetical mode
 
 | Group | Items |
 | --- | --- |
-| Works today, for research | Reference evidence for RPE65 from Ensembl, UniProt and AlphaFold DB, with provenance; labelled models (therapy time course, eye optics, retina-to-cortex response) |
-| Built, not validated | VCF header check; source policy |
+| Works today, for research | Reference evidence for RPE65 from Ensembl, UniProt and AlphaFold DB, with provenance; the gene library (ClinGen, HGNC, HPO); labelled models (therapy time course, eye optics, retina-to-cortex response) |
+| Built, not validated | VCF header check; source policy; cross-species comparison (Ensembl Compara) |
 | Blocked | ClinVar variant records; commercial-pilot use |
-| Proposed | First IRD gene panel (D5); cross-species comparison |
+| Proposed | First IRD gene panel (D5) |
 | Needed before any clinical use | Clinical use itself |
 
 "Built, not validated" means the code exists and its tests pass. It does not mean it has been validated.
@@ -63,10 +68,14 @@ is refused, in every mode.
 | HGNC REST | allowed | pending review | terms read, review pending | not approved | not approved |
 | RCSB PDB | allowed | pending review | terms read, review pending | not approved | not approved |
 | ClinVar (NCBI E-utilities) | **denied** | denied | requires legal review | not approved | not approved |
+| ClinGen gene–disease validity | allowed (GOV-5) | pending review | terms not yet read | not approved | not approved |
+| Ensembl Compara (REST) | allowed (GOV-5) | pending review | Ensembl terms read; not confirmed for Compara | not approved | not approved |
+| HPO annotations | allowed (GOV-5) | pending review | terms not yet read | not approved | not approved |
 
 **What the research permissions rest on.** "Allowed" for research fetch, store and display records the
 product owner's decision that app use of these sources is not restricted while their terms reviews are open.
-It is not the outcome of a legal review, and no legal review has been done.
+It is not the outcome of a legal review, and no legal review has been done. For ClinGen, Ensembl Compara
+and HPO the same decision was made on 2026-10-31 (GOV-5), before their terms had been read.
 
 **How it is enforced.**
 
@@ -97,19 +106,22 @@ removal is recorded in `data/genome/snapshot/rpe65/REDACTIONS.json`.
 - AlphaFold structures are predictions with their own per-residue confidence, not measurements.
 - The Vision target list comes from the gene registry, but the evidence loader, therapy model and copy are
   RPE65-specific.
+- The gene library is as small as ClinGen's curations make it: 8 autism-related genes and no Alzheimer disease
+  gene in the capture of 2026-10-31. A curation is not a diagnosis or proof of cause. An orthologue is not
+  shown to share function, and a deviation from the baseline is not a biological finding. Details are in
+  [LIBRARY.md](LIBRARY.md) §7.
 - No analytical or clinical validation has been performed.
 
 ## 5. Traceability: requirement, implementation, test, release
 
-`requirements.json` lists REQ-001 to REQ-017. Each names the files that implement it and the tests that check
+`requirements.json` lists REQ-001 to REQ-021. Each names the files that implement it and the tests that check
 it. A test (`governance.test.ts`, "trace every requirement's implementation and tests to files and tests that
 exist") fails if any named file or test is missing. `risks.json` links each risk to the requirements that
 mitigate it. `changes.json` records each change and the requirements it touched.
 
 | Status | Requirements |
 | --- | --- |
-| Implemented (code and tests exist; not validated) | REQ-001 to REQ-013, REQ-017 |
-| Proposed | REQ-014 (cross-species comparison, if it is ever added) |
+| Implemented (code and tests exist; not validated) | REQ-001 to REQ-014, REQ-017 to REQ-021 |
 | Requires qualified review | REQ-015 (clinical intended use, regulatory determination, validation, quality release); REQ-016 (NCBI notice and ClinVar legal review) |
 
 **Release.** Every requirement's `release` is empty: no version of this software has been released for any
@@ -123,7 +135,7 @@ The records have a deterministic SHA-256 digest (`governanceDigest()`), so a cha
 
 | Protocol | Status | What it is |
 | --- | --- | --- |
-| VER-001 | implemented | Software verification: automated tests of REQ-001 to REQ-013 and REQ-017, on synthetic fixtures and the public RPE65 snapshot |
+| VER-001 | implemented | Software verification: automated tests of REQ-001 to REQ-014 and REQ-017 to REQ-021, on synthetic fixtures, the public RPE65 snapshot and the gene library capture |
 | VER-002 | incomplete | Accessibility check: automated markup checks of the status, warning, withheld and loading states only; no audit against an accessibility standard and no testing with assistive technology |
 | VAL-001 | requires qualified review | Analytical validation (displayed reference values match their sources); not started, needs a protocol approved by a qualified genomics reviewer |
 | VAL-002 | requires qualified review | Clinical validation; cannot be defined until a clinical intended use exists |
@@ -163,6 +175,8 @@ From `reviews.json`. None has started, and no reviewer has been appointed.
 | UniProt and AlphaFold DB terms | a person reading the providers' terms pages | commercial pilot |
 | Whether serving each source's display copy is permitted, with what attribution, and whether raw responses served before 2026-10-29 need action | legal reviewer | redistribution |
 | Clinical intended use and regulatory determination | qualified clinical and regulatory reviewers | clinical use |
+| ClinGen and HPO terms and attribution, and whether Ensembl's terms cover Compara | person reading the terms; legal reviewer for redistribution | gene library, cross-species comparison |
+| Library scope: whether to add genes ClinGen's Intellectual Disability and Autism panel curated under other labels, and a source for Alzheimer disease genes | qualified genomics reviewer and product owner | gene library |
 
 A completed review is recorded in `reviews.json` with the reviewer, date and outcome; nothing is recorded as
 completed until it has happened.

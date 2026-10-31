@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordVersion": "1.0.0",
-  "effectiveFrom": "2026-10-29",
+  "recordVersion": "1.1.0",
+  "effectiveFrom": "2026-10-31",
   "softwareVersion": "unreleased",
   "note": "What Genome v1 and the Vision pages do today, grouped for the status panel shown on each Vision page. 'Implemented, not validated' means the software exists and its tests pass; it does not mean it is correct for any clinical purpose. None of these items has clinical validation.",
   "items": [
@@ -18,6 +18,13 @@
       "name": "Labelled models",
       "description": "The gene-therapy time course, the eye optics and the retina-to-cortex response, each labelled hypothetical, computed or schematic.",
       "requirements": ["REQ-009"]
+    },
+    {
+      "id": "ST-LIBRARY",
+      "category": "research",
+      "name": "Gene library",
+      "description": "Genes ClinGen's curations link to autism spectrum disorder (8 in the capture of 31 Oct 2026) or Alzheimer disease (none), with HGNC identifiers, HPO phenotypes and every curation as ClinGen states it.",
+      "requirements": ["REQ-018", "REQ-019"]
     },
     {
       "id": "ST-VCF-HEADER",
@@ -56,9 +63,9 @@
     },
     {
       "id": "ST-CROSS-SPECIES",
-      "category": "proposed",
+      "category": "implemented-unvalidated",
       "name": "Cross-species comparison",
-      "description": "Not built. If added, source observations, computed mappings and hypotheses stay separate.",
+      "description": "Orthologues of library genes in seven species from Ensembl Compara, a species tree from Ensembl's taxonomy, and a stated baseline for identity. Orthology is not shown as equivalent function.",
       "requirements": ["REQ-014"]
     },
     {

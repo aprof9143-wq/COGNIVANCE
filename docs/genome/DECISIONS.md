@@ -66,6 +66,8 @@ population" and decision 5 is "Input data and quality requirements", which are *
 
 ## GOV-3: Autism and Alzheimer's are outside Genome
 
+**Superseded by GOV-5 on 2026-10-31.** Kept here as the record of what was decided before.
+
 | Field | Value |
 | --- | --- |
 | **Question** | Should Genome show placeholders for Autism or Alzheimer's disease work? |
@@ -81,4 +83,18 @@ population" and decision 5 is "Input data and quality requirements", which are *
 | **Answer** | Only verified evidence for every item in `config/genome/governance/release-gate.json` together with recorded approvals. Availability is computed by `src/lib/genome/release.ts`; the gate's `status` field and any setting are ignored. Today no evidence exists, so clinical use is unavailable. |
 | **Source** | Clinical-genomics governance brief, 2026-10-29. |
 | **Status** | Decided. No evidence or approval is recorded. |
+
+## GOV-5: a research gene library for autism and Alzheimer disease, compared across species
+
+| Field | Value |
+| --- | --- |
+| **Question** | Should Genome cover autism spectrum disorder and Alzheimer disease, and compare genes across species? |
+| **Answer** | Yes, as a research and demonstration library, not a diagnostic tool. A gene is included only when a ClinGen gene-disease validity curation's disease label names the condition at capture time; no gene, association or classification is added by hand. Orthologues come from Ensembl Compara for chimpanzee, rhesus macaque, mouse, rat, dog, chicken and zebrafish. |
+| **Source** | Product owner, 2026-10-31. Supersedes GOV-3. |
+| **Data access** | Captured in GitHub Actions (the build sandbox cannot reach the sources), with SHA-256 provenance; the app reads a display copy. |
+| **Source terms** | ClinGen, Ensembl Compara and HPO may be fetched, stored and displayed for research while their terms review is pending; redistribution is not permitted; nothing is approved for commercial or clinical use. |
+| **ClinVar and NCBI** | ClinVar stays withheld; gene pages link out to ClinVar on NCBI's site. NCBI is not called; the NCBI Gene ID shown is HGNC's cross-reference. |
+| **Sample data** | Synthetic, labelled, shown only when no capture exists, never mixed with captured data. |
+| **What the first capture found** | 8 genes with an autism curation (2026-10-31); no ClinGen curation names Alzheimer disease, so that condition is empty. ClinGen's Intellectual Disability and Autism expert panel curated 370 genes under other disease labels; they are not included. Whether to widen the scope, and which source to use for Alzheimer disease, is review REV-LIBRARY-SCOPE. |
+| **Implemented in** | `tools/genome-library/`, `config/genome/library.json`, `src/lib/genomics/`, `src/components/genomics/`, `src/routes/genomics*.tsx`, `src/routes/api.genomics.live.ts`. See [LIBRARY.md](LIBRARY.md). |
 
