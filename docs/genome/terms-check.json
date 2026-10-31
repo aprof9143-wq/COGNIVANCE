@@ -4,7 +4,7 @@
   "pages": [
     {
       "bytes": 50531,
-      "checkedAt": "2026-10-31T12:02:00+00:00",
+      "checkedAt": "2026-10-31T12:21:01+00:00",
       "contentType": "application/pdf",
       "finalUrl": "https://alphafold.ebi.ac.uk/assets/License-Disclaimer.pdf",
       "id": "alphafold-db",
@@ -15,7 +15,7 @@
     },
     {
       "bytes": 79827,
-      "checkedAt": "2026-10-31T12:01:59+00:00",
+      "checkedAt": "2026-10-31T12:21:00+00:00",
       "contentType": "text/html;charset=UTF-8",
       "finalUrl": "https://alphafold.ebi.ac.uk/faq",
       "id": "alphafold-db",
@@ -26,7 +26,7 @@
     },
     {
       "bytes": 30260,
-      "checkedAt": "2026-10-31T12:02:00+00:00",
+      "checkedAt": "2026-10-31T12:21:01+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
       "id": "alphafold-db",
@@ -37,7 +37,7 @@
     },
     {
       "bytes": 143475,
-      "checkedAt": "2026-10-31T12:02:04+00:00",
+      "checkedAt": "2026-10-31T12:21:04+00:00",
       "contentType": "text/html; charset=UTF-8",
       "finalUrl": "https://clinicalgenome.org/",
       "id": "clingen-gene-validity",
@@ -48,40 +48,40 @@
     },
     {
       "bytes": 116959,
-      "checkedAt": "2026-10-31T12:02:04+00:00",
+      "checkedAt": "2026-10-31T12:21:04+00:00",
       "contentType": "text/html; charset=UTF-8",
       "finalUrl": "https://search.clinicalgenome.org/kb/gene-validity",
       "id": "clingen-gene-validity",
       "lastModified": null,
-      "sha256": "b6bedd48f6f79c0f3e1c7688ea8d4acb98138634c751199d0f082905fe43fd1c",
+      "sha256": "0eac55e218421ee7600dca64e408645a1194ff61a46bef0408faa7c27dbe8a8b",
       "status": 200,
       "url": "https://search.clinicalgenome.org/kb/gene-validity"
     },
     {
-      "bytes": 21387,
-      "checkedAt": "2026-10-31T12:02:01+00:00",
+      "bytes": 21386,
+      "checkedAt": "2026-10-31T12:21:02+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://www.ncbi.nlm.nih.gov/books/NBK25497/",
       "id": "clinvar-eutils",
       "lastModified": null,
-      "sha256": "794be4aac0626300b9d44a7e9a5ebd18b3952dc31c2a1db6a8ce5979c44fece8",
+      "sha256": "62b1f9a5df2243e460017bb6486673bf11593590fdb62ce70c79f108426ce5d8",
       "status": 200,
       "url": "https://www.ncbi.nlm.nih.gov/books/NBK25497/"
     },
     {
-      "bytes": 21425,
-      "checkedAt": "2026-10-31T12:02:01+00:00",
+      "bytes": 21424,
+      "checkedAt": "2026-10-31T12:21:02+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/",
       "id": "clinvar-eutils",
       "lastModified": null,
-      "sha256": "76e5679f731d79eb40de19ec13ff6080c8ec4194816fc0ec06212b5731b73657",
+      "sha256": "201e770c225fb325552ca474b22527c6ec6761a8760018ceeb46ea008015bad3",
       "status": 200,
       "url": "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/"
     },
     {
       "bytes": 38936,
-      "checkedAt": "2026-10-31T12:02:01+00:00",
+      "checkedAt": "2026-10-31T12:21:02+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.ncbi.nlm.nih.gov/home/about/policies/",
       "id": "clinvar-eutils",
@@ -92,7 +92,7 @@
     },
     {
       "bytes": 30260,
-      "checkedAt": "2026-10-31T12:02:06+00:00",
+      "checkedAt": "2026-10-31T12:21:25+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
       "id": "ensembl-compara",
@@ -103,18 +103,18 @@
     },
     {
       "bytes": 25277,
-      "checkedAt": "2026-10-31T12:02:05+00:00",
+      "checkedAt": "2026-10-31T12:21:05+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://jun2026.archive.ensembl.org/info/about/legal/disclaimer.html",
       "id": "ensembl-compara",
       "lastModified": null,
-      "sha256": "74e18fdf4b9640408291478bd386ab7c3294cae2265faed0958998b293c0e29c",
+      "sha256": "dd8a0bbb97cf5850b820bfaa5f99db2b5cc71f8b058546b2eeb6c9b79e6f8e59",
       "status": 200,
       "url": "https://www.ensembl.org/info/about/legal/disclaimer.html"
     },
     {
       "bytes": 30260,
-      "checkedAt": "2026-10-31T12:01:56+00:00",
+      "checkedAt": "2026-10-31T12:20:58+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
       "id": "ensembl-rest",
@@ -124,19 +124,15 @@
       "url": "https://www.ebi.ac.uk/about/terms-of-use/"
     },
     {
-      "bytes": 25277,
-      "checkedAt": "2026-10-31T12:01:33+00:00",
-      "contentType": "text/html; charset=utf-8",
-      "finalUrl": "https://jun2026.archive.ensembl.org/info/about/legal/disclaimer.html",
+      "checkedAt": "2026-10-31T12:20:45+00:00",
+      "error": "HTTP Error 504: Gateway Time-out",
       "id": "ensembl-rest",
-      "lastModified": null,
-      "sha256": "74e18fdf4b9640408291478bd386ab7c3294cae2265faed0958998b293c0e29c",
-      "status": 200,
+      "status": null,
       "url": "https://www.ensembl.org/info/about/legal/disclaimer.html"
     },
     {
       "bytes": 6144,
-      "checkedAt": "2026-10-31T12:02:02+00:00",
+      "checkedAt": "2026-10-31T12:21:02+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.genenames.org/about/license/",
       "id": "hgnc-rest",
@@ -147,7 +143,7 @@
     },
     {
       "bytes": 70745,
-      "checkedAt": "2026-10-31T12:02:02+00:00",
+      "checkedAt": "2026-10-31T12:21:03+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.genenames.org/help/rest/",
       "id": "hgnc-rest",
@@ -157,37 +153,37 @@
       "url": "https://www.genenames.org/help/rest/"
     },
     {
-      "bytes": 277008,
-      "checkedAt": "2026-10-31T12:02:07+00:00",
+      "bytes": 277009,
+      "checkedAt": "2026-10-31T12:21:26+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://github.com/obophenotype/human-phenotype-ontology",
       "id": "hpo-annotations",
       "lastModified": null,
-      "sha256": "32e6ee78835834326857b8220054dcb89c46ca572d501fb489ea811741e26e12",
+      "sha256": "7b89dbd420eb0a54938840a2098f0c959297f5a692c93371d8e6fd72ef83a65e",
       "status": 200,
       "url": "https://github.com/obophenotype/human-phenotype-ontology"
     },
     {
-      "checkedAt": "2026-10-31T12:02:07+00:00",
+      "checkedAt": "2026-10-31T12:21:26+00:00",
       "error": "HTTP Error 404: Not Found",
       "id": "hpo-annotations",
       "status": null,
       "url": "https://hpo.jax.org/app/license"
     },
     {
-      "bytes": 187706,
-      "checkedAt": "2026-10-31T12:02:08+00:00",
+      "bytes": 187707,
+      "checkedAt": "2026-10-31T12:21:28+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://github.com/molstar/molstar/blob/master/LICENSE",
       "id": "molstar",
       "lastModified": null,
-      "sha256": "febc7e94fe20ac17a3c496c637658c1e89e0ea2cbfdb29eaa3932019102bd1a4",
+      "sha256": "a05cc9f67699f6563f5db5967be003895347f0480105d619e4c625a5d110c325",
       "status": 200,
       "url": "https://github.com/molstar/molstar/blob/master/LICENSE"
     },
     {
       "bytes": 95023,
-      "checkedAt": "2026-10-31T12:02:09+00:00",
+      "checkedAt": "2026-10-31T12:21:28+00:00",
       "contentType": "text/html",
       "finalUrl": "https://docs.python.org/3/license.html",
       "id": "python-stdlib",
@@ -198,17 +194,17 @@
     },
     {
       "bytes": 41993,
-      "checkedAt": "2026-10-31T12:02:03+00:00",
+      "checkedAt": "2026-10-31T12:21:04+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://www.rcsb.org/pages/usage-policy",
       "id": "rcsb-pdb",
       "lastModified": null,
-      "sha256": "e70549c656f845c45a6bdfe6f594338ec035204c78d52ac6f67684cb1e58cd07",
+      "sha256": "28a85e1a93dd75e1428bd36b0135db502b9f6999d2576dad2a718df39d800cc6",
       "status": 200,
       "url": "https://www.rcsb.org/pages/usage-policy"
     },
     {
-      "checkedAt": "2026-10-31T12:01:58+00:00",
+      "checkedAt": "2026-10-31T12:21:00+00:00",
       "error": "HTTP Error 500: ",
       "id": "uniprot-rest",
       "status": null,
@@ -216,7 +212,7 @@
     },
     {
       "bytes": 6577,
-      "checkedAt": "2026-10-31T12:01:58+00:00",
+      "checkedAt": "2026-10-31T12:20:59+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.uniprot.org/help/copyright",
       "id": "uniprot-rest",
@@ -227,7 +223,7 @@
     },
     {
       "bytes": 6577,
-      "checkedAt": "2026-10-31T12:01:57+00:00",
+      "checkedAt": "2026-10-31T12:20:59+00:00",
       "contentType": "text/html",
       "finalUrl": "https://www.uniprot.org/help/license",
       "id": "uniprot-rest",
@@ -237,13 +233,13 @@
       "url": "https://www.uniprot.org/help/license"
     },
     {
-      "bytes": 186702,
-      "checkedAt": "2026-10-31T12:02:07+00:00",
+      "bytes": 186704,
+      "checkedAt": "2026-10-31T12:21:27+00:00",
       "contentType": "text/html; charset=utf-8",
       "finalUrl": "https://github.com/colinhacks/zod/blob/main/LICENSE",
       "id": "zod",
       "lastModified": null,
-      "sha256": "9b4229ead038ebc1290df9e42acdab7943e40488809ab9edc16581ebde229e76",
+      "sha256": "f942684daf4ad741a2b426b1acf8bff595a1caf08ea5cc534fc44e0c7772a567",
       "status": 200,
       "url": "https://github.com/colinhacks/zod/blob/main/LICENSE"
     }
