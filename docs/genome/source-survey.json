@@ -1,0 +1,482 @@
+{
+  "note": "Evidence that each candidate page was rendered and what its visible text hashed to. The text is printed in the job log, not stored. Not a review outcome.",
+  "pages": [
+    {
+      "checkedAt": "2026-10-31T12:23:46+00:00",
+      "finalUrl": "https://www.alzforum.org/mutations",
+      "id": "alzforum-mutations",
+      "status": 403,
+      "textChars": 205,
+      "textSha256": "ddb7f121723d7d3601aa92d740eecb1ff3a3e36aaa15044fbe06e9f6da1955fd",
+      "title": "Access Denied",
+      "url": "https://www.alzforum.org/mutations",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:28+00:00",
+      "error": "Page.goto: net::ERR_NAME_NOT_RESOLVED at http://www.alzgene.org/\nCall log:\nnavigating to \"http://www.alzgene.org/\", waiting until \"domcontentloaded\"\n",
+      "id": "alzgene",
+      "status": null,
+      "url": "http://www.alzgene.org/",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:28+00:00",
+      "error": "Page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.alzgene.org/\nCall log:\nnavigating to \"https://www.alzgene.org/\", waiting until \"domcontentloaded\"\n",
+      "id": "alzgene",
+      "status": null,
+      "url": "https://www.alzgene.org/",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:18+00:00",
+      "finalUrl": "https://clinicalgenome.org/",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 13606,
+      "textSha256": "f7500e7aaf77e116b58a40c26913b7d5c899fd8cfb8c7abb7f578d4409480c17",
+      "title": "Welcome to ClinGen",
+      "url": "https://clinicalgenome.org/",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:51+00:00",
+      "finalUrl": "https://clinicalgenome.org/docs/?doc-type=website-updates",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 11749,
+      "textSha256": "ac85cdb2e8bf92c737f379f5b898e968e2775e94b6c7d6008a8025d56b4a4284",
+      "title": "Documents & Announcements - ClinGen | Clinical Genome Resource",
+      "url": "https://clinicalgenome.org/docs/?doc-type=website-updates",
+      "via": "Learn About New Features"
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:48+00:00",
+      "finalUrl": "https://search.clinicalgenome.org/kb/downloads",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 12880,
+      "textSha256": "ac309a37a2c08f8df2302e4b1c16c426a3af724d90dd06967a7dcc6668151fbf",
+      "title": "ClinGen Web",
+      "url": "https://search.clinicalgenome.org/kb/downloads",
+      "via": "File Downloads & APIs"
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:46+00:00",
+      "finalUrl": "https://search.clinicalgenome.org/kb/downloads",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 12880,
+      "textSha256": "ac309a37a2c08f8df2302e4b1c16c426a3af724d90dd06967a7dcc6668151fbf",
+      "title": "ClinGen Web",
+      "url": "https://search.clinicalgenome.org/kb/downloads/",
+      "via": "File Downloads"
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:21+00:00",
+      "finalUrl": "https://search.clinicalgenome.org/kb/gene-validity?page=1&size=25&search=",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 9818,
+      "textSha256": "7e00b45fccb87baf22bc5af3de89ae22197ccdbb376831aa419fc443dc9cdb92",
+      "title": "ClinGen Gene-Disease Validity Curations",
+      "url": "https://search.clinicalgenome.org/kb/gene-validity",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:41+00:00",
+      "finalUrl": "https://www.clinicalgenome.org/docs/terms-of-use/",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 12586,
+      "textSha256": "6d8ebbf9d20c5db4a57063e9e4dee88f7cbbcb1148654760bb5c66fe8c94bda7",
+      "title": "Citing ClinGen & Terms of Use - ClinGen | Clinical Genome Resource",
+      "url": "https://www.clinicalgenome.org/about/terms-of-use/",
+      "via": "Citing ClinGen & Terms of Use"
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:43+00:00",
+      "finalUrl": "https://www.clinicalgenome.org/docs/?doc-type=website-updates",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 11749,
+      "textSha256": "ac85cdb2e8bf92c737f379f5b898e968e2775e94b6c7d6008a8025d56b4a4284",
+      "title": "Documents & Announcements - ClinGen | Clinical Genome Resource",
+      "url": "https://www.clinicalgenome.org/docs/?doc-type=website-updates",
+      "via": "Website Updates"
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:39+00:00",
+      "finalUrl": "https://www.clinicalgenome.org/docs/terms-of-use/",
+      "id": "clingen-terms",
+      "status": 200,
+      "textChars": 12586,
+      "textSha256": "6d8ebbf9d20c5db4a57063e9e4dee88f7cbbcb1148654760bb5c66fe8c94bda7",
+      "title": "Citing ClinGen & Terms of Use - ClinGen | Clinical Genome Resource",
+      "url": "https://www.clinicalgenome.org/docs/terms-of-use/",
+      "via": "Citing ClinGen"
+    },
+    {
+      "checkedAt": "2026-10-31T12:25:56+00:00",
+      "finalUrl": "https://rest.ensembl.org/documentation/info/homology_species_gene_id",
+      "id": "ensembl-compara-docs",
+      "status": 200,
+      "textChars": 4954,
+      "textSha256": "87ad178437c7b91809a1181843eadee829fede40dd9f10bbd2a1e66e2c1f2bb8",
+      "title": "Ensembl Rest API - GET homology/id/:species/:id",
+      "url": "https://rest.ensembl.org/documentation/info/homology_species_gene_id",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:58+00:00",
+      "finalUrl": "https://rest.ensembl.org/documentation/info/homology_symbol",
+      "id": "ensembl-compara-docs",
+      "status": 200,
+      "textChars": 2558,
+      "textSha256": "2300f8466055fb220ce62d150ab387a11dc1fdccd9ad9d4c885578f7c10e702a",
+      "title": "Ensembl Rest API - GET homology/symbol/:species/:symbol",
+      "url": "https://rest.ensembl.org/documentation/info/homology_symbol",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:16+00:00",
+      "finalUrl": "https://thegencc.org/download",
+      "id": "gencc",
+      "status": 200,
+      "textChars": 4314,
+      "textSha256": "ee94a914e15109bfffa6e818b58344677fca89f841777d2b7ce1028230496808",
+      "title": "Download GenCC Data",
+      "url": "https://search.thegencc.org/download",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:13+00:00",
+      "finalUrl": "https://thegencc.org/",
+      "id": "gencc",
+      "status": 200,
+      "textChars": 3984,
+      "textSha256": "b8d8a2f7c2d818523948098ee6870237ac9907ac045b51b2773c1553745be47c",
+      "title": "GenCC genes with classifications",
+      "url": "https://thegencc.org/",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:18+00:00",
+      "finalUrl": "https://thegencc.org/download",
+      "id": "gencc",
+      "status": 200,
+      "textChars": 4314,
+      "textSha256": "ee94a914e15109bfffa6e818b58344677fca89f841777d2b7ce1028230496808",
+      "title": "Download GenCC Data",
+      "url": "https://thegencc.org/download",
+      "via": "Download"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:26+00:00",
+      "error": "Page.goto: net::ERR_ABORTED at https://thegencc.org/download/action/submissions-export-csv?format=new\nCall log:\nnavigating to \"https://thegencc.org/download/action/submissions-export-csv?format=new\", waiting until \"domcontentloaded\"\n",
+      "id": "gencc",
+      "status": null,
+      "url": "https://thegencc.org/download/action/submissions-export-csv?format=new",
+      "via": "Submissions (csv)"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:25+00:00",
+      "error": "Page.goto: net::ERR_ABORTED at https://thegencc.org/download/action/submissions-export-tsv?format=new\nCall log:\nnavigating to \"https://thegencc.org/download/action/submissions-export-tsv?format=new\", waiting until \"domcontentloaded\"\n",
+      "id": "gencc",
+      "status": null,
+      "url": "https://thegencc.org/download/action/submissions-export-tsv?format=new",
+      "via": "Submissions (tsv)"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:25+00:00",
+      "error": "Page.goto: net::ERR_ABORTED at https://thegencc.org/download/action/submissions-export-xlsx?format=new\nCall log:\nnavigating to \"https://thegencc.org/download/action/submissions-export-xlsx?format=new\", waiting until \"domcontentloaded\"\n",
+      "id": "gencc",
+      "status": null,
+      "url": "https://thegencc.org/download/action/submissions-export-xlsx?format=new",
+      "via": "Submissions (xlsx)"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:21+00:00",
+      "finalUrl": "https://thegencc.org/faq",
+      "id": "gencc",
+      "status": 200,
+      "textChars": 17754,
+      "textSha256": "91b8c93c9708d123c54006fee032322a7b769beba2cb9e50774acfa39f63ee88",
+      "title": "GenCC FAQ",
+      "url": "https://thegencc.org/faq",
+      "via": "About GenCC\nClassifications"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:23+00:00",
+      "finalUrl": "https://thegencc.org/terms",
+      "id": "gencc",
+      "status": 200,
+      "textChars": 2798,
+      "textSha256": "2ff13939d2fe48b019e119abf305bcec702c469e471f07247e71054c06272d33",
+      "title": "GenCC Terms of Use",
+      "url": "https://thegencc.org/terms",
+      "via": "GenCC Terms of Use"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:06+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 10260,
+      "textSha256": "0b41da6aac4c64f92cb6199362c2e34321064adc8caf75190ac17a66eec7dcf0",
+      "title": "Terms of Use | EMBL-EBI",
+      "url": "http://www.ebi.ac.uk/about/terms-of-use",
+      "via": "Terms of Use for EMBL-EBI Services"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:11+00:00",
+      "finalUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 4094,
+      "textSha256": "bb9e765ab139a83ec0642440e612263b06ce2f274a83977f2bfd794f77c4e610",
+      "title": "Deed - Attribution 4.0 International - Creative Commons",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "via": "CC-BY-4.0"
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:28+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/gwas/docs/about/",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 6435,
+      "textSha256": "fd62520365343190c028c8e8c656eda38afeae4f49252fe3c0776f512bb9d2c3",
+      "title": "About the GWAS Catalog | GWAS Catalog Documentation",
+      "url": "https://www.ebi.ac.uk/gwas/docs/about",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:56+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/gwas/docs/citation/",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 1962,
+      "textSha256": "04434f085ed4aad0d884aabb4cccaec38e514f43e0419374a9deb74f7b2562a3",
+      "title": "Citing the GWAS Catalog | GWAS Catalog Documentation",
+      "url": "https://www.ebi.ac.uk/gwas/docs/citation",
+      "via": "Citing the GWAS Catalog"
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:52+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/gwas/docs/downloads/",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 1272,
+      "textSha256": "ad19d69771f03ee32fe8d96b4f603aa837f335db7ec739a68d1184b2740e9cf5",
+      "title": "Downloads | GWAS Catalog Documentation",
+      "url": "https://www.ebi.ac.uk/gwas/docs/downloads",
+      "via": "Downloads"
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:35+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/gwas/docs/file-downloads/",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 4619,
+      "textSha256": "ce4025f4499398e5e23a46987a692274e4aa09d013d550dbc854934eace302a0",
+      "title": "Downloading the GWAS Catalog | GWAS Catalog Documentation",
+      "url": "https://www.ebi.ac.uk/gwas/docs/file-downloads",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:59+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/gwas/docs/downloads/",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 1272,
+      "textSha256": "ad19d69771f03ee32fe8d96b4f603aa837f335db7ec739a68d1184b2740e9cf5",
+      "title": "Downloads | GWAS Catalog Documentation",
+      "url": "https://www.ebi.ac.uk/gwas/downloads",
+      "via": "downloads"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:02+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/gwas/downloads/summary-statistics",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 7740,
+      "textSha256": "b2dcadba6e0453ac08cce93277306f00ebc19892c4aa7f99e7805a656fa19793",
+      "title": "GWAS Catalog",
+      "url": "https://www.ebi.ac.uk/gwas/downloads/summary-statistics",
+      "via": "summary statistics page"
+    },
+    {
+      "checkedAt": "2026-10-31T12:22:38+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/gwas/efotraits/MONDO_0004975",
+      "id": "gwas-catalog",
+      "status": 200,
+      "textChars": 2438,
+      "textSha256": "c76a724f564a3141482262b95e720313286817a982642eeeb00774b0015dbe87",
+      "title": "GWAS Catalog",
+      "url": "https://www.ebi.ac.uk/gwas/efotraits/MONDO_0004975",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:53+00:00",
+      "finalUrl": "https://hpo.jax.org/license",
+      "id": "hpo-terms",
+      "status": 404,
+      "textChars": 1357,
+      "textSha256": "28942481912fb3c1b9b5354d50c45ed0bc72d3d76c6785e8c8133e8162222461",
+      "title": "Human Phenotype Ontology",
+      "url": "https://hpo.jax.org/app/license",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:56+00:00",
+      "finalUrl": "https://hpo.jax.org/license",
+      "id": "hpo-terms",
+      "status": 404,
+      "textChars": 1357,
+      "textSha256": "28942481912fb3c1b9b5354d50c45ed0bc72d3d76c6785e8c8133e8162222461",
+      "title": "Human Phenotype Ontology",
+      "url": "https://hpo.jax.org/license",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:15+00:00",
+      "finalUrl": "https://www.omim.org/help/agreement",
+      "id": "omim",
+      "status": 403,
+      "textChars": 260,
+      "textSha256": "51cbe93152afd53500ff5588d2356d2fc5f274962bd31c80b24c8287404f2337",
+      "title": "Just a moment...",
+      "url": "https://www.omim.org/help/agreement",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:01+00:00",
+      "finalUrl": "https://platform-docs.opentargets.org/citation",
+      "id": "open-targets",
+      "status": 200,
+      "textChars": 2111,
+      "textSha256": "2ff40e2f6f07bf8b15d08d1c91277a82d0e840f412d570cb950a093d6ea9f216",
+      "title": "Citation | Open Targets Platform Documentation",
+      "url": "https://platform-docs.opentargets.org/citation",
+      "via": "Citation"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:49+00:00",
+      "finalUrl": "https://platform-docs.opentargets.org/licence",
+      "id": "open-targets",
+      "status": 200,
+      "textChars": 3350,
+      "textSha256": "831e370053aa9363b0a376053c73780723753cfdf146e0249d64461406362dd7",
+      "title": "Licence | Open Targets Platform Documentation",
+      "url": "https://platform-docs.opentargets.org/licence",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:08+00:00",
+      "finalUrl": "https://platform-docs.opentargets.org/licence.md",
+      "id": "open-targets",
+      "status": 200,
+      "textChars": 12081,
+      "textSha256": "1dc64d95df328593c85feea5742945678349daaf60eff0666497fa4822ebb11e",
+      "title": "",
+      "url": "https://platform-docs.opentargets.org/licence.md",
+      "via": "Markdown"
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:05+00:00",
+      "finalUrl": "https://platform-docs.opentargets.org/licence/terms-of-use",
+      "id": "open-targets",
+      "status": 200,
+      "textChars": 4523,
+      "textSha256": "bf31ad17c8d9baac2d7abe9e16458f7d49e40b5f97c1f3a6aa746c8982384ebe",
+      "title": "Terms of use | Open Targets Platform Documentation",
+      "url": "https://platform-docs.opentargets.org/licence/terms-of-use",
+      "via": "Terms of use"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:58+00:00",
+      "finalUrl": "https://platform-docs.opentargets.org/release-notes",
+      "id": "open-targets",
+      "status": 200,
+      "textChars": 44170,
+      "textSha256": "3e71c4aa4911da72135ad9301dfa01d7e884b9973d3e32574750b84f60570fb4",
+      "title": "Release notes | Open Targets Platform Documentation",
+      "url": "https://platform-docs.opentargets.org/release-notes",
+      "via": "Release notes"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:53+00:00",
+      "error": "Page.evaluate: TypeError: Cannot read properties of undefined (reading 'trim')\n    at eval (eval at evaluate (:234:30), <anonymous>:1:71)\n    at Array.map (<anonymous>)\n    at eval (eval at evaluate (:234:30), <anonymous>:1:49)\n    at UtilityScript.evaluate (<anonymous>:241:19)\n    at UtilityScript.",
+      "id": "open-targets",
+      "status": null,
+      "url": "https://platform.opentargets.org/disease/MONDO_0004975",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:10+00:00",
+      "finalUrl": "https://www.apache.org/licenses/LICENSE-2.0",
+      "id": "open-targets",
+      "status": 200,
+      "textChars": 12205,
+      "textSha256": "de6f9ac47f635de44181a1fa34efc58a0a890222a7fdcedc947c95875b615809",
+      "title": "Apache License, Version 2.0 | Apache Software Foundation",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "via": "APACHE LICENSE, VERSION 2.0"
+    },
+    {
+      "checkedAt": "2026-10-31T12:24:13+00:00",
+      "finalUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
+      "id": "open-targets",
+      "status": 200,
+      "textChars": 10260,
+      "textSha256": "0b41da6aac4c64f92cb6199362c2e34321064adc8caf75190ac17a66eec7dcf0",
+      "title": "Terms of Use | EMBL-EBI",
+      "url": "https://www.ebi.ac.uk/about/terms-of-use/",
+      "via": "EMBL-EBI terms of use"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:38+00:00",
+      "finalUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "id": "orphadata",
+      "status": 200,
+      "textChars": 4094,
+      "textSha256": "bb9e765ab139a83ec0642440e612263b06ce2f274a83977f2bfd794f77c4e610",
+      "title": "Deed - Attribution 4.0 International - Creative Commons",
+      "url": "https://creativecommons.org/licenses/by/4.0",
+      "via": "Commons Attribution 4.0 International (CC BY 4.0) licence"
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:33+00:00",
+      "finalUrl": "https://www.orphadata.com/",
+      "id": "orphadata",
+      "status": 200,
+      "textChars": 3143,
+      "textSha256": "71b794d4d19187af227dbe4864e3ab6f76e94c9da315cf3eb64a9863c91f8bca",
+      "title": "Orphadata \u2013 Orphanet datasets",
+      "url": "https://www.orphadata.com/",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:26+00:00",
+      "finalUrl": "https://sciences.orphadata.com/genes/",
+      "id": "orphadata",
+      "status": 200,
+      "textChars": 1135,
+      "textSha256": "c200d2b64ad3f9afde1984ea8d9ffba8592ca3c8e4996881c6cbe426619cfc4b",
+      "title": "Genes \u2013 Science Orphadata",
+      "url": "https://www.orphadata.com/genes/",
+      "via": null
+    },
+    {
+      "checkedAt": "2026-10-31T12:23:41+00:00",
+      "finalUrl": "https://www.orphadata.com/legal-notice/",
+      "id": "orphadata",
+      "status": 200,
+      "textChars": 21223,
+      "textSha256": "04eb9d549cd621f061f9219ddbd2a28ef8e1db60764c37060a3e60b5d67cf086",
+      "title": "Legal notice \u2013 Orphadata",
+      "url": "https://www.orphadata.com/legal-notice",
+      "via": "Legal Notice Cookies & GPDR"
+    }
+  ]
+}
