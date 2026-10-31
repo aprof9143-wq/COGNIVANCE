@@ -7,8 +7,8 @@
     {
       "id": "VER-001",
       "kind": "software-verification",
-      "purpose": "Check the software against REQ-001 to REQ-013 and REQ-017 with automated tests.",
-      "dataset": "Synthetic fixtures, and the captured public reference snapshot for RPE65 (data/genome/snapshot/rpe65) and its display copy. No patient data.",
+      "purpose": "Check the software against REQ-001 to REQ-014 and REQ-017 to REQ-021 with automated tests.",
+      "dataset": "Synthetic fixtures, the captured public reference snapshot for RPE65 (data/genome/snapshot/rpe65) and its display copy, and the gene library capture (data/genome/library) and its display copy. No patient data.",
       "metrics": [
         "Every test in pnpm test and the Python tool tests passes on the commit under review."
       ],

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordVersion": "1.0.0",
-  "effectiveFrom": "2026-10-29",
+  "recordVersion": "1.1.0",
+  "effectiveFrom": "2026-10-31",
   "note": "Issues and risks identified while building Genome v1, with the software mitigations in place and who owns them. A working register for later independent review; it is not a risk-management file under any standard, and listing a mitigation does not mean the risk is acceptable. No named owner has been recorded; 'project owner' stands until one is.",
   "risks": [
     {
@@ -75,6 +75,30 @@
       "issue": "The served display copy drifts from the raw snapshot or from what the app reads.",
       "mitigation": "Display copy rebuilt deterministically; tests check it is current and holds exactly the fields the parsers read.",
       "requirements": ["REQ-007", "REQ-008"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-010",
+      "issue": "A gene-condition curation in the library is read as a diagnosis, a risk estimate or proof that the gene causes the condition.",
+      "mitigation": "Each page states what a curation is and is not; classifications shown as ClinGen states them, with Disputed and Refuted kept visible and conflicts flagged; no patient data or variant interpretation.",
+      "requirements": ["REQ-018"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-011",
+      "issue": "An orthologue is read as a gene with the same function, or a deviation from the baseline as a biological anomaly.",
+      "mitigation": "Orthology defined on every view; 'none reported' distinguished from 'not retrieved'; baseline and deviation defined, with n shown and no baseline below 8 genes; deviation described as measurable, not biological.",
+      "requirements": ["REQ-014"],
+      "owner": "project owner",
+      "status": "mitigated-in-software-pending-review"
+    },
+    {
+      "id": "RISK-012",
+      "issue": "Sample data is mistaken for real data, or mixed with it.",
+      "mitigation": "Synthetic identifiers prefixed SAMPLE; banner and badge on every page; loader returns snapshot or sample, never both; a broken file is an error, not a fallback.",
+      "requirements": ["REQ-019"],
       "owner": "project owner",
       "status": "mitigated-in-software-pending-review"
     }

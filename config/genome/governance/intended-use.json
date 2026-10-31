@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "recordVersion": "1.0.0",
-  "effectiveFrom": "2026-10-29",
+  "recordVersion": "1.1.0",
+  "effectiveFrom": "2026-10-31",
   "status": "research-only",
   "note": "The current intended use of Genome v1 and the Vision pages it feeds, as the software is built today. It is not a clinical intended-use statement: none exists, and writing one needs a qualified clinical reviewer (release-gate.json, INTENDED-USE). Nothing here asserts that any regulation applies or is satisfied.",
-  "intendedUse": "Research and demonstration: an evidence layer that shows public reference records for registered inherited-retinal-disease genes (gene, transcript, protein and predicted structure), each with its source, release and retrieval time, alongside clearly labelled hypothetical models.",
+  "intendedUse": "Research and demonstration: an evidence layer that shows public reference records for registered inherited-retinal-disease genes (gene, transcript, protein and predicted structure), and a research gene library of the genes ClinGen's gene-disease validity curations associate with autism spectrum disorder or Alzheimer disease, with their identifiers, orthologues in other species and annotated phenotypes; each value with its source, release and retrieval time, alongside clearly labelled hypothetical models.",
   "excludedUses": [
     "Clinical decision-making of any kind",
     "Diagnosis, screening or prognosis for any person",
@@ -30,6 +30,14 @@
       {
         "name": "RPE65-associated inherited retinal dystrophy",
         "basis": "Chosen as the first use case on 2026-10-19 (src/lib/vision/targets.ts). A product decision, not a diagnosis and not a clinical claim."
+      },
+      {
+        "name": "Autism spectrum disorder (research gene library)",
+        "basis": "Product owner, 2026-10-31 (decision GOV-5). Genes are those whose ClinGen gene-disease validity curation has a disease label containing 'autis' at capture time; none is added by hand. Not a diagnosis, a risk estimate or a clinical claim."
+      },
+      {
+        "name": "Alzheimer disease (research gene library)",
+        "basis": "Product owner, 2026-10-31 (decision GOV-5). Genes are those whose ClinGen curation has a disease label containing 'alzheimer'; the capture of 2026-10-31 found none, and none is added by hand."
       }
     ],
     "genes": {
@@ -61,10 +69,15 @@
     "The eye model is a population-average schematic eye, not any person's eye.",
     "AlphaFold structures are predictions with their own per-residue confidence, not measurements.",
     "No analytical or clinical validation has been performed.",
-    "The eye simulation can show a visitor's own picture through the model eye. The picture stays in the browser, is never stored or sent, and is not meant for medical images."
+    "The eye simulation can show a visitor's own picture through the model eye. The picture stays in the browser, is never stored or sent, and is not meant for medical images.",
+    "The gene library holds only genes whose ClinGen curation names the condition in its disease label: 8 autism-related genes and no Alzheimer disease gene in the capture of 2026-10-31. Genes curated by ClinGen's Intellectual Disability and Autism expert panel under other disease labels are not included.",
+    "A ClinGen curation describes published evidence that variation in a gene causes a disease. It is not a diagnosis, a risk estimate or proof of cause for any person, and several curations of one gene may disagree.",
+    "HPO phenotypes are those annotated to diseases linked with a gene; they are not specific to the library's conditions.",
+    "Orthology and percent identity come from Ensembl Compara. An orthologue is not shown to have the same function, and 'none reported' is not proof that a gene is absent. A deviation from the comparison baseline is a measurable difference within this gene set, not a biological finding; with 8 genes the baseline is small.",
+    "The sample library is synthetic and is shown only when no capture exists, labelled as such; it is never mixed with captured data."
   ],
   "speciesCaveats": [
-    "Every record is for Homo sapiens (taxon 9606). No cross-species comparison exists in the software.",
-    "If cross-species comparison is added, orthology or pathway overlap must not be presented as proof of causation or clinical relevance, and no animal model may be presented as capturing the full human phenotype."
+    "Every gene record is for Homo sapiens (taxon 9606). Other species appear only as orthologues of human genes, as Ensembl Compara reports them, for chimpanzee, rhesus macaque, mouse, rat, dog, chicken and zebrafish.",
+    "Orthology or pathway overlap is never presented as proof of causation, clinical relevance or equivalent function, and no animal model is presented as capturing the full human phenotype."
   ]
 }

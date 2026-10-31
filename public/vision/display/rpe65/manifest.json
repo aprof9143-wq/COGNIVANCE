@@ -115,7 +115,7 @@
   ],
   "gene": "RPE65",
   "hgncId": "HGNC:10294",
-  "inventoryVersion": "1.3.0",
+  "inventoryVersion": "1.4.1",
   "kind": "display-only",
   "notice": "Display-only copy for the Cognivance Vision research pages: the fields the app shows, from sources whose display the source policy permits. Not a redistribution of the source databases; their raw responses are not served. Research software. Not a medical device, not clinically validated, and not for clinical decision-making.",
   "rawManifestSha256": "36174fa94ab33978256e06c35e9b59037c790056c7cb39e084b3265de028fed1",

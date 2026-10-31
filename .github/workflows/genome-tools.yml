@@ -8,6 +8,7 @@ on:
     paths:
       - "tools/vision-snapshot/**"
       - "tools/genome-display/**"
+      - "tools/genome-library/**"
       - "data/genome/**"
       - "public/vision/display/**"
       - "config/genome/**"
@@ -17,6 +18,7 @@ on:
     paths:
       - "tools/vision-snapshot/**"
       - "tools/genome-display/**"
+      - "tools/genome-library/**"
       - "data/genome/**"
       - "public/vision/display/**"
       - "config/genome/**"
@@ -37,3 +39,5 @@ jobs:
         run: python -m unittest discover -s tools/vision-snapshot -p "test_*.py" -v
       - name: Display-copy builder tests (no network)
         run: python -m unittest discover -s tools/genome-display -p "test_*.py" -v
+      - name: Library capture tests (no network)
+        run: python -m unittest discover -s tools/genome-library -p "test_*.py" -v

@@ -6,6 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { ProgramStrip } from "@/components/site/ProgramStrip";
 import { HeroCircuit } from "@/components/site/HeroCircuit";
 import { Trace } from "@/components/site/Trace";
+import { StatusKey, StatusPill, WorkflowStrip } from "@/components/site/Workflow";
 import { COMPANY, MODULES, TEAM, type ModuleKey } from "@/lib/company";
 
 const title = "Cognivance — the simulation layer for brain and eye medicine";
@@ -95,8 +96,8 @@ const PROOF = [
     d: "our first gene: the target of Luxturna, the first FDA-approved gene therapy for an inherited disease (2017).",
   },
   {
-    v: "9 tools",
-    d: "working today behind one sign-in, from genome evidence to a 3D brain simulation.",
+    v: `${MODULES.length} tools`,
+    d: "behind one sign-in, from genome evidence to a 3D brain simulation, each marked working, limited, demo or planned.",
   },
 ];
 
@@ -159,7 +160,13 @@ const TILES: {
     span: "lg:col-span-2",
     h: "h-[230px]",
   },
-  { key: "viewer", img: "viewer", pos: "object-top", span: "lg:col-span-2", h: "h-[230px]" },
+  {
+    key: "genomics",
+    img: "genomics",
+    pos: "object-left-top",
+    span: "lg:col-span-2",
+    h: "h-[230px]",
+  },
 ];
 
 const initials = (n: string) =>
@@ -294,8 +301,9 @@ function Landing() {
             <div>
               <H2>One workspace, from the gene to the cortex.</H2>
               <Lead>
-                Nine tools behind one sign-in, in light and dark. Each is working software you can
-                open today, labelled honestly as live data, model or demo.
+                {MODULES.length} tools behind one sign-in, joined in one flow from the data to the
+                evidence behind it. Each says how far it is real: working, connected but limited,
+                sample or planned.
               </Lead>
             </div>
             <Link
@@ -306,7 +314,14 @@ function Landing() {
             </Link>
           </div>
 
-          <div className="mt-14 grid gap-4 lg:grid-cols-6">
+          <div className="mt-12">
+            <WorkflowStrip />
+            <div className="mt-4">
+              <StatusKey />
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-6">
             {TILES.map((t, i) => {
               const m = MODULES.find((x) => x.key === t.key)!;
               const img = `w-full ${t.h} ${t.fit === "contain" ? "object-contain" : "object-cover"} ${t.pos}`;
@@ -339,16 +354,14 @@ function Landing() {
                         {m.blurb}
                       </p>
                     </div>
-                    <span className="shrink-0 rounded-full border border-border px-2.5 py-1 text-[11.5px] text-ash">
-                      {m.status}
-                    </span>
+                    <StatusPill status={m.status} />
                   </div>
                 </Link>
               );
             })}
           </div>
 
-          <ul className="mt-4 grid gap-px overflow-hidden rounded-[20px] border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-4 grid gap-px overflow-hidden rounded-[20px] border border-border bg-border sm:grid-cols-2 lg:grid-cols-5 [&>li:last-child:nth-child(odd)]:sm:max-lg:col-span-2">
             {rest.map((m) => (
               <li key={m.key} className="bg-card">
                 <Link
@@ -357,7 +370,7 @@ function Landing() {
                 >
                   <span className="flex items-baseline justify-between gap-3">
                     <span className="text-[15px] font-semibold tracking-[-0.015em]">{m.name}</span>
-                    <span className="text-[11.5px] text-ash">{m.status}</span>
+                    <StatusPill status={m.status} />
                   </span>
                   <span className="mt-1.5 text-[13.5px] leading-relaxed text-ash">{m.blurb}</span>
                 </Link>

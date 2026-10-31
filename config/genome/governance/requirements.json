@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordVersion": "1.0.0",
-  "effectiveFrom": "2026-10-29",
+  "recordVersion": "1.1.0",
+  "effectiveFrom": "2026-10-31",
   "note": "Genome v1 requirements, each traced to where it is implemented and the tests that verify it (src/lib/genome/governance.test.ts checks every file and test named here exists). Status is one of implemented, proposed, incomplete or requires-qualified-review. 'Implemented' means built and verified by these tests; it does not mean validated for any clinical purpose, and passing tests do not establish clinical validity, safety or regulatory compliance. No requirement has been released: there is no release yet.",
   "requirements": [
     {
@@ -326,14 +326,15 @@
       "source": "Genome governance brief, 2026-10-29; src/lib/vision/targets.ts decision 5",
       "status": "implemented",
       "implementation": [
-        "src/components/vision/VisionModule.tsx",
+        "src/components/genomics/LibraryPage.tsx",
         "src/components/vision/RetinalImage.tsx",
+        "src/components/vision/VisionModule.tsx",
         "src/lib/genome/vcf.ts"
       ],
       "verification": [
         {
           "file": "src/lib/genome/governance.test.ts",
-          "test": "offers no genomic or clinical data upload on the Genome and Vision pages"
+          "test": "offers no genomic or clinical data upload on the Genome, Genomics and Vision pages"
         },
         {
           "file": "src/lib/genome/vcf.test.ts",
@@ -371,11 +372,32 @@
     {
       "id": "REQ-014",
       "statement": "If cross-species comparison is added: keep direct source observations, computed mappings and hypotheses separate; record source, method, version, taxon, identifiers and caveats; never present orthology or pathway overlap as proof of causation or clinical relevance.",
-      "source": "Genome governance brief, 2026-10-29",
-      "status": "proposed",
-      "implementation": [],
-      "verification": [],
-      "note": "No cross-species comparison exists in the software.",
+      "source": "Genome governance brief, 2026-10-29; product owner, 2026-10-31 (GOV-5)",
+      "status": "implemented",
+      "implementation": [
+        "tools/genome-library/capture_library.py",
+        "src/lib/genomics/library.ts",
+        "src/components/genomics/ComparePage.tsx"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "tells 'not retrieved' from 'none reported'"
+        },
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "places a gene against the baseline, and refuses to compare what is not comparable"
+        },
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "groups species by the ancestors they share, whatever order a source lists them in"
+        },
+        {
+          "file": "src/lib/genomics/ui.test.ts",
+          "test": "names a deviation in words, with its baseline and count"
+        }
+      ],
+      "note": "Orthologues are shown as Ensembl reports them (source observation); the species tree, baseline and deviation are computed here and labelled as such; no orthologue is presented as functional equivalence.",
       "release": null
     },
     {
@@ -408,6 +430,106 @@
         {
           "file": "src/lib/genome/governance.test.ts",
           "test": "offers only current-focus, verified genes with a display copy as targets"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-018",
+      "statement": "Build the research gene library only from the source's curations: a gene is included when a ClinGen gene-disease validity curation's disease label matches a library condition, with the classification, disease identifier, inheritance, expert panel, date and report link kept verbatim. Add no gene, association or classification by hand, and never merge conflicting curations into one verdict.",
+      "source": "Product owner, 2026-10-31 (GOV-5)",
+      "status": "implemented",
+      "implementation": [
+        "tools/genome-library/capture_library.py",
+        "config/genome/library.json",
+        "src/lib/genomics/library.ts"
+      ],
+      "verification": [
+        {
+          "file": "tools/genome-library/test_capture_library.py",
+          "test": "test_conditions_match_the_source_label_verbatim"
+        },
+        {
+          "file": "src/lib/genomics/ui.test.ts",
+          "test": "keeps ClinGen's classification words and a report link on every curation"
+        },
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "keeps conflicting curations apart and flags the conflict"
+        },
+        {
+          "file": "src/lib/genomics/ui.test.ts",
+          "test": "explains a condition with no curated gene instead of filling it"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-019",
+      "statement": "Label sample data as synthetic wherever it appears, use it only when no capture exists, and never mix it with captured or live data.",
+      "source": "Product owner, 2026-10-31",
+      "status": "implemented",
+      "implementation": [
+        "src/lib/genomics/sample.ts",
+        "src/lib/genomics/load.ts",
+        "src/components/genomics/shared.tsx"
+      ],
+      "verification": [
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "is synthetic, labelled, valid and has no made-up taxonomy"
+        },
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "shows a captured snapshot as it is, with no sample genes mixed in"
+        },
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "reports a broken, unreachable or mislabelled file as an error, not as sample data"
+        },
+        {
+          "file": "src/lib/genomics/ui.test.ts",
+          "test": "labels sample data as synthetic, everywhere it appears"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-020",
+      "statement": "Read third-party sources through an adapter on the server for live checks: validate the response, time out, retry only what may succeed, report each source's outcome separately, apply the source policy before any request, and never change the captured snapshot.",
+      "source": "Product owner, 2026-10-31",
+      "status": "implemented",
+      "implementation": ["src/lib/genomics/live.ts", "src/routes/api.genomics.live.ts"],
+      "verification": [
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "reports a partial outage per source and keeps what did arrive"
+        },
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "retries a 503 and a 429, but not a 404"
+        },
+        {
+          "file": "src/lib/genomics/genomics.test.ts",
+          "test": "asks nothing of a source the policy refuses"
+        }
+      ],
+      "release": null
+    },
+    {
+      "id": "REQ-021",
+      "statement": "Give every feature one of four statuses (working, connected but limited, sample/demo, planned), state what it runs on, show captured data's date from its own manifest, and claim no live, real-time or clinical capability.",
+      "source": "Product owner, 2026-10-31",
+      "status": "implemented",
+      "implementation": ["src/lib/company.ts", "src/components/site/Workflow.tsx"],
+      "verification": [
+        {
+          "file": "src/lib/company.test.ts",
+          "test": "claims no live, real-time or clinical capability"
+        },
+        {
+          "file": "src/lib/company.test.ts",
+          "test": "reads 'data as of' from manifests that exist, with a capture time"
         }
       ],
       "release": null

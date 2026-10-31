@@ -14,14 +14,18 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
+import { Route as GenomicsRouteImport } from './routes/genomics'
 import { Route as NeurodegenerationRouteImport } from './routes/neurodegeneration'
 import { Route as NimbleRouteImport } from './routes/nimble'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as SimulationRouteImport } from './routes/simulation'
 import { Route as ViewerRouteImport } from './routes/viewer'
 import { Route as VisionRouteImport } from './routes/vision'
+import { Route as GenomicsSymbolRouteImport } from './routes/genomics_.$symbol'
+import { Route as GenomicsCompareRouteImport } from './routes/genomics_.compare'
 import { Route as VisionEyeRouteImport } from './routes/vision_.eye'
 import { Route as VisionTherapyRouteImport } from './routes/vision_.therapy'
+import { Route as ApiGenomicsLiveRouteImport } from './routes/api.genomics.live'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +50,11 @@ const AuthRoute = AuthRouteImport.update({
 const BenchmarksRoute = BenchmarksRouteImport.update({
   id: '/benchmarks',
   path: '/benchmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenomicsRoute = GenomicsRouteImport.update({
+  id: '/genomics',
+  path: '/genomics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NeurodegenerationRoute = NeurodegenerationRouteImport.update({
@@ -78,6 +87,16 @@ const VisionRoute = VisionRouteImport.update({
   path: '/vision',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GenomicsSymbolRoute = GenomicsSymbolRouteImport.update({
+  id: '/genomics_/$symbol',
+  path: '/genomics/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenomicsCompareRoute = GenomicsCompareRouteImport.update({
+  id: '/genomics_/compare',
+  path: '/genomics/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VisionEyeRoute = VisionEyeRouteImport.update({
   id: '/vision_/eye',
   path: '/vision/eye',
@@ -88,6 +107,11 @@ const VisionTherapyRoute = VisionTherapyRouteImport.update({
   path: '/vision/therapy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiGenomicsLiveRoute = ApiGenomicsLiveRouteImport.update({
+  id: '/api/genomics/live',
+  path: '/api/genomics/live',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -95,14 +119,18 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/benchmarks': typeof BenchmarksRoute
+  '/genomics': typeof GenomicsRoute
   '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
+  '/genomics/$symbol': typeof GenomicsSymbolRoute
+  '/genomics/compare': typeof GenomicsCompareRoute
   '/vision/eye': typeof VisionEyeRoute
   '/vision/therapy': typeof VisionTherapyRoute
+  '/api/genomics/live': typeof ApiGenomicsLiveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,14 +138,18 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/benchmarks': typeof BenchmarksRoute
+  '/genomics': typeof GenomicsRoute
   '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
+  '/genomics/$symbol': typeof GenomicsSymbolRoute
+  '/genomics/compare': typeof GenomicsCompareRoute
   '/vision/eye': typeof VisionEyeRoute
   '/vision/therapy': typeof VisionTherapyRoute
+  '/api/genomics/live': typeof ApiGenomicsLiveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -126,14 +158,18 @@ export interface FileRoutesById {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/benchmarks': typeof BenchmarksRoute
+  '/genomics': typeof GenomicsRoute
   '/neurodegeneration': typeof NeurodegenerationRoute
   '/nimble': typeof NimbleRoute
   '/research': typeof ResearchRoute
   '/simulation': typeof SimulationRoute
   '/viewer': typeof ViewerRoute
   '/vision': typeof VisionRoute
+  '/genomics_/$symbol': typeof GenomicsSymbolRoute
+  '/genomics_/compare': typeof GenomicsCompareRoute
   '/vision_/eye': typeof VisionEyeRoute
   '/vision_/therapy': typeof VisionTherapyRoute
+  '/api/genomics/live': typeof ApiGenomicsLiveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,14 +179,18 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/benchmarks'
+    | '/genomics'
     | '/neurodegeneration'
     | '/nimble'
     | '/research'
     | '/simulation'
     | '/viewer'
     | '/vision'
+    | '/genomics/$symbol'
+    | '/genomics/compare'
     | '/vision/eye'
     | '/vision/therapy'
+    | '/api/genomics/live'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -158,14 +198,18 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/benchmarks'
+    | '/genomics'
     | '/neurodegeneration'
     | '/nimble'
     | '/research'
     | '/simulation'
     | '/viewer'
     | '/vision'
+    | '/genomics/$symbol'
+    | '/genomics/compare'
     | '/vision/eye'
     | '/vision/therapy'
+    | '/api/genomics/live'
   id:
     | '__root__'
     | '/'
@@ -173,14 +217,18 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/benchmarks'
+    | '/genomics'
     | '/neurodegeneration'
     | '/nimble'
     | '/research'
     | '/simulation'
     | '/viewer'
     | '/vision'
+    | '/genomics_/$symbol'
+    | '/genomics_/compare'
     | '/vision_/eye'
     | '/vision_/therapy'
+    | '/api/genomics/live'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -189,14 +237,18 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   BenchmarksRoute: typeof BenchmarksRoute
+  GenomicsRoute: typeof GenomicsRoute
   NeurodegenerationRoute: typeof NeurodegenerationRoute
   NimbleRoute: typeof NimbleRoute
   ResearchRoute: typeof ResearchRoute
   SimulationRoute: typeof SimulationRoute
   ViewerRoute: typeof ViewerRoute
   VisionRoute: typeof VisionRoute
+  GenomicsSymbolRoute: typeof GenomicsSymbolRoute
+  GenomicsCompareRoute: typeof GenomicsCompareRoute
   VisionEyeRoute: typeof VisionEyeRoute
   VisionTherapyRoute: typeof VisionTherapyRoute
+  ApiGenomicsLiveRoute: typeof ApiGenomicsLiveRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -234,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/benchmarks'
       fullPath: '/benchmarks'
       preLoaderRoute: typeof BenchmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/genomics': {
+      id: '/genomics'
+      path: '/genomics'
+      fullPath: '/genomics'
+      preLoaderRoute: typeof GenomicsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/neurodegeneration': {
@@ -278,6 +337,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VisionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/genomics_/$symbol': {
+      id: '/genomics_/$symbol'
+      path: '/genomics/$symbol'
+      fullPath: '/genomics/$symbol'
+      preLoaderRoute: typeof GenomicsSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/genomics_/compare': {
+      id: '/genomics_/compare'
+      path: '/genomics/compare'
+      fullPath: '/genomics/compare'
+      preLoaderRoute: typeof GenomicsCompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vision_/eye': {
       id: '/vision_/eye'
       path: '/vision/eye'
@@ -292,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VisionTherapyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/genomics/live': {
+      id: '/api/genomics/live'
+      path: '/api/genomics/live'
+      fullPath: '/api/genomics/live'
+      preLoaderRoute: typeof ApiGenomicsLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -301,14 +381,18 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   BenchmarksRoute: BenchmarksRoute,
+  GenomicsRoute: GenomicsRoute,
   NeurodegenerationRoute: NeurodegenerationRoute,
   NimbleRoute: NimbleRoute,
   ResearchRoute: ResearchRoute,
   SimulationRoute: SimulationRoute,
   ViewerRoute: ViewerRoute,
   VisionRoute: VisionRoute,
+  GenomicsSymbolRoute: GenomicsSymbolRoute,
+  GenomicsCompareRoute: GenomicsCompareRoute,
   VisionEyeRoute: VisionEyeRoute,
   VisionTherapyRoute: VisionTherapyRoute,
+  ApiGenomicsLiveRoute: ApiGenomicsLiveRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

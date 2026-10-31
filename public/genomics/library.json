@@ -1,0 +1,4457 @@
+{
+  "capturedAt": "2026-10-31T11:33:49+00:00",
+  "complete": true,
+  "conditions": [
+    {
+      "geneCount": 8,
+      "key": "autism",
+      "label": "Autism spectrum disorder",
+      "match": "\\bautis",
+      "note": "Matches ClinGen disease labels containing 'autis' (autism, autistic). Curations recorded under a named syndrome without that word are not included."
+    },
+    {
+      "geneCount": 0,
+      "key": "alzheimer",
+      "label": "Alzheimer disease",
+      "match": "\\balzheimer",
+      "note": "Matches ClinGen disease labels containing 'alzheimer'."
+    }
+  ],
+  "genes": [
+    {
+      "curations": [
+        {
+          "classification": "Definitive",
+          "condition": "autism",
+          "date": "2020-01-15T11:00:00.000Z",
+          "diseaseLabel": "ADNP-related multiple congenital anomalies - intellectual disability - autism spectrum disorder",
+          "gcep": "Intellectual Disability and Autism Gene Curation Expert Panel",
+          "hgncId": "HGNC:15766",
+          "moi": "AD",
+          "mondoId": "MONDO:0014379",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_837200e1-ed55-415b-bd9e-6649e4abab1d-2020-01-15T110000.000Z",
+          "sop": "SOP7"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/ADNP.json",
+          "retrievedAt": "2026-10-31T11:33:51+00:00",
+          "sha256": "50607d274e82ca10b940dcc8cc4b5cf04d971c190d7405ed7415105cd9908d6f",
+          "url": "https://rest.genenames.org/fetch/symbol/ADNP"
+        },
+        {
+          "file": "ensembl/homology_ADNP.json",
+          "retrievedAt": "2026-10-31T11:34:17+00:00",
+          "sha256": "8d2579ab7020baab49dc8383011cb1f0646e2e5541947d65de6082619b36a7dd",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000101126?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000101126",
+        "hgncId": "HGNC:15766",
+        "location": "20q13.13",
+        "locusGroup": "protein-coding gene",
+        "name": "activity dependent neuroprotector homeobox",
+        "ncbiGeneId": "23394",
+        "status": "Approved",
+        "symbol": "ADNP",
+        "uniprotIds": [
+          "Q9H2P0"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845026717",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 97.64,
+          "percPos": 98.64,
+          "proteinId": "ENSCAFP00845036948",
+          "sourcePercId": 97.73,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Boreoeutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000062002",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 49.95,
+          "percPos": 62.64,
+          "proteinId": "ENSDARP00000083553",
+          "sourcePercId": 43.92,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Gnathostomata",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000074293",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 54.84,
+          "percPos": 69.19,
+          "proteinId": "ENSDARP00000103488",
+          "sourcePercId": 49.91,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Gnathostomata",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010014260",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 76.28,
+          "percPos": 81.23,
+          "proteinId": "ENSGALP00010020167",
+          "sourcePercId": 85.21,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Amniota",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000002761",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 95.1,
+          "percPos": 95.64,
+          "proteinId": "ENSMMUP00000003708",
+          "sourcePercId": 96.91,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Catarrhini",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMUSG00000051149",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 93.77,
+          "percPos": 96.03,
+          "proteinId": "ENSMUSP00000085316",
+          "sourcePercId": 94.28,
+          "species": "mus_musculus",
+          "taxonId": 10090,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000013623",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 99.73,
+          "percPos": 99.91,
+          "proteinId": "ENSPTRP00000023435",
+          "sourcePercId": 99.73,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000010975",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 94.11,
+          "percPos": 96.37,
+          "proteinId": "ENSRNOP00000014595",
+          "sourcePercId": 94.19,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0004691",
+          "name": "2-3 toe syndactyly"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0012443",
+          "name": "Abnormal brain morphology"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0030680",
+          "name": "Abnormal cardiovascular system morphology"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0001167",
+          "name": "Abnormal finger morphology"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0001627",
+          "name": "Abnormal heart morphology"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0001597",
+          "name": "Abnormal nail morphology"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040281"
+          ],
+          "hpoId": "HP:0002167",
+          "name": "Abnormal speech pattern"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0025160",
+          "name": "Abnormal temper tantrums"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0001780",
+          "name": "Abnormal toe morphology"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001344",
+          "name": "Absent speech"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "44/54",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0006288",
+          "name": "Advanced eruption of teeth"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000718",
+          "name": "Aggressive behavior"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000646",
+          "name": "Amblyopia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0010296",
+          "name": "Ankyloglossia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "28/60"
+          ],
+          "hpoId": "HP:0000463",
+          "name": "Anteverted nares"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "3/10",
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0000739",
+          "name": "Anxiety"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002835",
+          "name": "Aspiration"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000483",
+          "name": "Astigmatism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0001631",
+          "name": "Atrial septal defect"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "2/10",
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0007018",
+          "name": "Attention deficit hyperactivity disorder"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "5/10"
+          ],
+          "hpoId": "HP:0000717",
+          "name": "Autism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "3/10",
+            "HP:0040281"
+          ],
+          "hpoId": "HP:0000729",
+          "name": "Autistic behavior"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000006",
+          "name": "Autosomal dominant inheritance"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0001488",
+          "name": "Bilateral ptosis"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000248",
+          "name": "Brachycephaly"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0001156",
+          "name": "Brachydactyly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000283",
+          "name": "Broad face"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0010055",
+          "name": "Broad hallux"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "15/57"
+          ],
+          "hpoId": "HP:0000455",
+          "name": "Broad nasal tip"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0011304",
+          "name": "Broad thumb"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0003763",
+          "name": "Bruxism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000670",
+          "name": "Carious teeth"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002059",
+          "name": "Cerebral atrophy"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0100704",
+          "name": "Cerebral visual impairment"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0012450",
+          "name": "Chronic constipation"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002028",
+          "name": "Chronic diarrhea"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0004209",
+          "name": "Clinodactyly of the 5th finger"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "11/65"
+          ],
+          "hpoId": "HP:0000280",
+          "name": "Coarse facial features"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0000722",
+          "name": "Compulsive behaviors"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0003577",
+          "name": "Congenital onset"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0002019",
+          "name": "Constipation"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000028",
+          "name": "Cryptorchidism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000378",
+          "name": "Cupped ear"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "5/46"
+          ],
+          "hpoId": "HP:0000824",
+          "name": "Decreased response to growth hormone stimulation test"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040281"
+          ],
+          "hpoId": "HP:0000750",
+          "name": "Delayed speech and language development"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0005280",
+          "name": "Depressed nasal bridge"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002376",
+          "name": "Developmental regression"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "23/70"
+          ],
+          "hpoId": "HP:0000494",
+          "name": "Downslanted palpebral fissures"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002015",
+          "name": "Dysphagia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0010529",
+          "name": "Echolalia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0007651",
+          "name": "Ectropion of lower eyelids"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000105",
+          "name": "Enlarged kidney"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0010677",
+          "name": "Enuresis nocturna"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000286",
+          "name": "Epicanthus"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002572",
+          "name": "Episodic vomiting"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "25/55"
+          ],
+          "hpoId": "HP:0000232",
+          "name": "Everted lower lip vermilion"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000577",
+          "name": "Exotropia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "12/63"
+          ],
+          "hpoId": "HP:0000625",
+          "name": "Eyelid coloboma"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0010628",
+          "name": "Facial palsy"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001508",
+          "name": "Failure to thrive"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0011968",
+          "name": "Feeding difficulties"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0008947",
+          "name": "Floppy infant"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0007042",
+          "name": "Focal white matter lesions"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0002020",
+          "name": "Gastroesophageal reflux"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0011471",
+          "name": "Gastrostomy tube feeding in infancy"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0008935",
+          "name": "Generalized neonatal hypotonia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002857",
+          "name": "Genu valgum"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002171",
+          "name": "Gliosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "4/10",
+            "HP:0040281"
+          ],
+          "hpoId": "HP:0001263",
+          "name": "Global developmental delay"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0040082",
+          "name": "Happy demeanor"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0030148",
+          "name": "Heart murmur"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "33/66",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0009890",
+          "name": "High anterior hairline"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002705",
+          "name": "High, narrow palate"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0001007",
+          "name": "Hirsutism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000752",
+          "name": "Hyperactivity"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0003307",
+          "name": "Hyperlordosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "2/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000540",
+          "name": "Hypermetropia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000316",
+          "name": "Hypertelorism"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0001276",
+          "name": "Hypertonia"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002079",
+          "name": "Hypoplasia of the corpus callosum"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "6/10"
+          ],
+          "hpoId": "HP:0001252",
+          "name": "Hypotonia"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0005216",
+          "name": "Impaired mastication"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "3/10"
+          ],
+          "hpoId": "HP:0003593",
+          "name": "Infantile onset"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000023",
+          "name": "Inguinal hernia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "10/10"
+          ],
+          "hpoId": "HP:0001249",
+          "name": "Intellectual disability"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001511",
+          "name": "Intrauterine growth retardation"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000612",
+          "name": "Iris coloboma"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000737",
+          "name": "Irritability"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "3/10",
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0001382",
+          "name": "Joint hypermobility"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0001118",
+          "name": "Juvenile cataract"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0003621",
+          "name": "Juvenile onset"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0006956",
+          "name": "Lateral ventricle dilatation"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000276",
+          "name": "Long face"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000637",
+          "name": "Long palpebral fissure"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "22/56"
+          ],
+          "hpoId": "HP:0000343",
+          "name": "Long philtrum"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "11/78",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000369",
+          "name": "Low-set ears"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0012420",
+          "name": "Meconium stained amniotic fluid"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0000252",
+          "name": "Microcephaly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000691",
+          "name": "Microdontia"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0008551",
+          "name": "Microtia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0011800",
+          "name": "Midface retrusion"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0011342",
+          "name": "Mild global developmental delay"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0001653",
+          "name": "Mitral regurgitation"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0001634",
+          "name": "Mitral valve prolapse"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0011343",
+          "name": "Moderate global developmental delay"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001270",
+          "name": "Motor delay"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0000733",
+          "name": "Motor stereotypy"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "14/58"
+          ],
+          "hpoId": "HP:0045025",
+          "name": "Narrow palpebral fissure"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "5/10"
+          ],
+          "hpoId": "HP:0003623",
+          "name": "Neonatal onset"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001513",
+          "name": "Obesity"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000677",
+          "name": "Oligodontia"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0200136",
+          "name": "Oral-pharyngeal dysphagia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000767",
+          "name": "Pectus excavatum"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "3/10"
+          ],
+          "hpoId": "HP:0001763",
+          "name": "Pes planus"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0012683",
+          "name": "Pineal cyst"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0001357",
+          "name": "Plagiocephaly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0010442",
+          "name": "Polydactyly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0002591",
+          "name": "Polyphagia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002421",
+          "name": "Poor head control"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0011327",
+          "name": "Posterior plagiocephaly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "11/78"
+          ],
+          "hpoId": "HP:0000358",
+          "name": "Posteriorly rotated ears"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001788",
+          "name": "Premature rupture of membranes"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001212",
+          "name": "Prominent fingertip pads"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "45/74"
+          ],
+          "hpoId": "HP:0011220",
+          "name": "Prominent forehead"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000411",
+          "name": "Protruding ear"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000508",
+          "name": "Ptosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002205",
+          "name": "Recurrent respiratory infections"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002788",
+          "name": "Recurrent upper respiratory tract infections"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "2/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000010",
+          "name": "Recurrent urinary tract infections"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000817",
+          "name": "Reduced eye contact"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040281"
+          ],
+          "hpoId": "HP:0012760",
+          "name": "Reduced social responsiveness"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0002098",
+          "name": "Respiratory distress"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0001852",
+          "name": "Sandal gap"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0002650",
+          "name": "Scoliosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0001250",
+          "name": "Seizure"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040282"
+          ],
+          "hpoId": "HP:0011344",
+          "name": "Severe global developmental delay"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0008093",
+          "name": "Short 4th toe"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000331",
+          "name": "Short chin"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0006385",
+          "name": "Short lower limbs"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "32/73"
+          ],
+          "hpoId": "HP:0003196",
+          "name": "Short nose"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0012745",
+          "name": "Short palpebral fissure"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "2/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0004322",
+          "name": "Short stature"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000954",
+          "name": "Single transverse palmar crease"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0200006",
+          "name": "Slanting of the palpebral fissure"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002360",
+          "name": "Sleep disturbance"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0200055",
+          "name": "Small hand"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "-",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000319",
+          "name": "Smooth philtrum"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0002209",
+          "name": "Sparse scalp hair"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000486",
+          "name": "Strabismus"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0001182",
+          "name": "Tapered finger"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "20/55",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000179",
+          "name": "Thick lower lip vermilion"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0000963",
+          "name": "Thin skin"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "49/74",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000219",
+          "name": "Thin upper lip vermilion"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0000233",
+          "name": "Thin vermilion border"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0032792",
+          "name": "Tonic seizure"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0000243",
+          "name": "Trigonocephaly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "2/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0001956",
+          "name": "Truncal obesity"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "1/10"
+          ],
+          "hpoId": "HP:0011147",
+          "name": "Typical absence seizure"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040284"
+          ],
+          "hpoId": "HP:0001537",
+          "name": "Umbilical hernia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "2/10"
+          ],
+          "hpoId": "HP:0000582",
+          "name": "Upslanted palpebral fissure"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040281"
+          ],
+          "hpoId": "HP:0000020",
+          "name": "Urinary incontinence"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873",
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "1/10",
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002119",
+          "name": "Ventriculomegaly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000505",
+          "name": "Visual impairment"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0002013",
+          "name": "Vomiting"
+        },
+        {
+          "diseaseIds": [
+            "ORPHA:404448"
+          ],
+          "frequencies": [
+            "HP:0040283"
+          ],
+          "hpoId": "HP:0006610",
+          "name": "Wide intermamillary distance"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "14/66"
+          ],
+          "hpoId": "HP:0000154",
+          "name": "Wide mouth"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "34/76"
+          ],
+          "hpoId": "HP:0000431",
+          "name": "Wide nasal bridge"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:615873"
+          ],
+          "frequencies": [
+            "19/62"
+          ],
+          "hpoId": "HP:0000687",
+          "name": "Widely spaced teeth"
+        }
+      ],
+      "symbol": "ADNP"
+    },
+    {
+      "curations": [
+        {
+          "classification": "Disputed",
+          "condition": "autism",
+          "date": "2022-03-01T11:00:00.000Z",
+          "diseaseLabel": "autism spectrum disorder",
+          "gcep": "Intellectual Disability and Autism Gene Curation Expert Panel",
+          "hgncId": "HGNC:895",
+          "moi": "UD",
+          "mondoId": "MONDO:0005258",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_8ea232de-063f-489a-b00a-8c5d11dbe43a-2022-03-01T110000.000Z",
+          "sop": "SOP9"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/AVPR1A.json",
+          "retrievedAt": "2026-10-31T11:33:52+00:00",
+          "sha256": "a265900e31347412674ce4e342a521c9ef587ec02bea044fad41ccf40c67ed6c",
+          "url": "https://rest.genenames.org/fetch/symbol/AVPR1A"
+        },
+        {
+          "file": "ensembl/homology_AVPR1A.json",
+          "retrievedAt": "2026-10-31T11:34:24+00:00",
+          "sha256": "aeecece24dc6ce4d71acf10bb6ba65fbbddb84ec63d2311e076cc7ee76babd65",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000166148?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000166148",
+        "hgncId": "HGNC:895",
+        "location": "12q14.2",
+        "locusGroup": "protein-coding gene",
+        "name": "arginine vasopressin receptor 1A",
+        "ncbiGeneId": "552",
+        "status": "Approved",
+        "symbol": "AVPR1A",
+        "uniprotIds": [
+          "P37288"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845009998",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 81.88,
+          "percPos": 86.96,
+          "proteinId": "ENSCAFP00845013688",
+          "sourcePercId": 81.1,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Boreoeutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000045788",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 55.37,
+          "percPos": 68.05,
+          "proteinId": "ENSDARP00000067308",
+          "sourcePercId": 54.31,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000077083",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 62.8,
+          "percPos": 77.84,
+          "proteinId": "ENSDARP00000100061",
+          "sourcePercId": 56.94,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010011713",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 69.69,
+          "percPos": 77.8,
+          "proteinId": "ENSGALP00010016069",
+          "sourcePercId": 69.86,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Amniota",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000000549",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 92.91,
+          "percPos": 94.56,
+          "proteinId": "ENSMMUP00000000738",
+          "sourcePercId": 94.02,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Catarrhini",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMUSG00000020123",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 81.8,
+          "percPos": 88.18,
+          "proteinId": "ENSMUSP00000020323",
+          "sourcePercId": 82.78,
+          "species": "mus_musculus",
+          "taxonId": 10090,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000005167",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 98.81,
+          "percPos": 98.81,
+          "proteinId": "ENSPTRP00000061123",
+          "sourcePercId": 99.52,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000004400",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 81.84,
+          "percPos": 88.21,
+          "proteinId": "ENSRNOP00000005829",
+          "sourcePercId": 83.01,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [],
+      "symbol": "AVPR1A"
+    },
+    {
+      "curations": [
+        {
+          "classification": "Moderate",
+          "condition": "autism",
+          "date": "2026-02-02T11:00:00.000Z",
+          "diseaseLabel": "neurodevelopmental disorder with language impairment, autism, and attention deficit-hyperactivity disorder",
+          "gcep": "Intellectual Disability and Autism Gene Curation Expert Panel",
+          "hgncId": "HGNC:6743",
+          "moi": "AD",
+          "mondoId": "MONDO:0968945",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_688d0e25-04f0-4160-a53a-00a6b423cafa-2026-02-02T110000.000Z",
+          "sop": "SOP11"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/CAPRIN1.json",
+          "retrievedAt": "2026-10-31T11:33:52+00:00",
+          "sha256": "28a01028cac755410f4970fa69fcf07ee40c5972ab1ccd526c65ad24644b62b1",
+          "url": "https://rest.genenames.org/fetch/symbol/CAPRIN1"
+        },
+        {
+          "file": "ensembl/homology_CAPRIN1.json",
+          "retrievedAt": "2026-10-31T11:34:48+00:00",
+          "sha256": "2745af6e8d98e7236d781739320295ecb9ed2d741b03f57d9579e305bac2e665",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000135387?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000135387",
+        "hgncId": "HGNC:6743",
+        "location": "11p13",
+        "locusGroup": "protein-coding gene",
+        "name": "cell cycle associated protein 1",
+        "ncbiGeneId": "4076",
+        "status": "Approved",
+        "symbol": "CAPRIN1",
+        "uniprotIds": [
+          "Q14444"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845024554",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 97.49,
+          "percPos": 97.91,
+          "proteinId": "ENSCAFP00845034080",
+          "sourcePercId": 98.59,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Eutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000009346",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 57.61,
+          "percPos": 72.39,
+          "proteinId": "ENSDARP00000106234",
+          "sourcePercId": 54.44,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000054272",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 59.14,
+          "percPos": 72.81,
+          "proteinId": "ENSDARP00000089659",
+          "sourcePercId": 57.97,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010024855",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 87.46,
+          "percPos": 93.16,
+          "proteinId": "ENSGALP00010037443",
+          "sourcePercId": 86.6,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Amniota",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000021643",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 100.0,
+          "percPos": 100.0,
+          "proteinId": "ENSMMUP00000028504",
+          "sourcePercId": 100.0,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Catarrhini",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMUSG00000027184",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 97.03,
+          "percPos": 98.59,
+          "proteinId": "ENSMUSP00000106777",
+          "sourcePercId": 96.76,
+          "species": "mus_musculus",
+          "taxonId": 10090,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000003493",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 98.34,
+          "percPos": 98.34,
+          "proteinId": "ENSPTRP00000006065",
+          "sourcePercId": 100.0,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000009152",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 92.8,
+          "percPos": 94.16,
+          "proteinId": "ENSRNOP00000012428",
+          "sourcePercId": 96.33,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000718",
+          "name": "Aggressive behavior"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000739",
+          "name": "Anxiety"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0001284",
+          "name": "Areflexia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0000483",
+          "name": "Astigmatism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/1"
+          ],
+          "hpoId": "HP:0001251",
+          "name": "Ataxia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "9/11"
+          ],
+          "hpoId": "HP:0007018",
+          "name": "Attention deficit hyperactivity disorder"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "9/12"
+          ],
+          "hpoId": "HP:0000729",
+          "name": "Autistic behavior"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636",
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000006",
+          "name": "Autosomal dominant inheritance"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000455",
+          "name": "Broad nasal tip"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0000957",
+          "name": "Cafe-au-lait spot"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0001272",
+          "name": "Cerebellar atrophy"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0002059",
+          "name": "Cerebral atrophy"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636",
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/2",
+            "9/12"
+          ],
+          "hpoId": "HP:0011463",
+          "name": "Childhood onset"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0011265",
+          "name": "Cleft earlobe"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0004209",
+          "name": "Clinodactyly of the 5th finger"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/1"
+          ],
+          "hpoId": "HP:0034332",
+          "name": "Cognitive regression"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0003577",
+          "name": "Congenital onset"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000490",
+          "name": "Deeply set eye"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "12/12"
+          ],
+          "hpoId": "HP:0000750",
+          "name": "Delayed speech and language development"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0001260",
+          "name": "Dysarthria"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0002075",
+          "name": "Dysdiadochokinesis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0002015",
+          "name": "Dysphagia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0007359",
+          "name": "Focal-onset seizure"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0002121",
+          "name": "Generalized non-motor (absence) seizure"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "5/12"
+          ],
+          "hpoId": "HP:0001263",
+          "name": "Global developmental delay"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0003391",
+          "name": "Gowers sign"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "3/12"
+          ],
+          "hpoId": "HP:0000365",
+          "name": "Hearing impairment"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000540",
+          "name": "Hypermetropia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000316",
+          "name": "Hypertelorism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000601",
+          "name": "Hypotelorism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0002521",
+          "name": "Hypsarrhythmia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0003593",
+          "name": "Infantile onset"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0012469",
+          "name": "Infantile spasms"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0003621",
+          "name": "Juvenile onset"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0000276",
+          "name": "Long face"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/1"
+          ],
+          "hpoId": "HP:0002505",
+          "name": "Loss of ambulation"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000294",
+          "name": "Low anterior hairline"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0009765",
+          "name": "Low hanging columella"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000347",
+          "name": "Micrognathia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000545",
+          "name": "Myopia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0002870",
+          "name": "Obstructive sleep apnea"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0003477",
+          "name": "Peripheral axonal neuropathy"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000201",
+          "name": "Pierre-Robin sequence"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0001212",
+          "name": "Prominent fingertip pads"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/1"
+          ],
+          "hpoId": "HP:0003701",
+          "name": "Proximal muscle weakness"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000508",
+          "name": "Ptosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0000960",
+          "name": "Sacral dimple"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0002650",
+          "name": "Scoliosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0001195",
+          "name": "Single umbilical artery"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0003202",
+          "name": "Skeletal muscle atrophy"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "3/12"
+          ],
+          "hpoId": "HP:0000486",
+          "name": "Strabismus"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "2/12"
+          ],
+          "hpoId": "HP:0000219",
+          "name": "Thin upper lip vermilion"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0001337",
+          "name": "Tremor"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620782"
+          ],
+          "frequencies": [
+            "1/12"
+          ],
+          "hpoId": "HP:0001537",
+          "name": "Umbilical hernia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:620636"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0002317",
+          "name": "Unsteady gait"
+        }
+      ],
+      "symbol": "CAPRIN1"
+    },
+    {
+      "curations": [
+        {
+          "classification": "Moderate",
+          "condition": "autism",
+          "date": "2023-02-28T17:00:00.000Z",
+          "diseaseLabel": "PAX5-related B lymphopenia and autism spectrum disorder",
+          "gcep": "Antibody Deficiencies Gene Curation Expert Panel",
+          "hgncId": "HGNC:8619",
+          "moi": "AR",
+          "mondoId": "MONDO:0100299",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_111b7453-55ff-4638-9cb7-1936400ec2a4-2023-02-28T170000.000Z",
+          "sop": "SOP9"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/PAX5.json",
+          "retrievedAt": "2026-10-31T11:33:53+00:00",
+          "sha256": "9c269cbc11caf56e370a5b65d00c391f429db1d3d84eb8464d1948fda9514ee4",
+          "url": "https://rest.genenames.org/fetch/symbol/PAX5"
+        },
+        {
+          "file": "ensembl/homology_PAX5.json",
+          "retrievedAt": "2026-10-31T11:34:54+00:00",
+          "sha256": "0364c6ca0f353bdcab26f0d986f98c8467f76a95e12ceb9bb624ed3925545c9d",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000196092?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000196092",
+        "hgncId": "HGNC:8619",
+        "location": "9p13.2",
+        "locusGroup": "protein-coding gene",
+        "name": "paired box 5",
+        "ncbiGeneId": "5079",
+        "status": "Approved",
+        "symbol": "PAX5",
+        "uniprotIds": [
+          "Q02548"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845013298",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 98.98,
+          "percPos": 99.23,
+          "proteinId": "ENSCAFP00845018662",
+          "sourcePercId": 98.98,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Boreoeutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000037383",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 74.49,
+          "percPos": 83.84,
+          "proteinId": "ENSDARP00000114412",
+          "sourcePercId": 75.45,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010001212",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 87.53,
+          "percPos": 90.22,
+          "proteinId": "ENSGALP00010001350",
+          "sourcePercId": 91.56,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Sarcopterygii",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000019639",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 66.34,
+          "percPos": 70.52,
+          "proteinId": "ENSMMUP00000043020",
+          "sourcePercId": 69.05,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Primates",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMUSG00000014030",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 99.23,
+          "percPos": 99.23,
+          "proteinId": "ENSMUSP00000014174",
+          "sourcePercId": 99.23,
+          "species": "mus_musculus",
+          "taxonId": 10090,
+          "taxonomyLevel": "Eutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000020936",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 100.0,
+          "percPos": 100.0,
+          "proteinId": "ENSPTRP00000049315",
+          "sourcePercId": 100.0,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000024729",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 94.63,
+          "percPos": 94.63,
+          "proteinId": "ENSRNOP00000108398",
+          "sourcePercId": 99.23,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Eutheria",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [],
+      "symbol": "PAX5"
+    },
+    {
+      "curations": [
+        {
+          "classification": "Disputed",
+          "condition": "autism",
+          "date": "2021-01-06T17:00:00.000Z",
+          "diseaseLabel": "autism spectrum disorder",
+          "gcep": "Intellectual Disability and Autism Gene Curation Expert Panel",
+          "hgncId": "HGNC:11050",
+          "moi": "AD",
+          "mondoId": "MONDO:0005258",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_cc4b0612-0a53-4e36-b737-5c0f49a387a1-2021-01-06T170000.000Z",
+          "sop": "SOP8"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/SLC6A4.json",
+          "retrievedAt": "2026-10-31T11:33:53+00:00",
+          "sha256": "57dd727b84f5c9618acd05aadc47626e1bf8139ad566efd3607477a7b6139b95",
+          "url": "https://rest.genenames.org/fetch/symbol/SLC6A4"
+        },
+        {
+          "file": "ensembl/homology_SLC6A4.json",
+          "retrievedAt": "2026-10-31T11:35:18+00:00",
+          "sha256": "6b2fabe8b8289665b3d559d2d86377b7d3780efa06cb7608711b57de60fa411e",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000108576?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000108576",
+        "hgncId": "HGNC:11050",
+        "location": "17q11.2",
+        "locusGroup": "protein-coding gene",
+        "name": "solute carrier family 6 member 4",
+        "ncbiGeneId": "6532",
+        "status": "Approved",
+        "symbol": "SLC6A4",
+        "uniprotIds": [
+          "P31645"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845012358",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 93.33,
+          "percPos": 95.4,
+          "proteinId": "ENSCAFP00845017273",
+          "sourcePercId": 93.33,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Boreoeutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000061165",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 67.03,
+          "percPos": 78.95,
+          "proteinId": "ENSDARP00000081336",
+          "sourcePercId": 68.73,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010029709",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 76.27,
+          "percPos": 83.88,
+          "proteinId": "ENSGALP00010044551",
+          "sourcePercId": 81.11,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Amniota",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000003515",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 98.57,
+          "percPos": 99.52,
+          "proteinId": "ENSMMUP00000004679",
+          "sourcePercId": 98.57,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Catarrhini",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMUSG00000020838",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 92.54,
+          "percPos": 95.4,
+          "proteinId": "ENSMUSP00000021195",
+          "sourcePercId": 92.54,
+          "species": "mus_musculus",
+          "taxonId": 10090,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000008958",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 99.37,
+          "percPos": 99.52,
+          "proteinId": "ENSPTRP00000015294",
+          "sourcePercId": 99.37,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000003476",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 91.75,
+          "percPos": 94.92,
+          "proteinId": "ENSRNOP00000004717",
+          "sourcePercId": 91.75,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [
+        {
+          "diseaseIds": [
+            "OMIM:164230"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000739",
+          "name": "Anxiety"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:164230"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000006",
+          "name": "Autosomal dominant inheritance"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:164230"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0030212",
+          "name": "Collectionism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:164230"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000722",
+          "name": "Compulsive behaviors"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:164230"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000716",
+          "name": "Depression"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:164230"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0012166",
+          "name": "Skin-picking"
+        }
+      ],
+      "symbol": "SLC6A4"
+    },
+    {
+      "curations": [
+        {
+          "classification": "Disputed",
+          "condition": "autism",
+          "date": "2020-10-08T16:00:00.000Z",
+          "diseaseLabel": "autism spectrum disorder",
+          "gcep": "Intellectual Disability and Autism Gene Curation Expert Panel",
+          "hgncId": "HGNC:20653",
+          "moi": "AD",
+          "mondoId": "MONDO:0005258",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_463ee005-1264-45da-bd85-3776a6637c68-2020-10-08T160000.000Z",
+          "sop": "SOP7"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/SLC9A9.json",
+          "retrievedAt": "2026-10-31T11:33:54+00:00",
+          "sha256": "2ad9c887520cb71ad91bf8c95bc6908f55de662fb27b750672b9162b9bf92955",
+          "url": "https://rest.genenames.org/fetch/symbol/SLC9A9"
+        },
+        {
+          "file": "ensembl/homology_SLC9A9.json",
+          "retrievedAt": "2026-10-31T11:36:47+00:00",
+          "sha256": "13d25b705231708f002f3c14abd35d2706774bd6085d0a54b05f9014670ed253",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000181804?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000181804",
+        "hgncId": "HGNC:20653",
+        "location": "3q24",
+        "locusGroup": "protein-coding gene",
+        "name": "solute carrier family 9 member A9",
+        "ncbiGeneId": "285195",
+        "status": "Approved",
+        "symbol": "SLC9A9",
+        "uniprotIds": [
+          "Q8IVB4"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845029260",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 94.1,
+          "percPos": 96.89,
+          "proteinId": "ENSCAFP00845040642",
+          "sourcePercId": 93.95,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Boreoeutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010015887",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 80.72,
+          "percPos": 88.8,
+          "proteinId": "ENSGALP00010022126",
+          "sourcePercId": 80.47,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Sarcopterygii",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000009694",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 94.64,
+          "percPos": 95.09,
+          "proteinId": "ENSMMUP00000061734",
+          "sourcePercId": 98.6,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Catarrhini",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMUSG00000031129",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 92.24,
+          "percPos": 95.65,
+          "proteinId": "ENSMUSP00000033463",
+          "sourcePercId": 92.09,
+          "species": "mus_musculus",
+          "taxonId": 10090,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000015491",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 99.84,
+          "percPos": 99.84,
+          "proteinId": "ENSPTRP00000026668",
+          "sourcePercId": 99.84,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000008554",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 91.47,
+          "percPos": 95.35,
+          "proteinId": "ENSRNOP00000011358",
+          "sourcePercId": 91.47,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [],
+      "symbol": "SLC9A9"
+    },
+    {
+      "curations": [
+        {
+          "classification": "Definitive",
+          "condition": "autism",
+          "date": "2026-06-22T10:00:00.000Z",
+          "diseaseLabel": "intellectual developmental disorder with autistic features and language delay, with or without seizures",
+          "gcep": "Intellectual Disability and Autism Gene Curation Expert Panel",
+          "hgncId": "HGNC:30212",
+          "moi": "AD",
+          "mondoId": "MONDO:0030051",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_b3d3d067-5a78-44b4-9c57-25cc784123bf-2026-06-22T100000.000Z",
+          "sop": "SOP12"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/TANC2.json",
+          "retrievedAt": "2026-10-31T11:33:55+00:00",
+          "sha256": "f885dbba0e43e8be5676fcccc5511612d7682641c36b9abe32c62de6647873fb",
+          "url": "https://rest.genenames.org/fetch/symbol/TANC2"
+        },
+        {
+          "file": "ensembl/homology_TANC2.json",
+          "retrievedAt": "2026-10-31T11:37:11+00:00",
+          "sha256": "fb2cbd23054b63ff51bba215d44e7749b35d59869fb33d56b63b2a2184ea9c53",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000170921?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000170921",
+        "hgncId": "HGNC:30212",
+        "location": "17q23.2-q23.3",
+        "locusGroup": "protein-coding gene",
+        "name": "tetratricopeptide repeat, ankyrin repeat and coiled-coil containing 2",
+        "ncbiGeneId": "26115",
+        "status": "Approved",
+        "symbol": "TANC2",
+        "uniprotIds": [
+          "Q9HCD6"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845017410",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 98.6,
+          "percPos": 99.05,
+          "proteinId": "ENSCAFP00845024190",
+          "sourcePercId": 94.99,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Eutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000079097",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 72.48,
+          "percPos": 82.46,
+          "proteinId": "ENSDARP00000146066",
+          "sourcePercId": 70.73,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000107441",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 67.77,
+          "percPos": 77.84,
+          "proteinId": "ENSDARP00000146288",
+          "sourcePercId": 67.84,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010023245",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 94.99,
+          "percPos": 97.54,
+          "proteinId": "ENSGALP00010034430",
+          "sourcePercId": 95.03,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Amniota",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000013411",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 99.61,
+          "percPos": 99.76,
+          "proteinId": "ENSMMUP00000017615",
+          "sourcePercId": 99.76,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Catarrhini",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMUSG00000053580",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 98.09,
+          "percPos": 98.8,
+          "proteinId": "ENSMUSP00000097904",
+          "sourcePercId": 94.31,
+          "species": "mus_musculus",
+          "taxonId": 10090,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000009511",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 99.9,
+          "percPos": 99.95,
+          "proteinId": "ENSPTRP00000064371",
+          "sourcePercId": 99.47,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000052840",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 97.83,
+          "percPos": 98.7,
+          "proteinId": "ENSRNOP00000069281",
+          "sourcePercId": 97.93,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Euarchontoglires",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "4/12"
+          ],
+          "hpoId": "HP:0000739",
+          "name": "Anxiety"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "4/14"
+          ],
+          "hpoId": "HP:0007018",
+          "name": "Attention deficit hyperactivity disorder"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "15/20"
+          ],
+          "hpoId": "HP:0000729",
+          "name": "Autistic behavior"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000006",
+          "name": "Autosomal dominant inheritance"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "9/15"
+          ],
+          "hpoId": "HP:0012450",
+          "name": "Chronic constipation"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "3/14"
+          ],
+          "hpoId": "HP:0001363",
+          "name": "Craniosynostosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "18/20"
+          ],
+          "hpoId": "HP:0000750",
+          "name": "Delayed speech and language development"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "2/11"
+          ],
+          "hpoId": "HP:0002376",
+          "name": "Developmental regression"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "5/13"
+          ],
+          "hpoId": "HP:0001290",
+          "name": "Generalized hypotonia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "19/20"
+          ],
+          "hpoId": "HP:0001249",
+          "name": "Intellectual disability"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "3/9"
+          ],
+          "hpoId": "HP:0001382",
+          "name": "Joint hypermobility"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "3/18"
+          ],
+          "hpoId": "HP:0000252",
+          "name": "Microcephaly"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "13/19"
+          ],
+          "hpoId": "HP:0001270",
+          "name": "Motor delay"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "13/19"
+          ],
+          "hpoId": "HP:0000733",
+          "name": "Motor stereotypy"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0002650",
+          "name": "Scoliosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "11/20"
+          ],
+          "hpoId": "HP:0001250",
+          "name": "Seizure"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "5/13"
+          ],
+          "hpoId": "HP:0002360",
+          "name": "Sleep disturbance"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "5/13"
+          ],
+          "hpoId": "HP:0002497",
+          "name": "Spastic ataxia"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:618906"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0000687",
+          "name": "Widely spaced teeth"
+        }
+      ],
+      "symbol": "TANC2"
+    },
+    {
+      "curations": [
+        {
+          "classification": "Disputed",
+          "condition": "autism",
+          "date": "2021-03-02T05:00:00.000Z",
+          "diseaseLabel": "autism spectrum disorder",
+          "gcep": "Intellectual Disability and Autism Gene Curation Expert Panel",
+          "hgncId": "HGNC:18308",
+          "moi": "XL",
+          "mondoId": "MONDO:0005258",
+          "reportUrl": "https://search.clinicalgenome.org/kb/gene-validity/CGGV:assertion_7a780ea6-ad4e-417a-a596-27188e327aad-2021-03-02T050000.000Z",
+          "sop": "SOP8"
+        }
+      ],
+      "files": [
+        {
+          "file": "hgnc/TMLHE.json",
+          "retrievedAt": "2026-10-31T11:33:55+00:00",
+          "sha256": "9551b2c4fa8d5ac3409a31951f1ffb78d54833e54b1d9e6bf4f89119c0cdd6f0",
+          "url": "https://rest.genenames.org/fetch/symbol/TMLHE"
+        },
+        {
+          "file": "ensembl/homology_TMLHE.json",
+          "retrievedAt": "2026-10-31T11:37:25+00:00",
+          "sha256": "2907772c3869e67f9b267510f8dc3e8e62deca3038160b82b1753a5d72baf223",
+          "url": "https://rest.ensembl.org/homology/id/human/ENSG00000185973?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+        }
+      ],
+      "hgnc": {
+        "ensemblGeneId": "ENSG00000185973",
+        "hgncId": "HGNC:18308",
+        "location": "Xq28",
+        "locusGroup": "protein-coding gene",
+        "name": "trimethyllysine hydroxylase, epsilon",
+        "ncbiGeneId": "55217",
+        "status": "Approved",
+        "symbol": "TMLHE",
+        "uniprotIds": [
+          "Q9NVH6"
+        ]
+      },
+      "hgncIdCheck": "agree",
+      "orthologueStatus": "ok",
+      "orthologues": [
+        {
+          "dnDs": null,
+          "geneId": "ENSCAFG00845018126",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 89.71,
+          "percPos": 93.63,
+          "proteinId": "ENSCAFP00845025076",
+          "sourcePercId": 86.94,
+          "species": "canis_lupus_familiaris",
+          "taxonId": 9615,
+          "taxonomyLevel": "Boreoeutheria",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSDARG00000077547",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 69.27,
+          "percPos": 80.24,
+          "proteinId": "ENSDARP00000119657",
+          "sourcePercId": 67.46,
+          "species": "danio_rerio",
+          "taxonId": 7955,
+          "taxonomyLevel": "Euteleostomi",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSGALG00010015194",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 77.03,
+          "percPos": 84.01,
+          "proteinId": "ENSGALP00010021351",
+          "sourcePercId": 81.24,
+          "species": "gallus_gallus",
+          "taxonId": 9031,
+          "taxonomyLevel": "Amniota",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSMMUG00000009481",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 98.81,
+          "percPos": 99.05,
+          "proteinId": "ENSMMUP00000012404",
+          "sourcePercId": 98.81,
+          "species": "macaca_mulatta",
+          "taxonId": 9544,
+          "taxonomyLevel": "Catarrhini",
+          "type": "ortholog_one2one"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000022464",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 89.39,
+          "percPos": 92.84,
+          "proteinId": "ENSPTRP00000070507",
+          "sourcePercId": 80.05,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSPTRG00000045691",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 100.0,
+          "percPos": 100.0,
+          "proteinId": "ENSPTRP00000090224",
+          "sourcePercId": 100.0,
+          "species": "pan_troglodytes",
+          "taxonId": 9598,
+          "taxonomyLevel": "Homininae",
+          "type": "ortholog_one2many"
+        },
+        {
+          "dnDs": null,
+          "geneId": "ENSRNOG00000000729",
+          "method": "ENSEMBL_ORTHOLOGUES",
+          "percId": 65.84,
+          "percPos": 72.81,
+          "proteinId": "ENSRNOP00000044070",
+          "sourcePercId": 69.6,
+          "species": "rattus_norvegicus",
+          "taxonId": 10116,
+          "taxonomyLevel": "Eutheria",
+          "type": "ortholog_one2one"
+        }
+      ],
+      "phenotypes": [
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0000717",
+          "name": "Autism"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0000750",
+          "name": "Delayed speech and language development"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "0/2"
+          ],
+          "hpoId": "HP:0002376",
+          "name": "Developmental regression"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0001249",
+          "name": "Intellectual disability"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0002003",
+          "name": "Large forehead"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0000160",
+          "name": "Narrow mouth"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "2/2"
+          ],
+          "hpoId": "HP:0001513",
+          "name": "Obesity"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0000508",
+          "name": "Ptosis"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "0/2"
+          ],
+          "hpoId": "HP:0001250",
+          "name": "Seizure"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0000322",
+          "name": "Short philtrum"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "1/2"
+          ],
+          "hpoId": "HP:0000430",
+          "name": "Underdeveloped nasal alae"
+        },
+        {
+          "diseaseIds": [
+            "OMIM:300872"
+          ],
+          "frequencies": [
+            "-"
+          ],
+          "hpoId": "HP:0001419",
+          "name": "X-linked recessive inheritance"
+        }
+      ],
+      "symbol": "TMLHE"
+    }
+  ],
+  "libraryVersion": "1.0.0",
+  "mode": "snapshot",
+  "notice": "Research software. Not a medical device, not clinically validated, and not for clinical decision-making. A gene-condition curation describes published evidence about a gene; it is not a diagnosis, a risk estimate or proof of cause for any person. An orthologue is a gene related by descent, not a gene shown to have the same function.",
+  "releases": {
+    "ensembl": 116,
+    "hpo": "v2026-09-01"
+  },
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "file": {
+        "file": "clingen_gene_validity.csv",
+        "retrievedAt": "2026-10-31T11:33:51+00:00",
+        "sha256": "4920538f843d2c5b650f5d4cfeffeff1211c4b81ab04d012f0e70aab2594d9c6",
+        "url": "https://search.clinicalgenome.org/kb/gene-validity/download"
+      },
+      "fileCount": 1,
+      "id": "clingen-gene-validity",
+      "name": "ClinGen gene-disease validity",
+      "retrievedAt": "2026-10-31T11:33:51+00:00",
+      "status": "ok"
+    },
+    {
+      "file": null,
+      "fileCount": 8,
+      "id": "hgnc-rest",
+      "name": "HGNC",
+      "retrievedAt": "2026-10-31T11:33:55+00:00",
+      "status": "ok"
+    },
+    {
+      "file": null,
+      "fileCount": 17,
+      "id": "ensembl-compara",
+      "name": "Ensembl Compara (REST)",
+      "retrievedAt": "2026-10-31T11:41:49+00:00",
+      "status": "ok"
+    },
+    {
+      "file": {
+        "file": "hpo/genes_to_phenotype.extract.tsv",
+        "retrievedAt": "2026-10-31T11:41:50+00:00",
+        "sha256": "507a17bff9c49e6329fbd88b1f91734fa7e9fdea5c06304044c0892eb6ab248c",
+        "url": "https://github.com/obophenotype/human-phenotype-ontology/releases/download/v2026-09-01/genes_to_phenotype.txt"
+      },
+      "fileCount": 1,
+      "id": "hpo-annotations",
+      "name": "Human Phenotype Ontology annotations",
+      "retrievedAt": "2026-10-31T11:41:50+00:00",
+      "status": "ok"
+    }
+  ],
+  "species": [
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "9347",
+          "name": "Eutheria"
+        },
+        {
+          "id": "9443",
+          "name": "Primates"
+        },
+        {
+          "id": "9526",
+          "name": "Catarrhini"
+        },
+        {
+          "id": "9604",
+          "name": "Hominidae"
+        },
+        {
+          "id": "9605",
+          "name": "Homo"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "40674",
+          "name": "Mammalia"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "314146",
+          "name": "Euarchontoglires"
+        },
+        {
+          "id": "376913",
+          "name": "Haplorrhini"
+        }
+      ],
+      "commonName": "Human",
+      "ensembl": "homo_sapiens",
+      "role": "reference",
+      "scientificName": "Homo sapiens",
+      "taxonId": 9606
+    },
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "9347",
+          "name": "Eutheria"
+        },
+        {
+          "id": "9443",
+          "name": "Primates"
+        },
+        {
+          "id": "9526",
+          "name": "Catarrhini"
+        },
+        {
+          "id": "9596",
+          "name": "Pan"
+        },
+        {
+          "id": "9604",
+          "name": "Hominidae"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "40674",
+          "name": "Mammalia"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "314146",
+          "name": "Euarchontoglires"
+        },
+        {
+          "id": "376913",
+          "name": "Haplorrhini"
+        }
+      ],
+      "commonName": "Chimpanzee",
+      "ensembl": "pan_troglodytes",
+      "role": "comparison",
+      "scientificName": "Pan troglodytes",
+      "taxonId": 9598
+    },
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "9347",
+          "name": "Eutheria"
+        },
+        {
+          "id": "9443",
+          "name": "Primates"
+        },
+        {
+          "id": "9526",
+          "name": "Catarrhini"
+        },
+        {
+          "id": "9527",
+          "name": "Cercopithecidae"
+        },
+        {
+          "id": "9528",
+          "name": "Cercopithecinae"
+        },
+        {
+          "id": "9539",
+          "name": "Macaca"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "40674",
+          "name": "Mammalia"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "314146",
+          "name": "Euarchontoglires"
+        },
+        {
+          "id": "376913",
+          "name": "Haplorrhini"
+        }
+      ],
+      "commonName": "Rhesus macaque",
+      "ensembl": "macaca_mulatta",
+      "role": "comparison",
+      "scientificName": "Macaca mulatta",
+      "taxonId": 9544
+    },
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "9347",
+          "name": "Eutheria"
+        },
+        {
+          "id": "9989",
+          "name": "Rodentia"
+        },
+        {
+          "id": "10066",
+          "name": "Muridae"
+        },
+        {
+          "id": "10088",
+          "name": "Mus"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "39107",
+          "name": "Murinae"
+        },
+        {
+          "id": "40674",
+          "name": "Mammalia"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "314146",
+          "name": "Euarchontoglires"
+        },
+        {
+          "id": "314147",
+          "name": "Glires"
+        },
+        {
+          "id": "337687",
+          "name": "Muroidea"
+        },
+        {
+          "id": "1963758",
+          "name": "Myomorpha"
+        }
+      ],
+      "commonName": "Mouse",
+      "ensembl": "mus_musculus",
+      "role": "comparison",
+      "scientificName": "Mus musculus",
+      "taxonId": 10090
+    },
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "9347",
+          "name": "Eutheria"
+        },
+        {
+          "id": "9989",
+          "name": "Rodentia"
+        },
+        {
+          "id": "10066",
+          "name": "Muridae"
+        },
+        {
+          "id": "10114",
+          "name": "Rattus"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "39107",
+          "name": "Murinae"
+        },
+        {
+          "id": "40674",
+          "name": "Mammalia"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "314146",
+          "name": "Euarchontoglires"
+        },
+        {
+          "id": "314147",
+          "name": "Glires"
+        },
+        {
+          "id": "337687",
+          "name": "Muroidea"
+        },
+        {
+          "id": "1963758",
+          "name": "Myomorpha"
+        }
+      ],
+      "commonName": "Rat",
+      "ensembl": "rattus_norvegicus",
+      "role": "comparison",
+      "scientificName": "Rattus norvegicus",
+      "taxonId": 10116
+    },
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "9347",
+          "name": "Eutheria"
+        },
+        {
+          "id": "9608",
+          "name": "Canidae"
+        },
+        {
+          "id": "9611",
+          "name": "Canis"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "33554",
+          "name": "Carnivora"
+        },
+        {
+          "id": "40674",
+          "name": "Mammalia"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "314145",
+          "name": "Laurasiatheria"
+        },
+        {
+          "id": "379584",
+          "name": "Caniformia"
+        }
+      ],
+      "commonName": "Dog",
+      "ensembl": "canis_lupus_familiaris",
+      "role": "comparison",
+      "scientificName": "Canis lupus familiaris",
+      "taxonId": 9615
+    },
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "8492",
+          "name": "Archosauria"
+        },
+        {
+          "id": "8782",
+          "name": "Aves"
+        },
+        {
+          "id": "8825",
+          "name": "Neognathae"
+        },
+        {
+          "id": "8976",
+          "name": "Galliformes"
+        },
+        {
+          "id": "9005",
+          "name": "Phasianidae"
+        },
+        {
+          "id": "9030",
+          "name": "Gallus"
+        },
+        {
+          "id": "9072",
+          "name": "Phasianinae"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "436486",
+          "name": "Dinosauria"
+        },
+        {
+          "id": "436489",
+          "name": "Saurischia"
+        },
+        {
+          "id": "436491",
+          "name": "Theropoda"
+        },
+        {
+          "id": "436492",
+          "name": "Coelurosauria"
+        },
+        {
+          "id": "1329799",
+          "name": "Archelosauria"
+        },
+        {
+          "id": "1549675",
+          "name": "Galloanserae"
+        }
+      ],
+      "commonName": "Chicken",
+      "ensembl": "gallus_gallus",
+      "role": "comparison",
+      "scientificName": "Gallus gallus",
+      "taxonId": 9031
+    },
+    {
+      "ancestors": [
+        {
+          "id": "2759",
+          "name": "Eukaryota"
+        },
+        {
+          "id": "7711",
+          "name": "Chordata"
+        },
+        {
+          "id": "7742",
+          "name": "Vertebrata"
+        },
+        {
+          "id": "7898",
+          "name": "Actinopterygii"
+        },
+        {
+          "id": "7952",
+          "name": "Cypriniformes"
+        },
+        {
+          "id": "7954",
+          "name": "Danio"
+        },
+        {
+          "id": "32443",
+          "name": "Teleostei"
+        },
+        {
+          "id": "32519",
+          "name": "Ostariophysi"
+        },
+        {
+          "id": "33208",
+          "name": "Metazoa"
+        },
+        {
+          "id": "41665",
+          "name": "Neopterygii"
+        },
+        {
+          "id": "89593",
+          "name": "Craniata"
+        },
+        {
+          "id": "117571",
+          "name": "Euteleostomi"
+        },
+        {
+          "id": "2743709",
+          "name": "Danionidae"
+        },
+        {
+          "id": "2743711",
+          "name": "Danioninae"
+        }
+      ],
+      "commonName": "Zebrafish",
+      "ensembl": "danio_rerio",
+      "role": "comparison",
+      "scientificName": "Danio rerio",
+      "taxonId": 7955
+    }
+  ],
+  "tool": "tools/genome-library/capture_library.py"
+}

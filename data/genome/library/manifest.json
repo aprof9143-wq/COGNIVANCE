@@ -1,0 +1,488 @@
+{
+  "capturedAt": "2026-10-31T11:33:49+00:00",
+  "clingenColumns": {
+    "classification": "CLASSIFICATION",
+    "date": "CLASSIFICATION DATE",
+    "diseaseLabel": "DISEASE LABEL",
+    "gcep": "GCEP",
+    "hgncId": "GENE ID (HGNC)",
+    "moi": "MOI",
+    "mondoId": "DISEASE ID (MONDO)",
+    "reportUrl": "ONLINE REPORT",
+    "sop": "SOP",
+    "symbol": "GENE SYMBOL"
+  },
+  "complete": true,
+  "conditions": [
+    {
+      "key": "autism",
+      "label": "Autism spectrum disorder",
+      "match": "\\bautis",
+      "note": "Matches ClinGen disease labels containing 'autis' (autism, autistic). Curations recorded under a named syndrome without that word are not included."
+    },
+    {
+      "key": "alzheimer",
+      "label": "Alzheimer disease",
+      "match": "\\balzheimer",
+      "note": "Matches ClinGen disease labels containing 'alzheimer'."
+    }
+  ],
+  "ensemblReleases": [
+    116
+  ],
+  "files": [
+    {
+      "bytes": 1134370,
+      "file": "clingen_gene_validity.csv",
+      "retrievedAt": "2026-10-31T11:33:51+00:00",
+      "sha256": "4920538f843d2c5b650f5d4cfeffeff1211c4b81ab04d012f0e70aab2594d9c6",
+      "storedBytes": 1134370,
+      "storedSha256": "4920538f843d2c5b650f5d4cfeffeff1211c4b81ab04d012f0e70aab2594d9c6",
+      "url": "https://search.clinicalgenome.org/kb/gene-validity/download"
+    },
+    {
+      "bytes": 4256,
+      "file": "ensembl/homology_ADNP.json",
+      "retrievedAt": "2026-10-31T11:34:17+00:00",
+      "sha256": "8d2579ab7020baab49dc8383011cb1f0646e2e5541947d65de6082619b36a7dd",
+      "storedBytes": 4256,
+      "storedSha256": "8d2579ab7020baab49dc8383011cb1f0646e2e5541947d65de6082619b36a7dd",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000101126?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 3861,
+      "file": "ensembl/homology_AVPR1A.json",
+      "retrievedAt": "2026-10-31T11:34:24+00:00",
+      "sha256": "aeecece24dc6ce4d71acf10bb6ba65fbbddb84ec63d2311e076cc7ee76babd65",
+      "storedBytes": 3861,
+      "storedSha256": "aeecece24dc6ce4d71acf10bb6ba65fbbddb84ec63d2311e076cc7ee76babd65",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000166148?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 3908,
+      "file": "ensembl/homology_CAPRIN1.json",
+      "retrievedAt": "2026-10-31T11:34:48+00:00",
+      "sha256": "2745af6e8d98e7236d781739320295ecb9ed2d741b03f57d9579e305bac2e665",
+      "storedBytes": 3908,
+      "storedSha256": "2745af6e8d98e7236d781739320295ecb9ed2d741b03f57d9579e305bac2e665",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000135387?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 3258,
+      "file": "ensembl/homology_PAX5.json",
+      "retrievedAt": "2026-10-31T11:34:54+00:00",
+      "sha256": "0364c6ca0f353bdcab26f0d986f98c8467f76a95e12ceb9bb624ed3925545c9d",
+      "storedBytes": 3258,
+      "storedSha256": "0364c6ca0f353bdcab26f0d986f98c8467f76a95e12ceb9bb624ed3925545c9d",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000196092?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 3305,
+      "file": "ensembl/homology_SLC6A4.json",
+      "retrievedAt": "2026-10-31T11:35:18+00:00",
+      "sha256": "6b2fabe8b8289665b3d559d2d86377b7d3780efa06cb7608711b57de60fa411e",
+      "storedBytes": 3305,
+      "storedSha256": "6b2fabe8b8289665b3d559d2d86377b7d3780efa06cb7608711b57de60fa411e",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000108576?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 2819,
+      "file": "ensembl/homology_SLC9A9.json",
+      "retrievedAt": "2026-10-31T11:36:47+00:00",
+      "sha256": "13d25b705231708f002f3c14abd35d2706774bd6085d0a54b05f9014670ed253",
+      "storedBytes": 2819,
+      "storedSha256": "13d25b705231708f002f3c14abd35d2706774bd6085d0a54b05f9014670ed253",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000181804?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 4264,
+      "file": "ensembl/homology_TANC2.json",
+      "retrievedAt": "2026-10-31T11:37:11+00:00",
+      "sha256": "fb2cbd23054b63ff51bba215d44e7749b35d59869fb33d56b63b2a2184ea9c53",
+      "storedBytes": 4264,
+      "storedSha256": "fb2cbd23054b63ff51bba215d44e7749b35d59869fb33d56b63b2a2184ea9c53",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000170921?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 3295,
+      "file": "ensembl/homology_TMLHE.json",
+      "retrievedAt": "2026-10-31T11:37:25+00:00",
+      "sha256": "2907772c3869e67f9b267510f8dc3e8e62deca3038160b82b1753a5d72baf223",
+      "storedBytes": 3295,
+      "storedSha256": "2907772c3869e67f9b267510f8dc3e8e62deca3038160b82b1753a5d72baf223",
+      "url": "https://rest.ensembl.org/homology/id/human/ENSG00000185973?content-type=application/json;type=orthologues;sequence=none;format=full;target_species=pan_troglodytes;target_species=macaca_mulatta;target_species=mus_musculus;target_species=rattus_norvegicus;target_species=canis_lupus_familiaris;target_species=gallus_gallus;target_species=danio_rerio"
+    },
+    {
+      "bytes": 18,
+      "file": "ensembl/info_data.json",
+      "retrievedAt": "2026-10-31T11:33:56+00:00",
+      "sha256": "86e87c46ae1a424702676493d024d0508ce60f6c951b0b2803ce10269e09c20c",
+      "storedBytes": 18,
+      "storedSha256": "86e87c46ae1a424702676493d024d0508ce60f6c951b0b2803ce10269e09c20c",
+      "url": "https://rest.ensembl.org/info/data?content-type=application/json"
+    },
+    {
+      "bytes": 10722,
+      "file": "ensembl/taxonomy_10090.json",
+      "retrievedAt": "2026-10-31T11:38:37+00:00",
+      "sha256": "a0e15a514cc9a3429ed490d98eea27bd740df0f5857f710c06f0ccfa556c28b8",
+      "storedBytes": 10722,
+      "storedSha256": "a0e15a514cc9a3429ed490d98eea27bd740df0f5857f710c06f0ccfa556c28b8",
+      "url": "https://rest.ensembl.org/taxonomy/classification/10090?content-type=application/json"
+    },
+    {
+      "bytes": 10981,
+      "file": "ensembl/taxonomy_10116.json",
+      "retrievedAt": "2026-10-31T11:39:40+00:00",
+      "sha256": "6aede0813bf8f3356afbd58d9c698314c14463cfbb36a0bcb18b7b5e74d0cd3e",
+      "storedBytes": 10981,
+      "storedSha256": "6aede0813bf8f3356afbd58d9c698314c14463cfbb36a0bcb18b7b5e74d0cd3e",
+      "url": "https://rest.ensembl.org/taxonomy/classification/10116?content-type=application/json"
+    },
+    {
+      "bytes": 9419,
+      "file": "ensembl/taxonomy_7955.json",
+      "retrievedAt": "2026-10-31T11:41:49+00:00",
+      "sha256": "6dd5fca9df6f7e7142aeb18155fa8f0e1e47b83a87d4bba9dc5a6eab25e08607",
+      "storedBytes": 9419,
+      "storedSha256": "6dd5fca9df6f7e7142aeb18155fa8f0e1e47b83a87d4bba9dc5a6eab25e08607",
+      "url": "https://rest.ensembl.org/taxonomy/classification/7955?content-type=application/json"
+    },
+    {
+      "bytes": 12493,
+      "file": "ensembl/taxonomy_9031.json",
+      "retrievedAt": "2026-10-31T11:40:39+00:00",
+      "sha256": "b4366b23751d9d9e081597266b2923753c1ffec6cb546f82d215a63a7b428809",
+      "storedBytes": 12493,
+      "storedSha256": "b4366b23751d9d9e081597266b2923753c1ffec6cb546f82d215a63a7b428809",
+      "url": "https://rest.ensembl.org/taxonomy/classification/9031?content-type=application/json"
+    },
+    {
+      "bytes": 10838,
+      "file": "ensembl/taxonomy_9544.json",
+      "retrievedAt": "2026-10-31T11:38:09+00:00",
+      "sha256": "94adef5a13633468f733a92d15e797fd176d9a8211c750d6b28e9b4f10cf6c9e",
+      "storedBytes": 10838,
+      "storedSha256": "94adef5a13633468f733a92d15e797fd176d9a8211c750d6b28e9b4f10cf6c9e",
+      "url": "https://rest.ensembl.org/taxonomy/classification/9544?content-type=application/json"
+    },
+    {
+      "bytes": 10151,
+      "file": "ensembl/taxonomy_9598.json",
+      "retrievedAt": "2026-10-31T11:37:49+00:00",
+      "sha256": "437bff5fe4d22548e82054df001942087e3bde3f2e9f7f05d3fdbbde99ca093c",
+      "storedBytes": 10151,
+      "storedSha256": "437bff5fe4d22548e82054df001942087e3bde3f2e9f7f05d3fdbbde99ca093c",
+      "url": "https://rest.ensembl.org/taxonomy/classification/9598?content-type=application/json"
+    },
+    {
+      "bytes": 9995,
+      "file": "ensembl/taxonomy_9606.json",
+      "retrievedAt": "2026-10-31T11:37:43+00:00",
+      "sha256": "9a07696feb8056f0c61d68868497f7a32991a182dce4dfd937222597717c53c1",
+      "storedBytes": 9995,
+      "storedSha256": "9a07696feb8056f0c61d68868497f7a32991a182dce4dfd937222597717c53c1",
+      "url": "https://rest.ensembl.org/taxonomy/classification/9606?content-type=application/json"
+    },
+    {
+      "bytes": 8826,
+      "file": "ensembl/taxonomy_9615.json",
+      "retrievedAt": "2026-10-31T11:40:34+00:00",
+      "sha256": "33e9087d37f4d60161b8177464738f870a45f0b322ed1ae852786c1453228bde",
+      "storedBytes": 8826,
+      "storedSha256": "33e9087d37f4d60161b8177464738f870a45f0b322ed1ae852786c1453228bde",
+      "url": "https://rest.ensembl.org/taxonomy/classification/9615?content-type=application/json"
+    },
+    {
+      "bytes": 264,
+      "file": "hgnc/ADNP.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:51+00:00",
+      "sha256": "50607d274e82ca10b940dcc8cc4b5cf04d971c190d7405ed7415105cd9908d6f",
+      "storedBytes": 264,
+      "storedSha256": "50607d274e82ca10b940dcc8cc4b5cf04d971c190d7405ed7415105cd9908d6f",
+      "url": "https://rest.genenames.org/fetch/symbol/ADNP"
+    },
+    {
+      "bytes": 251,
+      "file": "hgnc/AVPR1A.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:52+00:00",
+      "sha256": "a265900e31347412674ce4e342a521c9ef587ec02bea044fad41ccf40c67ed6c",
+      "storedBytes": 251,
+      "storedSha256": "a265900e31347412674ce4e342a521c9ef587ec02bea044fad41ccf40c67ed6c",
+      "url": "https://rest.genenames.org/fetch/symbol/AVPR1A"
+    },
+    {
+      "bytes": 251,
+      "file": "hgnc/CAPRIN1.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:52+00:00",
+      "sha256": "28a01028cac755410f4970fa69fcf07ee40c5972ab1ccd526c65ad24644b62b1",
+      "storedBytes": 251,
+      "storedSha256": "28a01028cac755410f4970fa69fcf07ee40c5972ab1ccd526c65ad24644b62b1",
+      "url": "https://rest.genenames.org/fetch/symbol/CAPRIN1"
+    },
+    {
+      "bytes": 230,
+      "file": "hgnc/PAX5.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:53+00:00",
+      "sha256": "9c269cbc11caf56e370a5b65d00c391f429db1d3d84eb8464d1948fda9514ee4",
+      "storedBytes": 230,
+      "storedSha256": "9c269cbc11caf56e370a5b65d00c391f429db1d3d84eb8464d1948fda9514ee4",
+      "url": "https://rest.genenames.org/fetch/symbol/PAX5"
+    },
+    {
+      "bytes": 254,
+      "file": "hgnc/SLC6A4.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:53+00:00",
+      "sha256": "57dd727b84f5c9618acd05aadc47626e1bf8139ad566efd3607477a7b6139b95",
+      "storedBytes": 254,
+      "storedSha256": "57dd727b84f5c9618acd05aadc47626e1bf8139ad566efd3607477a7b6139b95",
+      "url": "https://rest.genenames.org/fetch/symbol/SLC6A4"
+    },
+    {
+      "bytes": 254,
+      "file": "hgnc/SLC9A9.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:54+00:00",
+      "sha256": "2ad9c887520cb71ad91bf8c95bc6908f55de662fb27b750672b9162b9bf92955",
+      "storedBytes": 254,
+      "storedSha256": "2ad9c887520cb71ad91bf8c95bc6908f55de662fb27b750672b9162b9bf92955",
+      "url": "https://rest.genenames.org/fetch/symbol/SLC9A9"
+    },
+    {
+      "bytes": 297,
+      "file": "hgnc/TANC2.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:55+00:00",
+      "sha256": "f885dbba0e43e8be5676fcccc5511612d7682641c36b9abe32c62de6647873fb",
+      "storedBytes": 297,
+      "storedSha256": "f885dbba0e43e8be5676fcccc5511612d7682641c36b9abe32c62de6647873fb",
+      "url": "https://rest.genenames.org/fetch/symbol/TANC2"
+    },
+    {
+      "bytes": 255,
+      "file": "hgnc/TMLHE.json",
+      "note": "Fields used",
+      "retrievedAt": "2026-10-31T11:33:55+00:00",
+      "sha256": "9551b2c4fa8d5ac3409a31951f1ffb78d54833e54b1d9e6bf4f89119c0cdd6f0",
+      "storedBytes": 255,
+      "storedSha256": "9551b2c4fa8d5ac3409a31951f1ffb78d54833e54b1d9e6bf4f89119c0cdd6f0",
+      "url": "https://rest.genenames.org/fetch/symbol/TMLHE"
+    },
+    {
+      "bytes": 20821704,
+      "file": "hpo/genes_to_phenotype.extract.tsv",
+      "note": "Rows for library genes only; bytes and sha256 are of the full release file. Columns: ['ncbi_gene_id', 'gene_symbol', 'hpo_id', 'hpo_name', 'frequency', 'disease_id']",
+      "retrievedAt": "2026-10-31T11:41:50+00:00",
+      "sha256": "507a17bff9c49e6329fbd88b1f91734fa7e9fdea5c06304044c0892eb6ab248c",
+      "storedBytes": 17626,
+      "storedSha256": "ccf50c06911c411c16f263365c0ee6db3b021efab82248d9c09b7ba8466dd501",
+      "url": "https://github.com/obophenotype/human-phenotype-ontology/releases/download/v2026-09-01/genes_to_phenotype.txt"
+    }
+  ],
+  "hpoPublished": "2026-09-03T06:08:39Z",
+  "hpoRelease": "v2026-09-01",
+  "libraryVersion": "1.0.0",
+  "note": "Raw responses as received, except: HGNC records are reduced to the fields used, and HPO's annotation file to the rows for library genes (bytes and sha256 describe the full file).",
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "licenceId": "clingen-gene-validity",
+      "status": "ok",
+      "step": "clingen"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "hgnc-rest",
+      "status": "ok",
+      "step": "hgnc"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "ensembl_release"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "homology"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "ensembl-compara",
+      "status": "ok",
+      "step": "taxonomy"
+    },
+    {
+      "licenceId": "hpo-annotations",
+      "status": "ok",
+      "step": "hpo"
+    }
+  ],
+  "species": [
+    {
+      "commonName": "Human",
+      "ensembl": "homo_sapiens",
+      "role": "reference",
+      "scientificName": "Homo sapiens",
+      "taxonId": 9606
+    },
+    {
+      "commonName": "Chimpanzee",
+      "ensembl": "pan_troglodytes",
+      "role": "comparison",
+      "scientificName": "Pan troglodytes",
+      "taxonId": 9598
+    },
+    {
+      "commonName": "Rhesus macaque",
+      "ensembl": "macaca_mulatta",
+      "role": "comparison",
+      "scientificName": "Macaca mulatta",
+      "taxonId": 9544
+    },
+    {
+      "commonName": "Mouse",
+      "ensembl": "mus_musculus",
+      "role": "comparison",
+      "scientificName": "Mus musculus",
+      "taxonId": 10090
+    },
+    {
+      "commonName": "Rat",
+      "ensembl": "rattus_norvegicus",
+      "role": "comparison",
+      "scientificName": "Rattus norvegicus",
+      "taxonId": 10116
+    },
+    {
+      "commonName": "Dog",
+      "ensembl": "canis_lupus_familiaris",
+      "role": "comparison",
+      "scientificName": "Canis lupus familiaris",
+      "taxonId": 9615
+    },
+    {
+      "commonName": "Chicken",
+      "ensembl": "gallus_gallus",
+      "role": "comparison",
+      "scientificName": "Gallus gallus",
+      "taxonId": 9031
+    },
+    {
+      "commonName": "Zebrafish",
+      "ensembl": "danio_rerio",
+      "role": "comparison",
+      "scientificName": "Danio rerio",
+      "taxonId": 7955
+    }
+  ],
+  "tool": "tools/genome-library/capture_library.py"
+}

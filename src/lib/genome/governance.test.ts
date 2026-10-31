@@ -121,11 +121,12 @@ describe("scope boundaries", () => {
     expect(selectableTargets(reg)).toEqual([]);
   });
 
-  it("offers no genomic or clinical data upload on the Genome and Vision pages", () => {
+  it("offers no genomic or clinical data upload on the Genome, Genomics and Vision pages", () => {
     const files = [
       ...walk("src/components/vision"),
-      ...walk("src/routes").filter((p) => /vision/.test(p)),
-    ].filter((p) => p.endsWith(".tsx"));
+      ...walk("src/components/genomics"),
+      ...walk("src/routes").filter((p) => /vision|genomics/.test(p)),
+    ].filter((p) => /\.tsx?$/.test(p));
     expect(files.length).toBeGreaterThan(3);
     for (const p of files) {
       const src = read(p);
@@ -148,10 +149,13 @@ describe("scope boundaries", () => {
     ).toEqual([]);
   });
 
-  it("keeps every record human, and cross-species comparison proposed", () => {
+  it("keeps every gene record human, with other species only as orthologues", () => {
     expect(REGISTRY.genes.every((g) => g.taxonId === 9606)).toBe(true);
+    expect(GOVERNANCE.intendedUse.scope.species.map((s) => s.taxonId)).toEqual([9606]);
     const req = GOVERNANCE.requirements.requirements.find((r) => r.id === "REQ-014")!;
-    expect(req.status).toBe("proposed");
-    expect(GOVERNANCE.intendedUse.speciesCaveats.join(" ")).toMatch(/orthology/);
+    expect(req.status).toBe("implemented");
+    const caveats = GOVERNANCE.intendedUse.speciesCaveats.join(" ");
+    expect(caveats).toMatch(/orthology/i);
+    expect(caveats).toMatch(/never presented as proof of causation/);
   });
 });
