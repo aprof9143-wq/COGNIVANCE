@@ -10,6 +10,10 @@ import {
   baseline,
   cell,
   classificationTone,
+  comparisonSpecies,
+  deviationWords,
+  modelCheck,
+  oneToOneCount,
   curationsFor,
   deviation,
   facets,
@@ -133,7 +137,7 @@ describe("orthology and the comparison baseline", () => {
     expect(b.n).toBe(9);
     expect(b.median).toBe(91.0);
     expect(b.low).toBeLessThan(b.q1);
-    // Zebrafish: one is one-to-many and two report none, leaving 6.
+    // Zebrafish: two genes report none, leaving 7, under the minimum of 8.
     expect(baseline(SAMPLE_LIBRARY, "danio_rerio")).toBeNull();
     expect(MIN_BASELINE_N).toBe(8);
   });
@@ -144,6 +148,35 @@ describe("orthology and the comparison baseline", () => {
     expect(deviation(lib, d, "mus_musculus")).toMatchObject({ kind: "below", value: 71.3 });
     expect(deviation(lib, lib.genes[0]!, "mus_musculus").kind).toBe("within");
     expect(deviation(lib, d, "danio_rerio").kind).toBe("no-baseline");
+  });
+});
+
+describe("comparison set and gene-model checks", () => {
+  it("compares only species with enough one-to-one orthologues, decided by the data", () => {
+    const set = comparisonSpecies(SAMPLE_LIBRARY).map((s) => s.ensembl);
+    expect(set).not.toContain("danio_rerio");
+    expect(set).toContain("mus_musculus");
+    expect(oneToOneCount(SAMPLE_LIBRARY, "danio_rerio")).toBe(7);
+    for (const k of set) expect(baseline(SAMPLE_LIBRARY, k)).not.toBeNull();
+  });
+
+  it("calls an outlier a candidate for review, never an anomaly", () => {
+    const d = deviation(
+      SAMPLE_LIBRARY,
+      SAMPLE_LIBRARY.genes.find((g) => g.symbol === "SAMPLE-D")!,
+      "mus_musculus",
+    );
+    expect(deviationWords(d)).toBe("Candidate for review (lower identity than this set)");
+    expect(deviationWords(d)).not.toMatch(/anomal/i);
+  });
+
+  it("flags aligned proteins whose lengths differ by more than a fifth", () => {
+    const o = structuredClone(SAMPLE_LIBRARY.genes[0]!.orthologues![0]!);
+    expect(modelCheck(o).kind).toBe("not-recorded");
+    o.model = { targetGene: null, targetProteinLength: 240, sourceProteinLength: 391 };
+    expect(modelCheck(o)).toMatchObject({ kind: "length-differs", human: 391, other: 240 });
+    o.model = { targetGene: null, targetProteinLength: 380, sourceProteinLength: 391 };
+    expect(modelCheck(o).kind).toBe("similar-length");
   });
 });
 

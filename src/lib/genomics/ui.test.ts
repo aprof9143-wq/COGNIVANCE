@@ -119,7 +119,9 @@ describe("page states", () => {
     const out = html(
       createElement(BaselineBar, { d: deviation(SAMPLE_LIBRARY, g, "mus_musculus") }),
     );
-    expect(out).toMatch(/aria-label="Below the baseline: 71.3% against a median of 91.0%/);
+    expect(out).toMatch(
+      /aria-label="Candidate for review \(lower identity than this set\): 71.3% against a median of 91.0%/,
+    );
     expect(out).toContain("n=9");
     const none = html(
       createElement(BaselineBar, { d: deviation(SAMPLE_LIBRARY, g, "danio_rerio") }),

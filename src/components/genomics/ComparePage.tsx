@@ -4,14 +4,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   baseline,
   cell,
+  comparisonSpecies,
   deviation,
+  deviationWords,
   leafOrder,
+  modelCheck,
+  oneToOneCount,
   MIN_BASELINE_N,
   orthologyWords,
   speciesTree,
   type TreeNode,
 } from "@/lib/genomics/library";
-import type { Library, LibraryGene, Species } from "@/lib/genomics/schema";
+import type { Library, LibraryGene, Orthologue, Species } from "@/lib/genomics/schema";
 import { BaselineBar } from "./GenePage";
 import { fmtDate, GenomicsFrame, ModeNotice, PageState, Panel, Term, useLibrary } from "./shared";
 
@@ -47,7 +51,10 @@ function Compare({ lib }: { lib: Library }) {
   const [hpo, setHpo] = useState("");
   const [focus, setFocus] = useState<string | null>(null);
   const all = lib.species;
-  const [picked, setPicked] = useState<string[]>(all.map((s) => s.ensembl));
+  const compared = useMemo(() => comparisonSpecies(lib), [lib]);
+  const inSet = (s: Species) => s.role === "reference" || compared.includes(s);
+  // The comparison set by default; species without a baseline can be added, for orthology only.
+  const [picked, setPicked] = useState<string[]>(all.filter(inSet).map((s) => s.ensembl));
   const condId = useId();
   const hpoId = useId();
 
@@ -154,10 +161,10 @@ function Compare({ lib }: { lib: Library }) {
             </div>
             <fieldset>
               <legend className="mb-2 text-[12px] text-[var(--v-ink-3)]">
-                Species (at least two)
+                Comparison set (with a baseline)
               </legend>
               <div className="flex flex-wrap gap-1.5">
-                {all.map((s) => {
+                {all.filter(inSet).map((s) => {
                   const on = picked.includes(s.ensembl);
                   return (
                     <button
@@ -178,6 +185,35 @@ function Compare({ lib }: { lib: Library }) {
                 })}
               </div>
             </fieldset>
+            {all.some((s) => !inSet(s)) && (
+              <fieldset>
+                <legend className="mb-2 text-[12px] text-[var(--v-ink-3)]">
+                  Orthology only: too few one-to-one orthologues for a baseline
+                </legend>
+                <div className="flex flex-wrap gap-1.5">
+                  {all
+                    .filter((s) => !inSet(s))
+                    .map((s) => {
+                      const on = picked.includes(s.ensembl);
+                      return (
+                        <button
+                          key={s.ensembl}
+                          type="button"
+                          aria-pressed={on}
+                          onClick={() => toggle(s.ensembl)}
+                          className={`rounded-full border border-dashed px-3 py-1 text-[12px] font-medium transition-colors ${
+                            on
+                              ? "border-[var(--v-accent)] text-[var(--v-accent-ink)]"
+                              : "border-[var(--v-line)] text-[var(--v-ink-3)]"
+                          }`}
+                        >
+                          {s.commonName} ({oneToOneCount(lib, s.ensembl)} of {lib.genes.length})
+                        </button>
+                      );
+                    })}
+                </div>
+              </fieldset>
+            )}
           </div>
         </Panel>
 
@@ -211,7 +247,23 @@ function Compare({ lib }: { lib: Library }) {
       </div>
 
       <div className="flex min-w-0 flex-col gap-3">
-        {focused && <FocusPanel lib={lib} g={focused} cols={cols} />}
+        <Panel title="Comparison set">
+          <p className="text-[13px] leading-snug text-[var(--v-ink-2)]">
+            {compared.length
+              ? `${compared.map((s) => s.commonName).join(", ")}: the species where this library has at least ${MIN_BASELINE_N} one-to-one orthologues with a reported identity. `
+              : `No species has ${MIN_BASELINE_N} one-to-one orthologues with a reported identity, so nothing is compared with a baseline. `}
+            The set is constrained by what the sources report, not chosen for a result.
+            {all.some((s) => !inSet(s)) &&
+              ` ${all
+                .filter((s) => !inSet(s))
+                .map((s) => `${s.commonName} (${oneToOneCount(lib, s.ensembl)})`)
+                .join(", ")} have fewer and are shown for orthology only.`}
+          </p>
+        </Panel>
+        <Candidates lib={lib} species={compared} genes={genes} />
+        {focused && (
+          <FocusPanel lib={lib} g={focused} cols={cols.filter((c) => compared.includes(c))} />
+        )}
         <Panel title="How to read this">
           <Legend />
           <div className="mt-4 flex flex-col gap-2 text-[12px] leading-snug text-[var(--v-ink-2)]">
@@ -221,11 +273,12 @@ function Compare({ lib }: { lib: Library }) {
               library (at least {MIN_BASELINE_N}). It describes this gene set, not the genome.
             </p>
             <p>
-              <strong className="text-[var(--v-ink)]">Outside the baseline.</strong> Identity beyond
+              <strong className="text-[var(--v-ink)]">Candidate for review.</strong> Identity beyond
               the Tukey fences: more than 1.5 times the interquartile range below the first quartile
-              or above the third. That is a measurable difference, not a biological finding:
-              alignment, gene models and annotation all add uncertainty, and the baseline itself
-              moves as the library changes.
+              or above the third. It marks a pair to check, not a biological anomaly: gene models,
+              alignment and annotation all change identity, and the baseline moves as the library
+              changes. Each candidate shows both proteins' lengths, a first check for a gene-model
+              issue.
             </p>
             <p>
               <strong className="text-[var(--v-ink)]">Tree.</strong> Groups species by the ancestors
@@ -384,7 +437,7 @@ function MatrixCell({ lib, g, s }: { lib: Library; g: LibraryGene; s: Species })
   const out = d.kind === "below" || d.kind === "above";
   const label =
     c.kind === "orthologue"
-      ? `${g.symbol} in ${s.commonName}: ${orthologyWords(c.best.type)} orthologue, ${c.best.percId ?? "unknown"}% identity${out ? `, ${d.kind} the baseline` : ""}`
+      ? `${g.symbol} in ${s.commonName}: ${orthologyWords(c.best.type)} orthologue, ${c.best.percId ?? "unknown"}% identity${out ? ", candidate for review" : ""}`
       : `${g.symbol} in ${s.commonName}: no orthologue reported`;
   return (
     <Popover>
@@ -459,8 +512,9 @@ function Evidence({ lib, g, s }: { lib: Library; g: LibraryGene; s: Species }) {
           <dd>
             {d.kind === "no-baseline" || d.kind === "not-comparable"
               ? d.reason
-              : `${d.kind === "within" ? "Within" : d.kind === "below" ? "Below" : "Above"} this library's spread: median ${d.baseline.median.toFixed(1)}%, middle half ${d.baseline.q1.toFixed(1)}–${d.baseline.q3.toFixed(1)}%, n=${d.baseline.n}.`}
+              : `${deviationWords(d)}. This library's spread: median ${d.baseline.median.toFixed(1)}%, middle half ${d.baseline.q1.toFixed(1)}–${d.baseline.q3.toFixed(1)}%, n=${d.baseline.n}.`}
           </dd>
+          <GeneModel o={c.best} species={s.commonName} />
         </dl>
       ) : (
         <p>
@@ -492,6 +546,105 @@ function Evidence({ lib, g, s }: { lib: Library; g: LibraryGene; s: Species }) {
         </Link>
       </div>
     </div>
+  );
+}
+
+/** The records behind a pair: the other species' gene, and the lengths of both aligned proteins. */
+function GeneModel({ o, species }: { o: Orthologue; species: string }) {
+  const m = modelCheck(o);
+  const gene = o.model?.targetGene;
+  return (
+    <>
+      <dt className="text-muted-foreground">Proteins</dt>
+      <dd>
+        {m.kind === "not-recorded" ? (
+          "Lengths not recorded in this capture."
+        ) : (
+          <>
+            human {m.human} aa, {species.toLowerCase()} {m.other} aa ({Math.round(m.ratio * 100)}%).
+            {m.kind === "length-differs" &&
+              " The lengths differ by more than a fifth, a common sign of an incomplete or different gene model: check it before reading anything into the identity."}
+          </>
+        )}
+      </dd>
+      {gene && (
+        <>
+          <dt className="text-muted-foreground">Gene record</dt>
+          <dd>
+            {[gene.symbol, gene.biotype, gene.assembly, gene.location, gene.source]
+              .filter(Boolean)
+              .join(" · ")}
+          </dd>
+        </>
+      )}
+    </>
+  );
+}
+
+/**
+ * Every pair outside its species baseline, with the checks a reviewer would do
+ * first. Listed so nothing is hidden, and labelled as candidates, not findings.
+ */
+function Candidates({
+  lib,
+  species,
+  genes,
+}: {
+  lib: Library;
+  species: Species[];
+  genes: LibraryGene[];
+}) {
+  const rows = genes.flatMap((g) =>
+    species.flatMap((s) => {
+      const d = deviation(lib, g, s.ensembl);
+      const c = cell(g, s.ensembl);
+      if ((d.kind !== "below" && d.kind !== "above") || c.kind !== "orthologue") return [];
+      return [{ g, s, d, o: c.best, file: g.files.find((f) => f.file.includes("homology")) }];
+    }),
+  );
+  return (
+    <Panel title="Candidates for review">
+      {rows.length === 0 ? (
+        <p className="text-[13px] text-[var(--v-ink-2)]">
+          No pair in the comparison set falls outside its baseline.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {rows.map(({ g, s, d, o, file }) => {
+            const m = modelCheck(o);
+            return (
+              <li
+                key={`${g.symbol}-${s.ensembl}`}
+                className="rounded-2xl bg-[var(--v-soft)] p-3 text-[12px] leading-snug"
+              >
+                <p className="text-[13px] font-medium text-[var(--v-ink)]">
+                  <span className="font-mono">{g.symbol}</span> · {s.commonName}
+                </p>
+                <p className="mt-1 text-[var(--v-ink-2)]">
+                  {o.percId}% identity against a median of {d.baseline.median.toFixed(1)}% (n=
+                  {d.baseline.n}).{" "}
+                  {m.kind === "not-recorded"
+                    ? "Protein lengths not recorded."
+                    : `Proteins: human ${m.human} aa, ${s.commonName.toLowerCase()} ${m.other} aa (${Math.round(m.ratio * 100)}%).`}
+                </p>
+                <p className="mt-1 text-[var(--v-ink-2)]">
+                  {m.kind === "length-differs"
+                    ? "Likely a gene-model issue to check first: the aligned proteins differ in length by more than a fifth."
+                    : m.kind === "similar-length"
+                      ? "The proteins are of similar length, so a gene-model gap is less likely; check the alignment and the orthology call before reading anything into it."
+                      : "Check the gene model and the orthology call before reading anything into it."}
+                </p>
+                <p className="mt-1 font-mono text-[11px] text-[var(--v-ink-3)]">
+                  {o.geneId}
+                  {o.model?.targetGene?.location ? ` · ${o.model.targetGene.location}` : ""}
+                  {file ? ` · retrieved ${fmtDate(file.retrievedAt)}` : ""}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Panel>
   );
 }
 
@@ -618,7 +771,7 @@ function Legend() {
         Not retrieved
       </li>
       <li className="flex items-center gap-2">
-        <span className="h-4 w-6 rounded ring-2 ring-[#c4741a]" aria-hidden /> Outside baseline
+        <span className="h-4 w-6 rounded ring-2 ring-[#c4741a]" aria-hidden /> Candidate for review
       </li>
       <li className="flex items-center gap-2">
         <span className="font-mono">1:n</span> Not one-to-one

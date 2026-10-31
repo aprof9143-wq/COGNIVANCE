@@ -5,13 +5,15 @@ import {
   cell,
   curationsFor,
   deviation,
+  deviationWords,
   hasConflict,
+  modelCheck,
   orthologyWords,
   type Deviation,
 } from "@/lib/genomics/library";
 import { geneExport } from "@/lib/genomics/export";
 import { requestLiveCheck, type LiveCheck } from "@/lib/genomics/live";
-import type { Library, LibraryGene, Species } from "@/lib/genomics/schema";
+import type { Library, LibraryGene, Orthologue, Species } from "@/lib/genomics/schema";
 import {
   Banner,
   ClassChip,
@@ -321,13 +323,30 @@ function OrthoRow({ lib, g, s }: { lib: Library; g: LibraryGene; s: Species }) {
           <span className="text-[var(--v-ink-3)]">None reported</span>
         )}
       </td>
-      <td className="py-2.5 pr-3 font-mono">
-        {c.kind === "orthologue" && c.best.percId !== null ? `${c.best.percId.toFixed(1)}%` : "—"}
+      <td className="py-2.5 pr-3">
+        <span className="font-mono">
+          {c.kind === "orthologue" && c.best.percId !== null ? `${c.best.percId.toFixed(1)}%` : "—"}
+        </span>
+        {c.kind === "orthologue" && <Lengths o={c.best} />}
       </td>
       <td className="py-2.5">
         <BaselineBar d={d} />
       </td>
     </tr>
+  );
+}
+
+/** Both aligned proteins' lengths; a large difference points at the gene model, not biology. */
+function Lengths({ o }: { o: Orthologue }) {
+  const m = modelCheck(o);
+  if (m.kind === "not-recorded") return null;
+  return (
+    <span
+      className={`block text-[11px] ${m.kind === "length-differs" ? "font-medium text-[#b5650d]" : "text-[var(--v-ink-3)]"}`}
+      title="Lengths of the two proteins Ensembl Compara aligned. A difference of more than a fifth often means an incomplete or different gene model."
+    >
+      {m.human} vs {m.other} aa{m.kind === "length-differs" && " · check gene model"}
+    </span>
   );
 }
 
@@ -343,13 +362,15 @@ export function BaselineBar({ d }: { d: Deviation }) {
   const lo = Math.min(b.low, d.value, b.q1) - 2;
   const hi = Math.max(Math.min(b.high, 100), d.value, b.q3) + 2;
   const x = (v: number) => `${((Math.min(Math.max(v, lo), hi) - lo) / (hi - lo)) * 100}%`;
-  const words = { within: "Within", below: "Below", above: "Above" }[d.kind];
+  const words = { within: "Within", below: "Candidate for review", above: "Candidate for review" }[
+    d.kind
+  ];
   return (
     <span className="flex items-center gap-2.5">
       <span
         className="relative block h-3 w-32 shrink-0"
         role="img"
-        aria-label={`${words} the baseline: ${d.value.toFixed(1)}% against a median of ${b.median.toFixed(1)}% (middle half ${b.q1.toFixed(1)} to ${b.q3.toFixed(1)}%, ${b.n} genes)`}
+        aria-label={`${deviationWords(d)}: ${d.value.toFixed(1)}% against a median of ${b.median.toFixed(1)}% (middle half ${b.q1.toFixed(1)} to ${b.q3.toFixed(1)}%, ${b.n} genes)`}
       >
         <span
           className="absolute inset-y-[5px] rounded-full bg-[var(--v-line)]"

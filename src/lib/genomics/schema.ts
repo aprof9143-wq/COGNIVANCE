@@ -64,6 +64,27 @@ export const Orthologue = z.object({
   taxonomyLevel: nstr,
   dnDs: nnum,
   method: nstr,
+  /** The human protein Compara aligned (captures from 2026-10-31 on). */
+  sourceProteinId: nstr.optional(),
+  /** The records behind the pair, from Ensembl lookups, for checking gene models. */
+  model: z
+    .object({
+      targetGene: z
+        .object({
+          id: nstr,
+          version: nnum,
+          symbol: nstr,
+          biotype: nstr,
+          assembly: nstr,
+          location: nstr,
+          source: nstr,
+          description: nstr,
+        })
+        .nullable(),
+      targetProteinLength: nnum,
+      sourceProteinLength: nnum,
+    })
+    .optional(),
 });
 export type Orthologue = z.infer<typeof Orthologue>;
 

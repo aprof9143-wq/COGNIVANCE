@@ -186,6 +186,51 @@ export function baseline(lib: Library, species: string): Baseline | null {
   };
 }
 
+/**
+ * The species the baseline comparison covers: those where the library has at
+ * least MIN_BASELINE_N one-to-one orthologues with a reported identity. It is
+ * decided by the data, so it is constrained by what the sources report.
+ */
+export function comparisonSpecies(lib: Library): Species[] {
+  return lib.species.filter((s) => s.role === "comparison" && baseline(lib, s.ensembl) !== null);
+}
+
+/** How many one-to-one orthologues with an identity a species has, for saying why it is left out. */
+export function oneToOneCount(lib: Library, species: string): number {
+  return lib.genes
+    .flatMap((g) => (g.orthologues ?? []).filter((o) => o.species === species))
+    .filter((o) => o.type === "ortholog_one2one" && o.percId !== null).length;
+}
+
+export type ModelCheck =
+  | { kind: "not-recorded" }
+  | {
+      kind: "similar-length" | "length-differs";
+      human: number;
+      other: number;
+      /** other / human */
+      ratio: number;
+    };
+
+/**
+ * Compare the lengths of the two proteins Compara aligned. A difference of
+ * more than a fifth is a common sign that one gene model is incomplete or
+ * different, which lowers identity without any biological difference. It
+ * flags a pair for checking; it settles nothing.
+ */
+export function modelCheck(o: Orthologue): ModelCheck {
+  const h = o.model?.sourceProteinLength ?? null;
+  const t = o.model?.targetProteinLength ?? null;
+  if (!h || !t) return { kind: "not-recorded" };
+  const ratio = t / h;
+  return {
+    kind: ratio < 0.8 || ratio > 1.25 ? "length-differs" : "similar-length",
+    human: h,
+    other: t,
+    ratio,
+  };
+}
+
 export type Deviation =
   | { kind: "no-baseline"; reason: string }
   | { kind: "not-comparable"; reason: string }
@@ -194,8 +239,8 @@ export type Deviation =
 /**
  * Where one gene's orthologue sits against the species baseline. Only
  * one-to-one orthologues are compared. "below" or "above" means outside the
- * Tukey fences of this gene set: a measurable deviation, not a finding about
- * biology or disease.
+ * Tukey fences of this gene set: a candidate for review, not a finding about
+ * biology or disease (see modelCheck).
  */
 export function deviation(lib: Library, g: LibraryGene, species: string): Deviation {
   const b = baseline(lib, species);
@@ -288,6 +333,14 @@ export const STALE_AFTER_DAYS = 90;
 
 export function ageDays(iso: string, now: Date = new Date()): number {
   return Math.floor((now.getTime() - new Date(iso).getTime()) / 86_400_000);
+}
+
+/** Plain words for a deviation, as every page shows it. */
+export function deviationWords(d: Deviation): string {
+  if (d.kind === "within") return "Within the baseline";
+  if (d.kind === "below") return "Candidate for review (lower identity than this set)";
+  if (d.kind === "above") return "Candidate for review (higher identity than this set)";
+  return d.kind === "no-baseline" ? "No baseline" : "Not compared";
 }
 
 export function isStale(lib: Library, now: Date = new Date()): boolean {
